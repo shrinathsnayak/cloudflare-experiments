@@ -45,7 +45,8 @@ cloudflare-experiments/
 │   ├── website-to-api/
 │   ├── website-to-llms-txt/
 │   ├── url-dns-lookup/
-│   └── ai-bot-visibility/
+│   ├── ai-bot-visibility/
+│   └── r2-storage/
 ├── .cursor/
 │   ├── rules/
 │   └── skills/
@@ -72,6 +73,7 @@ Each experiment is **fully independent** and includes its own `README.md`, `wran
 | [URL DNS Lookup](experiments/url-dns-lookup/) | Get all DNS records (A, AAAA, MX, NS, TXT, etc.) for any URL's hostname | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/url-dns-lookup) |
 | [Website to llms.txt](experiments/website-to-llms-txt/) | Convert any webpage into llms.txt format for LLM consumption | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-to-llms-txt) |
 | [AI Bot Visibility](experiments/ai-bot-visibility/) | Check if a URL is configured to be visible or blocked for AI crawlers (robots.txt + meta) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-bot-visibility) |
+| [R2 Storage](experiments/r2-storage/) | R2 storage API with list/get/put/delete and configurable list options | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/r2-storage) |
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 
@@ -90,7 +92,6 @@ Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinaths
 Additional platform features that may be explored:
 
 - Durable Objects
-- R2
 - D1
 - Queues
 - Turnstile
