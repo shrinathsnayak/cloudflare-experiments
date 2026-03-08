@@ -38,7 +38,6 @@ cloudflare-experiments/
 │   ├── ai-website-summary/
 │   ├── screenshot-api/
 │   ├── github-repo-explainer/
-│   ├── tech-stack-detector/
 │   ├── dependency-analyzer/
 │   ├── is-it-down/
 │   ├── website-metadata-extractor/
@@ -65,7 +64,6 @@ Each experiment is **fully independent** and includes its own `README.md`, `wran
 | [AI Website Summary](experiments/ai-website-summary/) | Summarize any webpage using Workers AI | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-website-summary) |
 | [Screenshot API](experiments/screenshot-api/) | Capture screenshots of any website from the edge (Browser Rendering) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/screenshot-api) |
 | [GitHub Repo Explainer](experiments/github-repo-explainer/) | AI explanation of any GitHub repository from README and key files | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/github-repo-explainer) |
-| [Tech Stack Detector](experiments/tech-stack-detector/) | Detect technologies used by a website | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/tech-stack-detector) |
 | [Dependency Analyzer](experiments/dependency-analyzer/) | Analyze all external resources (scripts, styles, fonts, images) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/dependency-analyzer) |
 | [Is It Down](experiments/is-it-down/) | Check if a website is reachable from Cloudflare's edge | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/is-it-down) |
 | [Website Metadata Extractor](experiments/website-metadata-extractor/) | Extract title, description, Open Graph, canonical from any page | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-metadata-extractor) |
