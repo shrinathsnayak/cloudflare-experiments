@@ -1,0 +1,11 @@
+---
+description: Contract for screenshot-api (route, params, response, browser binding)
+globs: examples/screenshot-api/**/*.ts
+alwaysApply: false
+---
+
+# Screenshot API
+
+- **Route**: `GET /screenshot?url=<url>`. Returns PNG image.
+- **Bindings**: `[browser]` binding = "BROWSER". Uses @cloudflare/puppeteer; nodejs_compat_v2.
+- **Flow**: launch browser, newPage, setViewport, goto, screenshot, close.

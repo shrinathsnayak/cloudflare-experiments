@@ -1,0 +1,11 @@
+---
+description: Contract for global-latency-tester (route, params, response, cf)
+globs: examples/global-latency-tester/**/*.ts
+alwaysApply: false
+---
+
+# Global Latency Tester
+
+- **Route**: `GET /latency?url=<url>`.
+- **Response**: `{ url, latencyMs, colo, statusCode }`. Uses request.cf.colo for edge location.
+- **Bindings**: None.

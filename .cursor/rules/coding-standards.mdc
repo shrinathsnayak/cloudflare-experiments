@@ -1,0 +1,39 @@
+---
+description: Global coding standards for Cloudflare Experiments (TypeScript, errors, responses, validation)
+alwaysApply: true
+---
+
+# Coding Standards
+
+## TypeScript
+
+- Use **strict** TypeScript; no `any` unless justified and typed.
+- Type Worker env in `src/types/env.d.ts` and use `Hono<{ Bindings: Env }>` so routes have typed `c.env`.
+- Define request/response shapes in `src/types/` and import in routes.
+
+## Errors and responses
+
+- **Client errors**: Return `{ error: string, code: string }` via a shared helper. Use `jsonError(c, message, code, status)` from `src/utils/response.ts` with status `400` (bad request) or `404` (not found).
+- **Server/upstream errors**: Use `jsonError(c, message, code, 502)` and log or rethrow in a global handler; do not expose internals in the response body.
+- **Success**: Use `jsonSuccess(c, data)` from `src/utils/response.ts` for JSON responses.
+- **Global handler**: In `src/index.ts`, register `app.onError((err, c) => c.json({ error: err.message, code: "INTERNAL_ERROR" }, 500))` (or equivalent) so uncaught errors return consistent JSON.
+
+Example:
+
+```ts
+// Route: validate → call lib → return
+const url = validateUrl(c.req.query("url"));
+if (!url) return jsonError(c, "Missing or invalid query parameter: url", "INVALID_URL");
+const result = await fetchWithTiming(url);
+return jsonSuccess(c, result);
+```
+
+## URL and input validation
+
+- For any endpoint that takes a `url` query param: validate with a shared `validateUrl(input: string | undefined): string | null` in `src/lib/url.ts`. Allow only `http://` and `https://`; reject empty, malformed, or other schemes.
+- Validate other required query params in the route and return `jsonError` with a clear message and code (e.g. `INVALID_QUERY`, `MISSING_PARAM`) when missing or invalid.
+
+## Conventions
+
+- **Routing**: Hono for routes and middleware. Prefer query params for inputs (e.g. `?url=`, `?q=`); respond with JSON or binary as appropriate.
+- **Naming**: Use descriptive, consistent error codes (e.g. `INVALID_URL`, `FETCH_ERROR`, `INTERNAL_ERROR`). Keep function and file names clear and consistent with the folder structure rules.

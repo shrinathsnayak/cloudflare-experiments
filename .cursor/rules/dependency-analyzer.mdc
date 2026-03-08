@@ -1,0 +1,11 @@
+---
+description: Contract for dependency-analyzer (route, params, response)
+globs: examples/dependency-analyzer/**/*.ts
+alwaysApply: false
+---
+
+# Dependency Analyzer
+
+- **Route**: `GET /analyze?url=<url>`.
+- **Response**: `{ scripts, stylesheets, images, fonts, iframes }` (arrays of URLs).
+- **Bindings**: None.

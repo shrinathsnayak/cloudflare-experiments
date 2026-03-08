@@ -1,0 +1,11 @@
+---
+description: Contract for website-devtools-inspector (route, params, response)
+globs: examples/website-devtools-inspector/**/*.ts
+alwaysApply: false
+---
+
+# Website DevTools Inspector
+
+- **Route**: `GET /devtools?url=<url>`.
+- **Response**: url, statusCode, responseTimeMs, headers, cookies, metadata, scripts, stylesheets, images, links.
+- **Bindings**: None.

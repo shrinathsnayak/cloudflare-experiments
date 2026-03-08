@@ -1,0 +1,11 @@
+---
+description: Contract for website-to-api (route, params, response)
+globs: examples/website-to-api/**/*.ts
+alwaysApply: false
+---
+
+# Website to API
+
+- **Route**: `GET /api?url=<url>`.
+- **Response**: `{ title, headings: [{ level, text }], links, images }`.
+- **Bindings**: None.

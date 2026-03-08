@@ -1,0 +1,12 @@
+---
+description: Contract for is-it-down experiment (route, params, response, bindings)
+globs: examples/is-it-down/**/*.ts
+alwaysApply: false
+---
+
+# Is It Down
+
+- **Route**: `GET /check?url=<url>` (url required, http/https only).
+- **Response**: `{ status: "reachable" | "unreachable", responseTime?, statusCode?, error? }`.
+- **Bindings**: None.
+- **Utils**: `validateUrl`, `fetchWithTiming`; error shape `{ error, code }`.

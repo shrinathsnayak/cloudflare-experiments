@@ -1,0 +1,12 @@
+---
+description: TypeScript details when editing example source (complements coding-standards and folder structure)
+globs: examples/**/*.ts
+alwaysApply: false
+---
+
+# Examples TypeScript
+
+- Follow the global **coding-standards** and **folder structure** rules.
+- Use `type` for request/response shapes in `src/types/`; use `interface` only if you need declaration merging.
+- Import types from `../types/` or `../types/env`; keep route files thin (validate → call lib/utils → return).
+- Do not import from other examples or from repo root; each example is self-contained.

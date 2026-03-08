@@ -1,0 +1,6 @@
+{
+  "name": "is-it-down",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "vars": {}
+}

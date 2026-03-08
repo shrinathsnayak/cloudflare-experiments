@@ -1,0 +1,11 @@
+---
+description: Contract for github-repo-explainer (route, params, response, AI binding)
+globs: examples/github-repo-explainer/**/*.ts
+alwaysApply: false
+---
+
+# GitHub Repo Explainer
+
+- **Route**: `GET /repo?url=<github repo url>`.
+- **Response**: `{ summary, mainTechnologies[], howItWorks, keyFeatures[], projectStructure, gettingStarted, notableDependencies[], useCases[] }`. Fetches README + prioritized root files (e.g. package.json) via GitHub API, then Workers AI for detailed explanation.
+- **Bindings**: `[ai]` binding = "AI".

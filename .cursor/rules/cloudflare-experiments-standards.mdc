@@ -1,0 +1,55 @@
+---
+description: Repo philosophy and folder structure for Cloudflare Experiments
+alwaysApply: true
+---
+
+# Cloudflare Experiments Standards
+
+## Philosophy
+
+- **Edge-first**: Experiments run on Cloudflare Workers at the edge.
+- **Stateless**: Prefer fetch + in-memory processing; avoid KV/D1/R2 unless the experiment explicitly needs them.
+- **Under 60 seconds**: Each request path should complete within ~60 seconds.
+- **Single responsibility**: Each example demonstrates one specific Cloudflare capability.
+
+## Folder Structure
+
+Every experiment lives under `examples/<name>/`. Use this layout only; do not add extra top-level dirs (e.g. no `app/`, `server/`).
+
+### Required layout
+
+```
+examples/<name>/
+├── src/
+│   ├── index.ts          # Entry: Hono app, mount routes, export default { fetch: app.fetch }
+│   ├── routes/           # Route handlers only (one file per route or logical group)
+│   ├── lib/              # Domain helpers (e.g. fetch, url validation, parsing)
+│   ├── utils/            # Generic helpers (response helpers, formatters)
+│   ├── constants/        # Constants and config (optional)
+│   └── types/            # All types; env in env.d.ts
+├── package.json
+├── wrangler.toml         # Or wrangler.json; bindings declared here
+├── tsconfig.json
+└── README.md
+```
+
+### Directory purposes
+
+| Directory | Purpose | Do not put here |
+|-----------|---------|-----------------|
+| `src/routes/` | Route handlers; thin layer that validate input, call lib/utils, return response | Business logic, types |
+| `src/lib/` | Domain logic: fetch wrappers, URL validation, HTML/API parsing | Response formatting, Hono helpers |
+| `src/utils/` | Shared helpers: `jsonError`, `jsonSuccess`, small pure helpers | Domain-specific logic |
+| `src/constants/` | Literals, config (e.g. model names, timeouts) | Types |
+| `src/types/` | All `type`/`interface`; `env.d.ts` for Worker bindings | Implementation |
+
+### File naming
+
+- **Routes**: `kebab-case.ts` matching the path (e.g. `check.ts` for `/check`, `screenshot.ts` for `/screenshot`).
+- **Types**: `env.d.ts` for bindings; other files named by domain (e.g. `check.ts`, `api.ts`).
+- **Lib/utils**: `url.ts`, `fetch.ts`, `response.ts` — one concern per file.
+
+### Config and isolation
+
+- Use **wrangler.toml** (or wrangler.json) per example; declare bindings there and type them in `src/types/env.d.ts`.
+- **No shared code between examples**: Each example is a standalone package with its own `package.json` and dependencies. Do not import from other examples or from repo root.

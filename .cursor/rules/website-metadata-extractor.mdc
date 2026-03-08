@@ -1,0 +1,11 @@
+---
+description: Contract for website-metadata-extractor (route, params, response)
+globs: examples/website-metadata-extractor/**/*.ts
+alwaysApply: false
+---
+
+# Website Metadata Extractor
+
+- **Route**: `GET /metadata?url=<url>`.
+- **Response**: `{ title, description, canonical, og: { ... } }`.
+- **Bindings**: None. Uses fetch + HTML parsing (regex).

@@ -1,0 +1,9 @@
+{
+  "name": "screenshot-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-11-01",
+  "compatibility_flags": ["nodejs_compat_v2"],
+  "browser": {
+    "binding": "BROWSER"
+  }
+}

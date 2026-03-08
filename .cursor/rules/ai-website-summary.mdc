@@ -1,0 +1,11 @@
+---
+description: Contract for ai-website-summary (route, params, response, AI binding)
+globs: examples/ai-website-summary/**/*.ts
+alwaysApply: false
+---
+
+# AI Website Summary
+
+- **Route**: `GET /summary?url=<url>`.
+- **Response**: `{ title, summary }`. Uses Workers AI to summarize body text.
+- **Bindings**: `[ai]` binding = "AI". Model in constants (e.g. llama-3.1-8b-instruct).

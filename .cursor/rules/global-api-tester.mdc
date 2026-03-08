@@ -1,0 +1,11 @@
+---
+description: Contract for global-api-tester (route, params, response)
+globs: examples/global-api-tester/**/*.ts
+alwaysApply: false
+---
+
+# Global API Tester
+
+- **Route**: `GET /test?url=<url>`.
+- **Response**: `{ status, latency, ok, error? }`.
+- **Bindings**: None.
