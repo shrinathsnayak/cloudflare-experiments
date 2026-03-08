@@ -42,8 +42,6 @@ cloudflare-experiments/
 │   ├── dependency-analyzer/
 │   ├── is-it-down/
 │   ├── website-metadata-extractor/
-│   ├── global-latency-tester/
-│   ├── global-api-tester/
 │   ├── website-devtools-inspector/
 │   ├── website-to-api/
 │   ├── website-to-llms-txt/
@@ -71,8 +69,6 @@ Each experiment is **fully independent** and includes its own `README.md`, `wran
 | [Dependency Analyzer](experiments/dependency-analyzer/) | Analyze all external resources (scripts, styles, fonts, images) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/dependency-analyzer) |
 | [Is It Down](experiments/is-it-down/) | Check if a website is reachable from Cloudflare's edge | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/is-it-down) |
 | [Website Metadata Extractor](experiments/website-metadata-extractor/) | Extract title, description, Open Graph, canonical from any page | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-metadata-extractor) |
-| [Global Latency Tester](experiments/global-latency-tester/) | Measure response time from the edge (and by colo) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/global-latency-tester) |
-| [Global API Tester](experiments/global-api-tester/) | Test API endpoints from Cloudflare's global edge | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/global-api-tester) |
 | [Website DevTools Inspector](experiments/website-devtools-inspector/) | DevTools-style inspection: headers, cookies, scripts, assets | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-devtools-inspector) |
 | [Website to API](experiments/website-to-api/) | Turn any webpage into structured JSON (title, headings, links, images) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-to-api) |
 | [URL DNS Lookup](experiments/url-dns-lookup/) | Get all DNS records (A, AAAA, MX, NS, TXT, etc.) for any URL's hostname | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/url-dns-lookup) |
