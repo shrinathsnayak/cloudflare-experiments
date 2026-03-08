@@ -1,6 +1,6 @@
 ---
 description: Contract for is-it-down experiment (route, params, response, bindings)
-globs: examples/is-it-down/**/*.ts
+globs: experiments/is-it-down/**/*.ts
 alwaysApply: false
 ---
 

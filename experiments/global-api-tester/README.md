@@ -33,7 +33,7 @@ GET /test?url=https://api.example.com
 ## Run locally
 
 ```bash
-cd examples/global-api-tester
+cd experiments/global-api-tester
 npm install
 npm run dev
 ```
@@ -42,7 +42,7 @@ Then: `http://localhost:8787/test?url=https://api.example.com`
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/global-api-tester)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/global-api-tester)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

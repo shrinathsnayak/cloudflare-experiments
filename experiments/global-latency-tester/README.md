@@ -80,7 +80,7 @@ How many colos you see depends on how Cloudflare routes the self-checks. For eve
 ## Run locally
 
 ```bash
-cd examples/global-latency-tester
+cd experiments/global-latency-tester
 npm install
 npm run dev
 ```
@@ -89,7 +89,7 @@ Then: `http://localhost:8787/latency?url=https://www.cloudflare.com` or `http://
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/global-latency-tester)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/global-latency-tester)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

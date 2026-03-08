@@ -29,7 +29,7 @@ GET /screenshot?url=https://www.cloudflare.com
 ## Run locally
 
 ```bash
-cd examples/screenshot-api
+cd experiments/screenshot-api
 npm install
 npm run dev
 ```
@@ -40,7 +40,7 @@ Then: `http://localhost:8787/screenshot?url=https://www.cloudflare.com`
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/screenshot-api)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/screenshot-api)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

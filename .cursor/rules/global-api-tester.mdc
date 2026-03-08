@@ -1,6 +1,6 @@
 ---
 description: Contract for global-api-tester (route, params, response)
-globs: examples/global-api-tester/**/*.ts
+globs: experiments/global-api-tester/**/*.ts
 alwaysApply: false
 ---
 

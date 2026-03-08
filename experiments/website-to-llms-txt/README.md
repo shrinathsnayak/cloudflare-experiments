@@ -45,7 +45,7 @@ The output follows the llms.txt convention: H1 (site/title), blockquote (descrip
 ## Run locally
 
 ```bash
-cd examples/website-to-llms-txt
+cd experiments/website-to-llms-txt
 npm install
 npm run dev
 ```
@@ -54,7 +54,7 @@ Then: `http://localhost:8787/llms.txt?url=https://www.cloudflare.com`
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/website-to-llms-txt)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-to-llms-txt)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

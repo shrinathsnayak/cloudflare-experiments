@@ -33,7 +33,7 @@ GET /summary?url=https://www.cloudflare.com
 ## Run locally
 
 ```bash
-cd examples/ai-website-summary
+cd experiments/ai-website-summary
 npm install
 npm run dev
 ```
@@ -44,7 +44,7 @@ Requires a Cloudflare account with Workers AI enabled.
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/ai-website-summary)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-website-summary)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

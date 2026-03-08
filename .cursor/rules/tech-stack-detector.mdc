@@ -1,6 +1,6 @@
 ---
 description: Contract for tech-stack-detector (route, params, response)
-globs: examples/tech-stack-detector/**/*.ts
+globs: experiments/tech-stack-detector/**/*.ts
 alwaysApply: false
 ---
 

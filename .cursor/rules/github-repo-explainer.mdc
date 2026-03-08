@@ -1,6 +1,6 @@
 ---
 description: Contract for github-repo-explainer (route, params, response, AI binding)
-globs: examples/github-repo-explainer/**/*.ts
+globs: experiments/github-repo-explainer/**/*.ts
 alwaysApply: false
 ---
 

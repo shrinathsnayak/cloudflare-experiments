@@ -1,6 +1,6 @@
 ---
 description: Contract for website-to-api (route, params, response)
-globs: examples/website-to-api/**/*.ts
+globs: experiments/website-to-api/**/*.ts
 alwaysApply: false
 ---
 

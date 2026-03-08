@@ -10,16 +10,16 @@ alwaysApply: true
 - **Edge-first**: Experiments run on Cloudflare Workers at the edge.
 - **Stateless**: Prefer fetch + in-memory processing; avoid KV/D1/R2 unless the experiment explicitly needs them.
 - **Under 60 seconds**: Each request path should complete within ~60 seconds.
-- **Single responsibility**: Each example demonstrates one specific Cloudflare capability.
+- **Single responsibility**: Each experiment demonstrates one specific Cloudflare capability.
 
 ## Folder Structure
 
-Every experiment lives under `examples/<name>/`. Use this layout only; do not add extra top-level dirs (e.g. no `app/`, `server/`).
+Every experiment lives under `experiments/<name>/`. Use this layout only; do not add extra top-level dirs (e.g. no `app/`, `server/`).
 
 ### Required layout
 
 ```
-examples/<name>/
+experiments/<name>/
 ├── src/
 │   ├── index.ts          # Entry: Hono app, mount routes, export default { fetch: app.fetch }
 │   ├── routes/           # Route handlers only (one file per route or logical group)
@@ -51,5 +51,5 @@ examples/<name>/
 
 ### Config and isolation
 
-- Use **wrangler.toml** (or wrangler.json) per example; declare bindings there and type them in `src/types/env.d.ts`.
-- **No shared code between examples**: Each example is a standalone package with its own `package.json` and dependencies. Do not import from other examples or from repo root.
+- Use **wrangler.toml** (or wrangler.json) per experiment; declare bindings there and type them in `src/types/env.d.ts`.
+- **No shared code between experiments**: Each experiment is a standalone package with its own `package.json` and dependencies. Do not import from other experiments or from repo root.

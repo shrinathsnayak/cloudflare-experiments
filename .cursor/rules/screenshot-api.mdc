@@ -1,6 +1,6 @@
 ---
 description: Contract for screenshot-api (route, params, response, browser binding)
-globs: examples/screenshot-api/**/*.ts
+globs: experiments/screenshot-api/**/*.ts
 alwaysApply: false
 ---
 

@@ -41,7 +41,7 @@ GET /metadata?url=https://www.cloudflare.com
 ## Run locally
 
 ```bash
-cd examples/website-metadata-extractor
+cd experiments/website-metadata-extractor
 npm install
 npm run dev
 ```
@@ -50,7 +50,7 @@ Then: `http://localhost:8787/metadata?url=https://www.cloudflare.com`
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/website-metadata-extractor)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-metadata-extractor)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

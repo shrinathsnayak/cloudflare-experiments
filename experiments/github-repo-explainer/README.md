@@ -39,7 +39,7 @@ GET /repo?url=https://github.com/cloudflare/workers-sdk
 ## Run locally
 
 ```bash
-cd examples/github-repo-explainer
+cd experiments/github-repo-explainer
 npm install
 npm run dev
 ```
@@ -50,7 +50,7 @@ Requires a Cloudflare account with Workers AI enabled. GitHub API is used withou
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/github-repo-explainer)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/github-repo-explainer)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

@@ -1,6 +1,6 @@
 ---
 description: Contract for website-metadata-extractor (route, params, response)
-globs: examples/website-metadata-extractor/**/*.ts
+globs: experiments/website-metadata-extractor/**/*.ts
 alwaysApply: false
 ---
 

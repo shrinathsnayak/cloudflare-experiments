@@ -1,6 +1,6 @@
 ---
 description: Contract for website-devtools-inspector (route, params, response)
-globs: examples/website-devtools-inspector/**/*.ts
+globs: experiments/website-devtools-inspector/**/*.ts
 alwaysApply: false
 ---
 

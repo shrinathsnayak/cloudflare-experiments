@@ -35,7 +35,7 @@ GET /api?url=https://www.cloudflare.com
 ## Run locally
 
 ```bash
-cd examples/website-to-api
+cd experiments/website-to-api
 npm install
 npm run dev
 ```
@@ -44,7 +44,7 @@ Then: `http://localhost:8787/api?url=https://www.cloudflare.com`
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/website-to-api)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-to-api)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

@@ -36,7 +36,7 @@ GET /analyze?url=https://www.cloudflare.com
 ## Run locally
 
 ```bash
-cd examples/dependency-analyzer
+cd experiments/dependency-analyzer
 npm install
 npm run dev
 ```
@@ -45,7 +45,7 @@ Then: `http://localhost:8787/analyze?url=https://www.cloudflare.com`
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/dependency-analyzer)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/dependency-analyzer)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

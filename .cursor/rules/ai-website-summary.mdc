@@ -1,6 +1,6 @@
 ---
 description: Contract for ai-website-summary (route, params, response, AI binding)
-globs: examples/ai-website-summary/**/*.ts
+globs: experiments/ai-website-summary/**/*.ts
 alwaysApply: false
 ---
 

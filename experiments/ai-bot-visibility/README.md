@@ -56,7 +56,7 @@ GET /check?url=https://www.cloudflare.com
 ## Run locally
 
 ```bash
-cd examples/ai-bot-visibility
+cd experiments/ai-bot-visibility
 npm install
 npm run dev
 ```
@@ -65,7 +65,7 @@ Then open: `http://localhost:8787/check?url=https://www.cloudflare.com`
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/ai-bot-visibility)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-bot-visibility)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

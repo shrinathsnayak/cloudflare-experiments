@@ -1,6 +1,6 @@
 ---
 description: Contract for global-latency-tester (route, params, response, cf)
-globs: examples/global-latency-tester/**/*.ts
+globs: experiments/global-latency-tester/**/*.ts
 alwaysApply: false
 ---
 

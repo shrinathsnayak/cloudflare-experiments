@@ -34,7 +34,7 @@ Every experiment demonstrates **practical capabilities of the Cloudflare platfor
 
 ```
 cloudflare-experiments/
-├── examples/
+├── experiments/
 │   ├── ai-website-summary/
 │   ├── screenshot-api/
 │   ├── github-repo-explainer/
@@ -56,7 +56,7 @@ cloudflare-experiments/
 └── LICENSE
 ```
 
-Each example is **fully independent** and includes its own `README.md`, `wrangler.json`, `package.json`, and `src/`. Each can be deployed individually.
+Each experiment is **fully independent** and includes its own `README.md`, `wrangler.json`, `package.json`, and `src/`. Each can be deployed individually.
 
 ---
 
@@ -64,20 +64,20 @@ Each example is **fully independent** and includes its own `README.md`, `wrangle
 
 | Experiment | Description | Deploy |
 |------------|-------------|--------|
-| [AI Website Summary](examples/ai-website-summary/) | Summarize any webpage using Workers AI | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/ai-website-summary) |
-| [Screenshot API](examples/screenshot-api/) | Capture screenshots of any website from the edge (Browser Rendering) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/screenshot-api) |
-| [GitHub Repo Explainer](examples/github-repo-explainer/) | AI explanation of any GitHub repository from README and key files | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/github-repo-explainer) |
-| [Tech Stack Detector](examples/tech-stack-detector/) | Detect technologies used by a website | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/tech-stack-detector) |
-| [Dependency Analyzer](examples/dependency-analyzer/) | Analyze all external resources (scripts, styles, fonts, images) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/dependency-analyzer) |
-| [Is It Down](examples/is-it-down/) | Check if a website is reachable from Cloudflare's edge | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/is-it-down) |
-| [Website Metadata Extractor](examples/website-metadata-extractor/) | Extract title, description, Open Graph, canonical from any page | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/website-metadata-extractor) |
-| [Global Latency Tester](examples/global-latency-tester/) | Measure response time from the edge (and by colo) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/global-latency-tester) |
-| [Global API Tester](examples/global-api-tester/) | Test API endpoints from Cloudflare's global edge | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/global-api-tester) |
-| [Website DevTools Inspector](examples/website-devtools-inspector/) | DevTools-style inspection: headers, cookies, scripts, assets | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/website-devtools-inspector) |
-| [Website to API](examples/website-to-api/) | Turn any webpage into structured JSON (title, headings, links, images) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/website-to-api) |
-| [URL DNS Lookup](examples/url-dns-lookup/) | Get all DNS records (A, AAAA, MX, NS, TXT, etc.) for any URL's hostname | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/url-dns-lookup) |
-| [Website to llms.txt](examples/website-to-llms-txt/) | Convert any webpage into llms.txt format for LLM consumption | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/website-to-llms-txt) |
-| [AI Bot Visibility](examples/ai-bot-visibility/) | Check if a URL is configured to be visible or blocked for AI crawlers (robots.txt + meta) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/examples/ai-bot-visibility) |
+| [AI Website Summary](experiments/ai-website-summary/) | Summarize any webpage using Workers AI | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-website-summary) |
+| [Screenshot API](experiments/screenshot-api/) | Capture screenshots of any website from the edge (Browser Rendering) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/screenshot-api) |
+| [GitHub Repo Explainer](experiments/github-repo-explainer/) | AI explanation of any GitHub repository from README and key files | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/github-repo-explainer) |
+| [Tech Stack Detector](experiments/tech-stack-detector/) | Detect technologies used by a website | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/tech-stack-detector) |
+| [Dependency Analyzer](experiments/dependency-analyzer/) | Analyze all external resources (scripts, styles, fonts, images) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/dependency-analyzer) |
+| [Is It Down](experiments/is-it-down/) | Check if a website is reachable from Cloudflare's edge | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/is-it-down) |
+| [Website Metadata Extractor](experiments/website-metadata-extractor/) | Extract title, description, Open Graph, canonical from any page | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-metadata-extractor) |
+| [Global Latency Tester](experiments/global-latency-tester/) | Measure response time from the edge (and by colo) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/global-latency-tester) |
+| [Global API Tester](experiments/global-api-tester/) | Test API endpoints from Cloudflare's global edge | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/global-api-tester) |
+| [Website DevTools Inspector](experiments/website-devtools-inspector/) | DevTools-style inspection: headers, cookies, scripts, assets | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-devtools-inspector) |
+| [Website to API](experiments/website-to-api/) | Turn any webpage into structured JSON (title, headings, links, images) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-to-api) |
+| [URL DNS Lookup](experiments/url-dns-lookup/) | Get all DNS records (A, AAAA, MX, NS, TXT, etc.) for any URL's hostname | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/url-dns-lookup) |
+| [Website to llms.txt](experiments/website-to-llms-txt/) | Convert any webpage into llms.txt format for LLM consumption | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-to-llms-txt) |
+| [AI Bot Visibility](experiments/ai-bot-visibility/) | Check if a URL is configured to be visible or blocked for AI crawlers (robots.txt + meta) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-bot-visibility) |
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 
@@ -85,9 +85,9 @@ Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinaths
 
 ## Key Features
 
-- **Independent deployments**: Every example includes a Cloudflare Deploy Button; deploy a single experiment without touching the others.
+- **Independent deployments**: Every experiment includes a Cloudflare Deploy Button; deploy a single experiment without touching the others.
 - **Stateless first**: Most experiments use edge compute, fetch, and HTML parsing—no persistent storage.
-- **Single responsibility**: Each example demonstrates one specific Cloudflare capability.
+- **Single responsibility**: Each experiment demonstrates one specific Cloudflare capability.
 
 ---
 
