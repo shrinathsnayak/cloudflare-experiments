@@ -75,7 +75,7 @@ npm run dev
 Then:
 
 ```bash
-curl -X POST http://localhost:8787/shorten -H "Content-Type: application/json" -d '{"url":"https://example.com"}'
+curl -X POST http://localhost:8787/shorten -H "Content-Type: application/json" -d '{"url":"https://cloudflare.com"}'
 curl -I http://localhost:8787/<code>
 ```
 

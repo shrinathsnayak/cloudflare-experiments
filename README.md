@@ -36,6 +36,7 @@ Every experiment demonstrates **practical capabilities of the Cloudflare platfor
 cloudflare-experiments/
 ├── experiments/
 │   ├── ai-website-summary/
+│   ├── ai-website-tag-generator/
 │   ├── screenshot-api/
 │   ├── github-repo-explainer/
 │   ├── dependency-analyzer/
@@ -49,7 +50,8 @@ cloudflare-experiments/
 │   ├── cloud-ai-proxy/
 │   ├── r2-storage/
 │   ├── whereami/
-│   └── link-shortener/
+│   ├── link-shortener/
+│   └── edge-redirect-simulator/
 ├── .cursor/
 │   ├── rules/
 │   └── skills/
@@ -66,6 +68,7 @@ Each experiment is **fully independent** and includes its own `README.md`, `wran
 | Experiment                                                            | Description                                                                               | Deploy                                                                                                                                                         |
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [AI Website Summary](experiments/ai-website-summary/)                 | Summarize any webpage using Workers AI                                                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-website-summary)         |
+| [AI Website Tag Generator](experiments/ai-website-tag-generator/)     | Generate topic tags for any website using Workers AI                                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-website-tag-generator)   |
 | [Screenshot API](experiments/screenshot-api/)                         | Capture screenshots of any website from the edge (Browser Rendering)                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/screenshot-api)             |
 | [GitHub Repo Explainer](experiments/github-repo-explainer/)           | AI explanation of any GitHub repository from README and key files                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/github-repo-explainer)      |
 | [Dependency Analyzer](experiments/dependency-analyzer/)               | Analyze all external resources (scripts, styles, fonts, images)                           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/dependency-analyzer)        |
@@ -80,6 +83,7 @@ Each experiment is **fully independent** and includes its own `README.md`, `wran
 | [R2 Storage](experiments/r2-storage/)                                 | R2 storage API with list/get/put/delete and configurable list options                     | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/r2-storage)                 |
 | [Where Am I](experiments/whereami/)                                   | Request metadata from Cloudflare's edge (request.cf geolocation, colo)                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/whereami)                   |
 | [Link Shortener](experiments/link-shortener/)                         | Shorten URLs and redirect with D1 (POST /shorten, GET /:code)                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/link-shortener)             |
+| [Edge Redirect Simulator](experiments/edge-redirect-simulator/)       | Show redirect chains for any URL (each hop and status code)                               | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/edge-redirect-simulator)    |
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

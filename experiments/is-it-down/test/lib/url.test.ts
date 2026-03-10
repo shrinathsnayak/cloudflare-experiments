@@ -23,12 +23,12 @@ describe("validateUrl", () => {
   });
 
   it("returns normalized URL for valid https", () => {
-    expect(validateUrl("https://example.com")).toBe("https://example.com/");
-    expect(validateUrl("https://example.com?q=1")).toBe("https://example.com/?q=1");
+    expect(validateUrl("https://cloudflare.com")).toBe("https://cloudflare.com/");
+    expect(validateUrl("https://cloudflare.com?q=1")).toBe("https://cloudflare.com/?q=1");
   });
 
   it("trims whitespace", () => {
-    expect(validateUrl("  https://example.com  ")).toBe("https://example.com/");
+    expect(validateUrl("  https://cloudflare.com  ")).toBe("https://cloudflare.com/");
   });
 
   it("returns null for invalid URL", () => {

@@ -26,7 +26,9 @@ describe("GET /check", () => {
   });
 
   it("returns 200 with reachable status when url is valid", async () => {
-    const res = await worker.fetch(new Request("http://localhost/check?url=https://example.com"));
+    const res = await worker.fetch(
+      new Request("http://localhost/check?url=https://cloudflare.com")
+    );
     expect(res.status).toBe(200);
     const body = (await res.json()) as {
       status: string;
