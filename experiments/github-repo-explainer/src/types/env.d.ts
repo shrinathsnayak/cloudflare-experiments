@@ -5,5 +5,8 @@ export interface Env {
 }
 
 interface Ai {
-  run(model: string, options: { prompt?: string; max_tokens?: number }): Promise<{ response?: string; result?: string }>;
+  run(
+    model: string,
+    options: { prompt?: string; max_tokens?: number }
+  ): Promise<{ response?: string; result?: string }>;
 }

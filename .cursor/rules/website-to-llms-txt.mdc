@@ -1,0 +1,12 @@
+---
+description: Contract for website-to-llms-txt (route, params, response, bindings)
+globs: experiments/website-to-llms-txt/**/*.ts
+alwaysApply: false
+---
+
+# Website to llms.txt
+
+- **Route**: `GET /llms.txt?url=<url>` (url required, http/https only).
+- **Response**: `Content-Type: text/plain`; body is llms.txt-style (title, description, Key Information links, Contact).
+- **Bindings**: None.
+- **Utils**: `validateUrl`, fetch + HTML parse; error shape `{ error, code }` for 400/502.

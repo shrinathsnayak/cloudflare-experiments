@@ -32,7 +32,8 @@ function extractImages(html: string): string[] {
 function extractFonts(html: string): string[] {
   const urls: string[] = [];
   let m: RegExpExecArray | null;
-  const re = /<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:preload|stylesheet)["'][^>]+as=["']font["']/gi;
+  const re =
+    /<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:preload|stylesheet)["'][^>]+as=["']font["']/gi;
   while ((m = re.exec(html)) !== null) urls.push(m[1].trim());
   const re2 = /url\(["']?([^"')]+\.(?:woff2?|ttf|otf|eot))["']?\)/gi;
   while ((m = re2.exec(html)) !== null) urls.push(m[1].trim());

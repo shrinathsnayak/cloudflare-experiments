@@ -9,8 +9,7 @@ import {
   fillCrawlerSpecificBlocks,
 } from "./page-signals";
 
-const DISCLAIMER =
-  "Configuration only; we cannot verify actual index inclusion in any AI product.";
+const DISCLAIMER = "Configuration only; we cannot verify actual index inclusion in any AI product.";
 
 /**
  * Combines robots.txt rules and page-level signals into a single visibility response.

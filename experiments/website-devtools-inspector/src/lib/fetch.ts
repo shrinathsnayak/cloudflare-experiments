@@ -27,7 +27,9 @@ export async function fetchPage(url: string): Promise<FetchResult> {
     const text = await res.text();
     const html = text.length > MAX_HTML_BYTES ? text.slice(0, MAX_HTML_BYTES) : text;
     const headers: Record<string, string> = {};
-    res.headers.forEach((v, k) => { headers[k.toLowerCase()] = v; });
+    res.headers.forEach((v, k) => {
+      headers[k.toLowerCase()] = v;
+    });
     const setCookie = res.headers.get("set-cookie");
     const cookies = setCookie ? setCookie.split(",").map((s) => s.trim()) : [];
     return { html, headers, statusCode: res.status, responseTimeMs, cookies };

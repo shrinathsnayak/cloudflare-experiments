@@ -22,8 +22,9 @@ function getTitle(html: string): string | null {
 }
 
 function getCanonical(html: string): string | null {
-  const m = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i)
-    || html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i);
+  const m =
+    html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["']/i) ||
+    html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["']/i);
   return m ? m[1].trim() : null;
 }
 

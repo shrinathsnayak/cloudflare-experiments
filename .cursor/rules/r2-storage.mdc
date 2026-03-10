@@ -1,0 +1,12 @@
+---
+description: Contract for r2-storage (list/object routes, R2 bindings, public/private buckets)
+globs: experiments/r2-storage/**/*.ts
+alwaysApply: false
+---
+
+# R2 Storage
+
+- **Routes**: `GET /list` (prefix, limit, cursor, delimiter, public); `GET /object`, `HEAD /object`, `PUT /object`, `DELETE /object` (key, optional public).
+- **Response**: List returns objects/cursor; object GET/HEAD returns body/headers; PUT returns `{ key, uploaded, url? }` (url when public + PUBLIC_BUCKET_URL).
+- **Bindings**: R2 (BUCKET, PUBLIC_BUCKET); var `PUBLIC_BUCKET_URL` for public object URLs.
+- **Utils**: `jsonError`, `jsonSuccess`; validate `key` for object routes.

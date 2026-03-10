@@ -11,7 +11,10 @@ export function getBucket(env: Env, publicBucket: string | undefined): R2Bucket 
 export function getPublicUrl(env: Env, key: string, usePublicBucket: boolean): string | undefined {
   if (!usePublicBucket || !env.PUBLIC_BUCKET_URL) return undefined;
   const base = env.PUBLIC_BUCKET_URL.replace(/\/$/, "");
-  const path = key.split("/").map((s) => encodeURIComponent(s)).join("/");
+  const path = key
+    .split("/")
+    .map((s) => encodeURIComponent(s))
+    .join("/");
   return `${base}/${path}`;
 }
 

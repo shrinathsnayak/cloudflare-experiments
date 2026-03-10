@@ -6,9 +6,9 @@ Given a GitHub repo URL, the worker fetches its README and key files and generat
 
 ### `GET /repo`
 
-| Query | Required | Description |
-|-------|----------|-------------|
-| `url` | Yes | GitHub repo URL (e.g. https://github.com/user/project) |
+| Query | Required | Description                                            |
+| ----- | -------- | ------------------------------------------------------ |
+| `url` | Yes      | GitHub repo URL (e.g. https://github.com/user/project) |
 
 **Example**
 

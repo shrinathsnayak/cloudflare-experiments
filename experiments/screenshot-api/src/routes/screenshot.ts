@@ -31,7 +31,12 @@ app.get("/screenshot", async (c) => {
       },
     });
   } catch (e) {
-    if (browser) try { await browser.close(); } catch { /* ignore */ }
+    if (browser)
+      try {
+        await browser.close();
+      } catch {
+        /* ignore */
+      }
     const message = e instanceof Error ? e.message : "Screenshot failed";
     return jsonError(c, message, "SCREENSHOT_ERROR", 502);
   }

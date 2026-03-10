@@ -1,0 +1,12 @@
+---
+description: Contract for ai-bot-visibility (route, params, response, bindings)
+globs: experiments/ai-bot-visibility/**/*.ts
+alwaysApply: false
+---
+
+# AI Bot Visibility
+
+- **Route**: `GET /check?url=<url>` (url required, http/https only).
+- **Response**: `{ url, disclaimer, crawlers[], summary: { allowed[], blocked[], notSpecified[] } }`. Reports per-crawler status (allowed, blocked, not_specified) from robots.txt and page-level signals.
+- **Bindings**: None.
+- **Utils**: `validateUrl`, fetch of page and robots.txt; error shape `{ error, code }`.

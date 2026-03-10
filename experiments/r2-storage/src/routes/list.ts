@@ -23,12 +23,7 @@ app.get("/list", async (c) => {
   if (rawLimit !== undefined) {
     const n = parseInt(rawLimit, 10);
     if (Number.isNaN(n) || n < 1 || n > LIST_MAX_KEYS) {
-      return jsonError(
-        c,
-        `limit must be between 1 and ${LIST_MAX_KEYS}`,
-        "INVALID_QUERY",
-        400
-      );
+      return jsonError(c, `limit must be between 1 and ${LIST_MAX_KEYS}`, "INVALID_QUERY", 400);
     }
     limit = n;
   }
@@ -48,7 +43,8 @@ app.get("/list", async (c) => {
       size: o.size,
       etag: o.etag,
       uploaded: o.uploaded.toISOString(),
-      ...(o.customMetadata && Object.keys(o.customMetadata).length > 0 && { customMetadata: o.customMetadata }),
+      ...(o.customMetadata &&
+        Object.keys(o.customMetadata).length > 0 && { customMetadata: o.customMetadata }),
     })),
     truncated: result.truncated,
     ...(result.truncated && result.cursor && { cursor: result.cursor }),

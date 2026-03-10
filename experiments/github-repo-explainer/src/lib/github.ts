@@ -2,8 +2,9 @@ import { GITHUB_API_BASE, FETCH_TIMEOUT_MS, MAX_CONTENT_CHARS } from "../constan
 
 export function parseRepoUrl(input: string): { owner: string; repo: string } | null {
   const trimmed = (input || "").trim();
-  const match = trimmed.match(/github\.com[/]([^/]+)[/]([^/]+?)(?:\.git)?[/]?$/i)
-    || trimmed.match(/^([^/]+)[/]([^/]+)$/);
+  const match =
+    trimmed.match(/github\.com[/]([^/]+)[/]([^/]+?)(?:\.git)?[/]?$/i) ||
+    trimmed.match(/^([^/]+)[/]([^/]+)$/);
   if (!match) return null;
   const owner = match[1].replace(/\.git$/, "");
   const repo = match[2].replace(/\.git$/, "");
@@ -46,8 +47,16 @@ export async function fetchRepoContent(owner: string, repo: string): Promise<Rep
   if (!treeRes.ok) return { readme, files: [] };
 
   const priorityNames = [
-    "package.json", "package-lock.json", "Cargo.toml", "pyproject.toml", "go.mod",
-    "tsconfig.json", "vite.config.ts", "vite.config.js", "next.config.js", "next.config.mjs",
+    "package.json",
+    "package-lock.json",
+    "Cargo.toml",
+    "pyproject.toml",
+    "go.mod",
+    "tsconfig.json",
+    "vite.config.ts",
+    "vite.config.js",
+    "next.config.js",
+    "next.config.mjs",
   ];
   const tree = (await treeRes.json()) as Array<{ name: string; type: string }>;
   const allFiles = tree.filter((f) => f.type === "file");

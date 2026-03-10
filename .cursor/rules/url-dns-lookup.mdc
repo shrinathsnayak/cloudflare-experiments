@@ -1,0 +1,12 @@
+---
+description: Contract for url-dns-lookup (route, params, response, bindings)
+globs: experiments/url-dns-lookup/**/*.ts
+alwaysApply: false
+---
+
+# URL DNS Lookup
+
+- **Route**: `GET /dns?url=<url>` (url required, http/https). Hostname is extracted and resolved via DoH.
+- **Response**: `{ hostname, records: { A?, AAAA?, CNAME?, MX?, NS?, TXT?, SOA?, CAA? } }`. Each record has name, type, ttl, data.
+- **Bindings**: None. Uses Cloudflare DoH API.
+- **Utils**: `validateUrl`, extract hostname; error shape `{ error, code }`.

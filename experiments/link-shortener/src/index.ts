@@ -9,7 +9,7 @@ app.get("/", (c) => {
   return c.json({
     name: "link-shortener",
     description: "Shorten URLs and redirect with D1 (primary) and KV (read cache)",
-    usage: "POST /shorten with { \"url\": \"...\" }, GET /:code to redirect",
+    usage: 'POST /shorten with { "url": "..." }, GET /:code to redirect',
   });
 });
 

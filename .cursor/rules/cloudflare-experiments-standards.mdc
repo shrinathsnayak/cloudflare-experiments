@@ -27,21 +27,32 @@ experiments/<name>/
 │   ├── utils/            # Generic helpers (response helpers, formatters)
 │   ├── constants/        # Constants and config (optional)
 │   └── types/            # All types; env in env.d.ts
-├── package.json
-├── wrangler.toml         # Or wrangler.json; bindings declared here
-├── tsconfig.json
+├── test/                 # Required: Vitest tests (smoke + unit/route tests as needed)
+│   ├── smoke.test.ts     # At least one smoke test (GET / returns 200 + app info)
+│   └── ...               # Optional: test/lib/*.test.ts, test/routes/*.test.ts
+├── vitest.config.ts      # Required when adding a new experiment
+├── package.json          # Must include "test": "vitest run", "test:watch": "vitest", devDep "vitest"
+├── wrangler.json         # Or wrangler.json; bindings declared here
+├── tsconfig.json         # Include "test/**/*.ts" in include
 └── README.md
 ```
 
+### New experiments: test and Prettier (main rule)
+
+When creating or scaffolding a **new experiment**, always:
+
+1. **Test setup**: Include a `test/` directory with Vitest (`vitest.config.ts`, `test` and `test:watch` scripts in `package.json`, devDependency `vitest`). Add at least `test/smoke.test.ts` that asserts `GET /` returns 200 and JSON with `name` and `description`. Add unit tests for `src/lib/` and `src/utils/` and route tests via `worker.fetch(new Request(...))` as needed; mock external or binding-dependent code with `vi.mock(...)`.
+2. **Prettier**: Use the **repo root** Prettier config only. Run `npm run format` (and `npm run format:check`) from the repository root; do not add a separate `.prettierrc` or Prettier config inside the experiment. New experiment code must be formatted with root Prettier before commit/PR.
+
 ### Directory purposes
 
-| Directory | Purpose | Do not put here |
-|-----------|---------|-----------------|
-| `src/routes/` | Route handlers; thin layer that validate input, call lib/utils, return response | Business logic, types |
-| `src/lib/` | Domain logic: fetch wrappers, URL validation, HTML/API parsing | Response formatting, Hono helpers |
-| `src/utils/` | Shared helpers: `jsonError`, `jsonSuccess`, small pure helpers | Domain-specific logic |
-| `src/constants/` | Literals, config (e.g. model names, timeouts) | Types |
-| `src/types/` | All `type`/`interface`; `env.d.ts` for Worker bindings | Implementation |
+| Directory        | Purpose                                                                         | Do not put here                   |
+| ---------------- | ------------------------------------------------------------------------------- | --------------------------------- |
+| `src/routes/`    | Route handlers; thin layer that validate input, call lib/utils, return response | Business logic, types             |
+| `src/lib/`       | Domain logic: fetch wrappers, URL validation, HTML/API parsing                  | Response formatting, Hono helpers |
+| `src/utils/`     | Shared helpers: `jsonError`, `jsonSuccess`, small pure helpers                  | Domain-specific logic             |
+| `src/constants/` | Literals, config (e.g. model names, timeouts)                                   | Types                             |
+| `src/types/`     | All `type`/`interface`; `env.d.ts` for Worker bindings                          | Implementation                    |
 
 ### File naming
 
@@ -51,5 +62,5 @@ experiments/<name>/
 
 ### Config and isolation
 
-- Use **wrangler.toml** (or wrangler.json) per experiment; declare bindings there and type them in `src/types/env.d.ts`.
+- Use **wrangler.json** per experiment; declare bindings there and type them in `src/types/env.d.ts`.
 - **No shared code between experiments**: Each experiment is a standalone package with its own `package.json` and dependencies. Do not import from other experiments or from repo root.

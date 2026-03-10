@@ -1,0 +1,12 @@
+---
+description: Contract for whereami (route, response, request.cf)
+globs: experiments/whereami/**/*.ts
+alwaysApply: false
+---
+
+# Where Am I
+
+- **Route**: `GET /whereami` (no query params).
+- **Response**: JSON from `request.cf` (country, city, region, timezone, colo, asn, etc.).
+- **Bindings**: None. Uses incoming request's `cf` object only.
+- **Utils**: `jsonSuccess`; no external fetch.

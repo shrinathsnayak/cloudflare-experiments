@@ -1,0 +1,12 @@
+---
+description: Contract for link-shortener (routes, params, response, D1/KV bindings)
+globs: experiments/link-shortener/**/*.ts
+alwaysApply: false
+---
+
+# Link Shortener
+
+- **Routes**: `POST /shorten` (body `{ url }`); `GET /:code` (redirect 302 or 404).
+- **Response (shorten)**: `{ code, url }`. D1 primary; KV read-through cache for redirects.
+- **Bindings**: D1 database, KV namespace (LINKS_CACHE).
+- **Utils**: `jsonError`, `jsonSuccess`; validate URL in body for POST.

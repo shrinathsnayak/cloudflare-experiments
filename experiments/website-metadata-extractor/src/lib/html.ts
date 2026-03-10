@@ -1,14 +1,5 @@
 import type { MetadataResponse } from "../types/metadata";
 
-function getAttr(html: string, tag: string, attr: string): string | null {
-  const re = new RegExp(
-    `<${tag}[^>]+${attr}=["']([^"']+)["']`,
-    "i"
-  );
-  const m = html.match(re);
-  return m ? m[1].trim() : null;
-}
-
 function getMetaContent(html: string, nameOrProperty: string, useProperty = false): string | null {
   const attr = useProperty ? "property" : "name";
   const re = new RegExp(
@@ -51,7 +42,8 @@ export function extractMetadata(html: string): MetadataResponse {
 
   return {
     title: getTitle(fragment),
-    description: getMetaContent(fragment, "description") ?? getMetaContent(fragment, "og:description", true),
+    description:
+      getMetaContent(fragment, "description") ?? getMetaContent(fragment, "og:description", true),
     canonical: getCanonical(fragment),
     og,
   };

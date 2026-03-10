@@ -5,5 +5,12 @@ export interface Env {
 }
 
 interface Ai {
-  run(model: string, options: { prompt?: string; messages?: Array<{ role: string; content: string }>; max_tokens?: number }): Promise<{ response?: string; result?: string }>;
+  run(
+    model: string,
+    options: {
+      prompt?: string;
+      messages?: Array<{ role: string; content: string }>;
+      max_tokens?: number;
+    }
+  ): Promise<{ response?: string; result?: string }>;
 }

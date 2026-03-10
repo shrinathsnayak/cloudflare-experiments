@@ -12,8 +12,8 @@ Minimal URL shortener using Cloudflare D1 (primary) and KV (read cache). Shorten
 
 ### `POST /shorten`
 
-| Body (JSON) | Required | Description        |
-| ----------- | -------- | ------------------ |
+| Body (JSON) | Required | Description           |
+| ----------- | -------- | --------------------- |
 | `url`       | Yes      | Long URL (http/https) |
 
 **Example**
@@ -62,7 +62,6 @@ Redirects to the stored URL. Returns `404` with `{ error, code: "NOT_FOUND" }` i
    Put the returned `id` in `wrangler.json` under `kv_namespaces[0].id` (replace the placeholder `00000000000000000000000000000000`). For local dev you can use the same id or create a preview namespace with `npx wrangler kv namespace create LINKS_CACHE --preview` and set `preview_id` in that entry.
 
 4. Apply migrations:
-
    - Local: `npm run db:migrate:local`
    - Remote: `npm run db:migrate`
 

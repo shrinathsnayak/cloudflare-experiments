@@ -4,7 +4,10 @@ import { MAX_LINKS_IN_LLMS_TXT } from "../constants/defaults";
 export type KeyLink = { text: string; href: string };
 
 function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  return html
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function oneLine(s: string): string {
@@ -18,17 +21,15 @@ function getTitle(html: string): string | null {
 
 function getDescription(html: string): string | null {
   const fragment = html.match(/<head[^>]*>([\s\S]*?)<\/head>/i)?.[1] ?? html;
-  const metaDesc = fragment.match(
-    /<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i
-  )?.[1] ?? fragment.match(
-    /<meta[^>]+content=["']([^"']*)["'][^>]+name=["']description["']/i
-  )?.[1];
+  const metaDesc =
+    fragment.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i)?.[1] ??
+    fragment.match(/<meta[^>]+content=["']([^"']*)["'][^>]+name=["']description["']/i)?.[1];
   if (metaDesc) return oneLine(metaDesc);
-  const ogDesc = fragment.match(
-    /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']*)["']/i
-  )?.[1] ?? fragment.match(
-    /<meta[^>]+content=["']([^"']*)["'][^>]+property=["']og:description["']/i
-  )?.[1];
+  const ogDesc =
+    fragment.match(
+      /<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']*)["']/i
+    )?.[1] ??
+    fragment.match(/<meta[^>]+content=["']([^"']*)["'][^>]+property=["']og:description["']/i)?.[1];
   return ogDesc ? oneLine(ogDesc) : null;
 }
 
@@ -41,7 +42,13 @@ function extractLinksWithText(html: string): LinkEntry[] {
   let m: RegExpExecArray | null;
   while ((m = re.exec(html)) !== null && out.length < MAX_LINKS_IN_LLMS_TXT) {
     const href = m[1].trim();
-    if (!href || href.startsWith("#") || href.startsWith("javascript:") || href.startsWith("mailto:")) continue;
+    if (
+      !href ||
+      href.startsWith("#") ||
+      href.startsWith("javascript:") ||
+      href.startsWith("mailto:")
+    )
+      continue;
     const text = stripHtml(m[2]) || href;
     const key = href.toLowerCase();
     if (seen.has(key)) continue;
@@ -110,7 +117,10 @@ export function buildLlmsTxt(
 /**
  * Extracts title, description, in-page links, and mailtos from HTML.
  */
-export function extractFromHtml(html: string, baseUrl: string): {
+export function extractFromHtml(
+  html: string,
+  baseUrl: string
+): {
   title: string | null;
   description: string | null;
   links: KeyLink[];

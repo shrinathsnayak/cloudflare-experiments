@@ -35,7 +35,8 @@ app.get("/object", async (c) => {
       size: object.size,
       etag: object.etag,
       uploaded: object.uploaded.toISOString(),
-      ...(object.customMetadata && Object.keys(object.customMetadata).length > 0 && { customMetadata: object.customMetadata }),
+      ...(object.customMetadata &&
+        Object.keys(object.customMetadata).length > 0 && { customMetadata: object.customMetadata }),
       ...(object.httpMetadata && { httpMetadata: object.httpMetadata }),
     };
     return jsonSuccess(c, response);

@@ -1,8 +1,4 @@
-import {
-  FETCH_TIMEOUT_MS,
-  MAX_HTML_BYTES,
-  MAX_ROBOTS_BYTES,
-} from "../constants/defaults";
+import { FETCH_TIMEOUT_MS, MAX_HTML_BYTES, MAX_ROBOTS_BYTES } from "../constants/defaults";
 
 const USER_AGENT = "Cloudflare-Experiments-AiBotVisibility/1.0";
 
@@ -31,8 +27,7 @@ export async function fetchPage(url: string): Promise<PageFetchResult> {
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
-    const html =
-      text.length > MAX_HTML_BYTES ? text.slice(0, MAX_HTML_BYTES) : text;
+    const html = text.length > MAX_HTML_BYTES ? text.slice(0, MAX_HTML_BYTES) : text;
     const headers: Record<string, string> = {};
     res.headers.forEach((v, k) => {
       headers[k.toLowerCase()] = v;
@@ -60,9 +55,7 @@ export async function fetchRobotsTxt(origin: string): Promise<string | null> {
     clearTimeout(timeoutId);
     if (!res.ok) return null;
     const text = await res.text();
-    return text.length > MAX_ROBOTS_BYTES
-      ? text.slice(0, MAX_ROBOTS_BYTES)
-      : text;
+    return text.length > MAX_ROBOTS_BYTES ? text.slice(0, MAX_ROBOTS_BYTES) : text;
   } catch {
     clearTimeout(timeoutId);
     return null;

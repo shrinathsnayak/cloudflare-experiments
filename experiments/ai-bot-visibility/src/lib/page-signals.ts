@@ -8,16 +8,10 @@ const BLOCK_TOKENS = ["noindex", "noai", "none"];
  */
 function getMetaContent(html: string, name: string): string | null {
   const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const re = new RegExp(
-    `<meta[^>]+name=["']${escaped}["'][^>]+content=["']([^"']*)["']`,
-    "i"
-  );
+  const re = new RegExp(`<meta[^>]+name=["']${escaped}["'][^>]+content=["']([^"']*)["']`, "i");
   let m = html.match(re);
   if (m) return m[1].trim() || null;
-  const re2 = new RegExp(
-    `<meta[^>]+content=["']([^"']*)["'][^>]+name=["']${escaped}["']`,
-    "i"
-  );
+  const re2 = new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]+name=["']${escaped}["']`, "i");
   m = html.match(re2);
   return m ? m[1].trim() || null : null;
 }
@@ -71,10 +65,7 @@ export function getPageRobotSignals(
  * If blockAll is true, all crawlers are considered blocked; otherwise only
  * those in blockedCrawlers (from crawler-specific meta) are blocked.
  */
-export function isCrawlerBlockedByPage(
-  signals: PageRobotSignals,
-  crawlerId: string
-): boolean {
+export function isCrawlerBlockedByPage(signals: PageRobotSignals, crawlerId: string): boolean {
   if (signals.blockAll) return true;
   const key = crawlerId.toLowerCase();
   return signals.blockedCrawlers.has(key);

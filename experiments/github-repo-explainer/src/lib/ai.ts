@@ -10,7 +10,9 @@ function ensureString(v: unknown, fallback: string): string {
 
 function ensureStringArray(v: unknown): string[] {
   if (!Array.isArray(v)) return [];
-  return v.filter((x): x is string => typeof x === "string" && x.trim().length > 0).map((x) => x.trim());
+  return v
+    .filter((x): x is string => typeof x === "string" && x.trim().length > 0)
+    .map((x) => x.trim());
 }
 
 /** Extract JSON string from model output that may include markdown or prose. */
@@ -23,11 +25,18 @@ function extractJson(raw: string): string {
   return candidate;
 }
 
-export async function explainRepo(env: Env, owner: string, repo: string, content: RepoContent): Promise<RepoExplainerResponse> {
+export async function explainRepo(
+  env: Env,
+  owner: string,
+  repo: string,
+  content: RepoContent
+): Promise<RepoExplainerResponse> {
   const context = [
     content.readme ? `## README\n${content.readme}` : "",
     ...content.files.map((f) => `## ${f.path}\n${f.content}`),
-  ].filter(Boolean).join("\n\n---\n\n");
+  ]
+    .filter(Boolean)
+    .join("\n\n---\n\n");
 
   const prompt = `You are a technical explainer. Analyze the following content from the GitHub repo "${owner}/${repo}" (README and key files).
 
@@ -54,7 +63,8 @@ Use exactly these keys (all required):
 Content:\n${context.slice(0, 22000)}`;
 
   const out = await env.AI.run(AI_MODEL, { prompt, max_tokens: AI_MAX_TOKENS });
-  const raw = (out as { response?: string }).response ?? (out as { result?: string }).result ?? "{}";
+  const raw =
+    (out as { response?: string }).response ?? (out as { result?: string }).result ?? "{}";
   const extracted = extractJson(raw);
   let parsed: Record<string, unknown>;
   try {

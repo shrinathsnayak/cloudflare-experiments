@@ -15,20 +15,37 @@ Thank you for your interest in contributing. This document explains how to propo
 ## Development Setup
 
 1. **Fork and clone** the repository.
-2. **Install dependencies** per experiment:
+2. **Install root tooling** (Prettier & ESLint, once per clone):
+   ```bash
+   npm install
+   ```
+3. **Install dependencies** per experiment:
    ```bash
    cd experiments/<experiment-name>
    npm install
    ```
-3. **Run locally** (per experiment):
+4. **Run locally** (per experiment):
    ```bash
    npm run dev
    # or: npx wrangler dev
    ```
-4. **Lint/type-check** (if the experiment has scripts):
+5. **Format and lint** (from repo root):
    ```bash
-   npm run lint
+   npm run format        # format with Prettier
+   npm run format:check  # check formatting only
+   npm run lint          # run ESLint
+   npm run lint:fix      # run ESLint with auto-fix
+   ```
+6. **Type-check** (per experiment):
+   ```bash
+   cd experiments/<experiment-name>
    npm run build
+   ```
+7. **Run tests** (each experiment has a `test/` directory and Vitest):
+   ```bash
+   cd experiments/<experiment-name>
+   npm run test        # run once
+   npm run test:watch  # watch mode
    ```
 
 ---
@@ -63,7 +80,7 @@ experiments/<name>/
 │   ├── constants/        # Optional config/literals
 │   └── types/            # All types; env in env.d.ts
 ├── package.json
-├── wrangler.toml         # or wrangler.json; bindings here
+├── wrangler.json         # or wrangler.json; bindings here
 ├── tsconfig.json
 └── README.md
 ```
@@ -71,6 +88,7 @@ experiments/<name>/
 - **No shared code between experiments**: Each experiment is standalone with its own `package.json` and dependencies. Do not import from other experiments or the repo root.
 - **Single responsibility**: One experiment = one Cloudflare capability (e.g. Workers AI, Browser Rendering, D1).
 - **Edge-first, under ~60 seconds**: Prefer stateless, fast request paths.
+- **Tests**: Each experiment has a `test/` directory. Use [Vitest](https://vitest.dev/); add unit tests for `src/lib/` and `src/utils/`, and route tests via the worker’s `fetch` (e.g. `worker.fetch(new Request("http://localhost/check?url=..."))`). Mock external or binding-dependent code in route tests (e.g. `vi.mock("../../src/lib/fetch", ...)`).
 
 ### TypeScript and API style
 
@@ -86,11 +104,14 @@ experiments/<name>/
 ## Adding a New Experiment
 
 1. Open an issue using the [Experiment idea](.github/ISSUE_TEMPLATE/experiment_idea.md) template to align with maintainers.
-2. Create `experiments/<name>/` with the structure above. You can use an existing experiment (e.g. `is-it-down` or `whereami`) as a reference.
-3. Implement the Worker (Hono app, routes, lib, utils, types). Declare bindings in `wrangler.toml`/`wrangler.json` and in `src/types/env.d.ts`.
-4. Add a **README.md** in the experiment folder (description, usage, deploy button if applicable).
-5. Add a row to the **experiments table** in the root **README.md** and, if applicable, a Deploy link.
-6. Submit a PR with a clear description and link to the experiment idea issue.
+2. Create `experiments/<name>/` with the structure in [Experiment structure](#experiment-structure). Copy an existing experiment (e.g. `is-it-down` or `whereami`) as a starting point.
+3. **Rule: test and Prettier.** Every new experiment must include:
+   - A **test/** directory with Vitest (`vitest.config.ts`, `test` / `test:watch` scripts in `package.json`, and at least a smoke test).
+   - Code formatted with **Prettier** from the repo root before submitting (`npm run format`).
+4. Implement the Worker (Hono app, routes, lib, utils, types). Declare bindings in `wrangler.json`/`wrangler.json` and in `src/types/env.d.ts`.
+5. Add a **README.md** in the experiment folder (description, usage, deploy button if applicable).
+6. Add a row to the **experiments table** in the root **README.md** and, if applicable, a Deploy link.
+7. Submit a PR with a clear description and link to the experiment idea issue.
 
 ---
 

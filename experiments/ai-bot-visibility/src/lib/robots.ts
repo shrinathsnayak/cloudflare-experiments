@@ -43,12 +43,7 @@ export function parseRobotsTxt(content: string): RobotsRules {
   return rules;
 }
 
-function appendRule(
-  rules: RobotsRules,
-  ua: string,
-  path: string,
-  allow: boolean
-): void {
+function appendRule(rules: RobotsRules, ua: string, path: string, allow: boolean): void {
   const list = rules.get(ua) ?? [];
   list.push({ path, allow });
   rules.set(ua, list);
@@ -84,7 +79,9 @@ export function isAllowedByRobots(
       pathNormalized === rulePath ||
       (rulePath.length > 0 &&
         pathNormalized.startsWith(rulePath) &&
-        (rulePath.endsWith("/") || pathNormalized.length === rulePath.length || pathNormalized[rulePath.length] === "/"));
+        (rulePath.endsWith("/") ||
+          pathNormalized.length === rulePath.length ||
+          pathNormalized[rulePath.length] === "/"));
     if (!matches) continue;
     const len = rulePath.length;
     if (len > bestLength) {
