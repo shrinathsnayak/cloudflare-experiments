@@ -46,7 +46,9 @@ cloudflare-experiments/
 │   ├── website-to-llms-txt/
 │   ├── url-dns-lookup/
 │   ├── ai-bot-visibility/
-│   └── r2-storage/
+│   ├── r2-storage/
+│   ├── whereami/
+│   └── link-shortener/
 ├── .cursor/
 │   ├── rules/
 │   └── skills/
@@ -74,8 +76,22 @@ Each experiment is **fully independent** and includes its own `README.md`, `wran
 | [Website to llms.txt](experiments/website-to-llms-txt/) | Convert any webpage into llms.txt format for LLM consumption | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/website-to-llms-txt) |
 | [AI Bot Visibility](experiments/ai-bot-visibility/) | Check if a URL is configured to be visible or blocked for AI crawlers (robots.txt + meta) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-bot-visibility) |
 | [R2 Storage](experiments/r2-storage/) | R2 storage API with list/get/put/delete and configurable list options | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/r2-storage) |
+| [Where Am I](experiments/whereami/) | Request metadata from Cloudflare's edge (request.cf geolocation, colo) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/whereami) |
+| [Link Shortener](experiments/link-shortener/) | Shorten URLs and redirect with D1 (POST /shorten, GET /:code) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/link-shortener) |
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
+
+---
+
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
+
+- How to submit **bug reports** and **pull requests**
+- **Code and structure standards** (experiment layout, TypeScript, errors, validation)
+- How to **propose or add a new experiment**
+
+By participating, you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
@@ -92,9 +108,7 @@ Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinaths
 Additional platform features that may be explored:
 
 - Durable Objects
-- D1
 - Queues
-- Turnstile
 - Images API
 - Email Workers
 - Vectorize

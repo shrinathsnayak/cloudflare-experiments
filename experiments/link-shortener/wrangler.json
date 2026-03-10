@@ -1,0 +1,24 @@
+{
+  "name": "link-shortener",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "link-shortener-db",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "LINKS_CACHE",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}
