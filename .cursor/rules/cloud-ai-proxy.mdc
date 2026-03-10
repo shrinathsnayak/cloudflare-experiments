@@ -1,0 +1,11 @@
+---
+description: Contract for cloud-ai-proxy (routes, params, response, AI binding)
+globs: experiments/cloud-ai-proxy/**/*.ts
+alwaysApply: false
+---
+
+# Cloud AI Proxy
+
+- **Routes**: `POST /chat` (JSON body: model, prompt?, messages?, max_tokens?); `GET /chat?model=&prompt=`.
+- **Response**: `{ response: string }`. Uses Workers AI; model name passed by caller.
+- **Bindings**: `[ai]` binding = "AI".
