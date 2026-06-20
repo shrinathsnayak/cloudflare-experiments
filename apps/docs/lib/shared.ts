@@ -24,6 +24,8 @@ export const gitConfig = {
   branch: "main",
 };
 
+export const portfolioUrl = "https://snayak.dev";
+
 export const siteBanner = {
   text: "This site is not affiliated with or endorsed by Cloudflare, Inc. It simply showcases experiments built using Cloudflare services.",
 };
