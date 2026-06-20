@@ -1,0 +1,89 @@
+---
+title: WebSocket Echo
+description: WebSocket echo server running on Cloudflare Workers
+---
+
+Upgrade HTTP requests to WebSocket connections and echo every message back from the edge using the Workers WebSocket API.
+
+## API Endpoint
+
+### GET /echo
+
+Accepts a WebSocket upgrade and echoes each message with an `echo: ` prefix.
+
+Requires `Upgrade: websocket` on the incoming request.
+
+#### Example Request
+
+Connect with any WebSocket client:
+
+```bash
+websocat wss://your-worker.workers.dev/echo
+```
+
+Send `hello` and receive `echo: hello`.
+
+#### Non-WebSocket Response
+
+When the request is not a WebSocket upgrade, the worker returns HTTP 426:
+
+```json
+{
+  "error": "Expected WebSocket upgrade request (Upgrade: websocket)",
+  "code": "NOT_WEBSOCKET"
+}
+```
+
+#### Error Codes
+
+- `426` - Request missing WebSocket upgrade (`NOT_WEBSOCKET`)
+
+## Use Cases
+
+- Learn WebSocket upgrades with `WebSocketPair` in Workers
+- Test real-time clients against a minimal echo server
+- Prototype bidirectional edge apps before adding Durable Objects
+- Debug WebSocket connectivity from browsers and CLI tools
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/websocket-echo)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    No additional configuration required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    Connect with `websocat`, a browser WebSocket client, or your app's WebSocket library to `wss://your-worker.workers.dev/echo`.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/websocket-echo
+npm install
+npm run dev
+```
+
+Connect to `ws://localhost:8787/echo` with a WebSocket client.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[WebSockets](https://developers.cloudflare.com/workers/runtime-apis/websockets/)** - `WebSocketPair` for bidirectional messaging

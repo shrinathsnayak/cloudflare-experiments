@@ -1,0 +1,131 @@
+---
+title: Edge Cache
+description: Fetch URLs with the Workers Cache API at the edge
+---
+
+Fetch external URLs through the Workers Cache API and report whether each response was served from cache, fetched from origin, or bypassed.
+
+## API Endpoint
+
+### GET /fetch
+
+Fetches a URL and returns cache metadata without streaming the full response body back to the client.
+
+**`url`** `string` (required)
+
+The target URL to fetch (must be http or https)
+
+**`bypass`** `string` (optional)
+
+Set to `1`, `true`, or `yes` to skip cache lookup and storage
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/fetch?url=https://www.cloudflare.com"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+The normalized URL that was fetched
+
+**`cacheStatus`** `string`
+
+One of `"HIT"`, `"MISS"`, or `"BYPASS"`
+
+**`statusCode`** `number`
+
+HTTP status code from the cached or origin response
+
+**`contentType`** `string | null`
+
+Response `Content-Type` header, if present
+
+**`bodySize`** `number`
+
+Response body size in bytes
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "cacheStatus": "MISS",
+  "statusCode": 200,
+  "contentType": "text/html; charset=utf-8",
+  "bodySize": 125678
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` parameter (not http/https)
+- `502` - Upstream fetch failed (`FETCH_ERROR`)
+
+## Use Cases
+
+- Learn how to use `caches.default` in Workers
+- Cache expensive origin fetches at the edge
+- Compare cache hit vs miss behavior during development
+- Build read-through cache patterns for APIs and static content
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/edge-cache)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    No additional configuration required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/fetch?url=https://www.cloudflare.com"
+    ```
+
+    Call the same URL again to see `"cacheStatus": "HIT"`.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/edge-cache
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/fetch?url=https://www.cloudflare.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/)** - Edge response caching via `caches.default`
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Origin requests from Workers

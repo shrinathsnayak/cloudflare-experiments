@@ -1,0 +1,103 @@
+---
+title: Response Headers
+description: Inspect HTTP response headers for any URL from the edge
+---
+
+Fetch any URL and return its HTTP status and response headers as JSON.
+
+## API Endpoint
+
+### GET /headers
+
+Uses `HEAD` first and falls back to `GET` when the origin does not support `HEAD`.
+
+**`url`** `string` (required)
+
+The target URL (must be http or https)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/headers?url=https://www.cloudflare.com"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+Final URL after redirects
+
+**`statusCode`** `number`
+
+HTTP status code
+
+**`statusText`** `string`
+
+HTTP status text
+
+**`method`** `string`
+
+`HEAD` or `GET`
+
+**`headers`** `object`
+
+Response headers as key/value pairs
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "statusCode": 200,
+  "statusText": "OK",
+  "method": "HEAD",
+  "headers": {
+    "content-type": "text/html; charset=utf-8",
+    "server": "cloudflare"
+  }
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `502` - Fetch failed (`FETCH_ERROR`)
+
+## Use Cases
+
+- Debug cache and security headers from the edge
+- Compare response headers across origins
+- Learn HEAD vs GET fallback patterns in Workers
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/response-headers)
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/headers?url=https://www.cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/response-headers
+npm install
+npm run dev
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests from the edge

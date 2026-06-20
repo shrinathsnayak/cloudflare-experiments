@@ -29,12 +29,23 @@ The experiments in this repository demonstrate various Cloudflare platform featu
   Proxy](/experiments/cloud-ai-proxy)
 </Card>
 
-<Card title="Browser Rendering">
-  **Headless browser** automation powered by Puppeteer on the edge. Capture screenshots and interact
-  with web pages: - Full Chrome browser in Workers - Screenshot capture - Page navigation and
-  interaction - No browser infrastructure to manage Used in: - [Screenshot
-  API](/experiments/screenshot-api)
-</Card>
+  <Card title="Browser Rendering">
+    **Headless browser** automation powered by Puppeteer on the edge.
+
+    Capture screenshots, generate PDFs, and interact with web pages:
+    - Full Chrome browser in Workers
+    - Screenshot and PDF generation
+    - Page metrics and DOM evaluation
+    - No browser infrastructure to manage
+
+    Used in:
+    - [Screenshot API](/experiments/screenshot-api)
+    - [PDF API](/experiments/pdf-api)
+    - [Page Metrics](/experiments/page-metrics)
+    - [Rendered Text](/experiments/rendered-text)
+    - [Browser Links](/experiments/browser-links)
+
+  </Card>
 
   <Card title="HTMLRewriter">
     **Streaming HTML parser** for transforming HTML on the fly.
@@ -70,13 +81,22 @@ The experiments in this repository demonstrate various Cloudflare platform featu
     - [Link Shortener](/experiments/link-shortener) (primary storage)
   </Card>
 
-<Card title="Workers KV">
-  **Global key-value store** optimized for high-read workloads. Distributed KV storage: - Eventually
-  consistent reads - Global edge caching - TTL support - Ideal for read-heavy caching Used in: -
-  [Link Shortener](/experiments/link-shortener) (read-through cache) - [Cron
-  Heartbeat](/experiments/cron-heartbeat) (scheduled run metadata) - [Task
-  Queue](/experiments/task-queue) (enqueue/process stats)
-</Card>
+  <Card title="Workers KV">
+    **Global key-value store** optimized for high-read workloads.
+
+    Distributed KV storage:
+    - Eventually consistent reads
+    - Global edge caching
+    - TTL support
+    - Ideal for read-heavy caching
+
+    Used in:
+    - [Link Shortener](/experiments/link-shortener) (read-through cache)
+    - [Cron Heartbeat](/experiments/cron-heartbeat) (scheduled run metadata)
+    - [Task Queue](/experiments/task-queue) (enqueue/process stats)
+    - [KV Notes](/experiments/kv-notes) (primary storage)
+
+  </Card>
 
   <Card title="R2 Storage">
     **Object storage** compatible with S3 APIs, with zero egress fees.
@@ -138,18 +158,52 @@ The experiments in this repository demonstrate various Cloudflare platform featu
     Used in:
     - [Where Am I](/experiments/whereami)
     - [Is It Down](/experiments/is-it-down)
+    - [Response Headers](/experiments/response-headers)
   </Card>
 
-  <Card title="Fetch API">
-    **Standards-based HTTP client** with edge optimizations.
-    
-    Make HTTP requests from the edge:
-    - Standard Web Fetch API
-    - Automatic retries and failover
-    - Connection pooling
-    - Header manipulation
-    
-    Used in: Most experiments for fetching external content
+<Card title="Fetch API">
+  **Standards-based HTTP client** with edge optimizations. Make HTTP requests from the edge: -
+  Standard Web Fetch API - Automatic retries and failover - Connection pooling - Header manipulation
+  Used in: Most experiments for fetching external content
+</Card>
+
+  <Card title="Cache API">
+    **Edge response cache** for storing fetch responses in the same colo.
+
+    Cache origin responses with `caches.default`:
+    - Read-through caching patterns
+    - Per-colo cache storage
+    - TTL via response headers
+
+    Used in:
+    - [Edge Cache](/experiments/edge-cache)
+
+  </Card>
+
+  <Card title="Web Crypto API">
+    **Cryptography at the edge** via `crypto.subtle`.
+
+    Hash and sign data without external libraries:
+    - SHA digests
+    - HMAC and signing (extensible pattern)
+    - Standards-based Web Crypto
+
+    Used in:
+    - [Crypto Hash](/experiments/crypto-hash)
+
+  </Card>
+
+  <Card title="WebSockets">
+    **Bidirectional messaging** from Workers using `WebSocketPair`.
+
+    Upgrade HTTP to WebSocket and push messages from the edge:
+    - Real-time echo and chat patterns
+    - Works with browser and CLI clients
+    - Foundation for Durable Objects WebSockets
+
+    Used in:
+    - [WebSocket Echo](/experiments/websocket-echo)
+
   </Card>
 </Cards>
 
@@ -166,6 +220,9 @@ The experiments in this repository demonstrate various Cloudflare platform featu
 | Durable Objects   | Compute | Strongly consistent state | ~5ms       | Requests + storage    |
 | Queues            | Async   | Background processing     | ~10ms      | Messages + operations |
 | Cron Triggers     | Compute | Scheduled tasks           | ~5ms       | Per invocation        |
+| Cache API         | Storage | Edge HTTP cache           | &lt;1ms    | Per operation         |
+| Web Crypto        | Crypto  | Hashing, signing          | &lt;1ms    | Per request           |
+| WebSockets        | Network | Real-time messaging       | ~5ms       | Per connection        |
 
 ## Architecture Patterns
 
@@ -179,6 +236,16 @@ Fetch external HTML and parse with regex or HTMLRewriter:
 - Website Metadata Extractor
 - Website DevTools Inspector
 
+### Browser Rendering Pattern
+
+Launch Puppeteer via the `BROWSER` binding, navigate, then screenshot, PDF, metrics, or DOM evaluation:
+
+- Screenshot API
+- PDF API
+- Page Metrics
+- Rendered Text
+- Browser Links
+
 ### AI Integration Pattern
 
 Fetch content, extract text, and summarize with Workers AI:
@@ -191,6 +258,12 @@ Fetch content, extract text, and summarize with Workers AI:
 Combine D1 (primary) with KV (cache) for optimal performance:
 
 - Link Shortener (D1 + KV)
+
+### KV Storage Pattern
+
+Simple key-value CRUD with a dedicated KV namespace:
+
+- KV Notes
 
 ### Object Storage Pattern
 
@@ -215,6 +288,24 @@ Cron handler writes metadata to KV; HTTP route reads status:
 HTTP enqueues messages; `queue()` handler processes asynchronously:
 
 - Task Queue
+
+### Edge Cache Pattern
+
+Fetch through `caches.default` and report cache hit/miss:
+
+- Edge Cache
+
+### Web Crypto Pattern
+
+Hash input with `crypto.subtle.digest` at the edge:
+
+- Crypto Hash
+
+### WebSocket Pattern
+
+Upgrade HTTP to WebSocket with `WebSocketPair`:
+
+- WebSocket Echo
 
 ## Learn More
 

@@ -1,0 +1,125 @@
+---
+title: Rendered Text
+description: Extract JavaScript-rendered visible text using Cloudflare Browser Rendering
+---
+
+Load any URL in a headless browser and extract the visible page text after JavaScript has executed.
+
+## API Endpoint
+
+### GET /text
+
+Returns the document title and normalized visible text from `document.body.innerText`.
+
+**`url`** `string` (required)
+
+The website URL to extract text from (must be http or https)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/text?url=https://www.cloudflare.com"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+The normalized URL that was loaded
+
+**`title`** `string`
+
+The page `<title>` after rendering
+
+**`text`** `string`
+
+Visible text with whitespace collapsed
+
+**`textLength`** `number`
+
+Length of the returned text in characters
+
+**`truncated`** `boolean`
+
+Whether the text was truncated at 50,000 characters
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "title": "Connect, protect, and build everywhere",
+  "text": "Connect, protect, and build everywhere ...",
+  "textLength": 1234,
+  "truncated": false
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` parameter
+- `502` - Navigation or extraction failed (`RENDER_ERROR`)
+
+## Use Cases
+
+- Scrape single-page apps and client-rendered content
+- Feed rendered page text to LLM pipelines
+- Compare static fetch vs browser-rendered output
+- Build search indexes for JavaScript-heavy sites
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rendered-text)
+
+  </Step>
+
+  <Step>
+
+### Enable Browser Rendering
+
+    Browser Rendering must be enabled on your account.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/text?url=https://www.cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/rendered-text
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/text?url=https://www.cloudflare.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`
+- **DOM evaluation** - Extract rendered text after `networkidle0`

@@ -1,0 +1,100 @@
+---
+title: KV Notes
+description: Simple note storage with Workers KV at the edge
+---
+
+Store and retrieve small text notes using a dedicated Workers KV namespace.
+
+## API Endpoints
+
+### POST /notes
+
+Create or update a note.
+
+**`id`** `string` (required)
+
+Note identifier (letters, numbers, `_`, `-`; max 64 characters)
+
+**`content`** `string` (required)
+
+Note body (max 4,000 characters)
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/notes" \
+  -H "Content-Type: application/json" \
+  -d '{"id":"todo-1","content":"Ship the experiment"}'
+```
+
+#### Success Response
+
+```json
+{
+  "id": "todo-1",
+  "content": "Ship the experiment",
+  "updatedAt": "2025-06-20T12:00:00.000Z"
+}
+```
+
+### GET /notes
+
+Fetch a note by id.
+
+**`id`** `string` (required)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/notes?id=todo-1"
+```
+
+### DELETE /notes
+
+Delete a note by id.
+
+**`id`** `string` (required)
+
+#### Error Codes
+
+- `400` - Invalid id or content (`INVALID_ID`, `INVALID_CONTENT`, `INVALID_BODY`)
+- `404` - Note not found (`NOT_FOUND`)
+
+## Use Cases
+
+- Learn KV read/write/delete patterns without D1
+- Store small configuration blobs at the edge
+- Prototype simple key-value APIs before adding auth
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/kv-notes)
+
+  </Step>
+
+  <Step>
+
+### Configure KV
+
+    Create a KV namespace and bind it as `NOTES` in `wrangler.json`.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/kv-notes
+npm install
+npm run dev
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers KV](https://developers.cloudflare.com/kv/)** - Global key-value storage

@@ -1,0 +1,110 @@
+---
+title: PDF API
+description: Generate PDF documents from any webpage using Cloudflare Browser Rendering
+---
+
+Generate a PDF from any URL using Browser Rendering and Puppeteer's `page.pdf()` API.
+
+## API Endpoint
+
+### GET /pdf
+
+Renders the specified URL in a headless browser and returns a PDF document.
+
+**`url`** `string` (required)
+
+The website URL to render (must be http or https)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/pdf?url=https://www.cloudflare.com" \
+  --output page.pdf
+```
+
+#### Success Response
+
+Returns a PDF file with the following headers:
+
+```http
+Content-Type: application/pdf
+Cache-Control: public, max-age=60
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` parameter (not http/https)
+- `502` - PDF generation failed (`PDF_ERROR`)
+
+## Use Cases
+
+- Convert web pages to printable PDF documents
+- Archive rendered page content with styles
+- Generate invoices or reports from HTML pages
+- Learn Browser Rendering PDF generation with Workers bindings
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/pdf-api)
+
+  </Step>
+
+  <Step>
+
+### Enable Browser Rendering
+
+    This experiment requires Browser Rendering on your Cloudflare account. See the [Browser Rendering docs](https://developers.cloudflare.com/browser-rendering/).
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/pdf?url=https://www.cloudflare.com" \
+      --output page.pdf
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/pdf-api
+npm install
+npm run dev
+```
+
+<Callout>
+
+`npm run dev` uses `wrangler dev --remote` so a real browser instance is available. Local dev without `--remote` will not work.
+
+</Callout>
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/pdf?url=https://www.cloudflare.com" --output test.pdf
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`
+- **Puppeteer `page.pdf()`** - PDF generation from rendered pages

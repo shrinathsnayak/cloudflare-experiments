@@ -32,6 +32,9 @@ Every experiment demonstrates **one specific Cloudflare capability**, including:
 - R2
 - HTMLRewriter
 - Edge networking
+- Cache API
+- Web Crypto
+- WebSockets
 
 ---
 
@@ -45,6 +48,10 @@ cloudflare-experiments/
 │       ├── ai-website-summary/
 │       ├── ai-website-tag-generator/
 │       ├── screenshot-api/
+│       ├── pdf-api/
+│       ├── page-metrics/
+│       ├── rendered-text/
+│       ├── browser-links/
 │       ├── github-repo-explainer/
 │       ├── dependency-analyzer/
 │       ├── is-it-down/
@@ -57,11 +64,16 @@ cloudflare-experiments/
 │       ├── cloud-ai-proxy/
 │       ├── r2-storage/
 │       ├── whereami/
+│       ├── response-headers/
 │       ├── link-shortener/
+│       ├── kv-notes/
 │       ├── edge-redirect-simulator/
 │       ├── durable-counter/
 │       ├── cron-heartbeat/
-│       └── task-queue/
+│       ├── task-queue/
+│       ├── edge-cache/
+│       ├── crypto-hash/
+│       └── websocket-echo/
 ├── turbo.json
 ├── .cursor/
 │   ├── rules/
@@ -81,6 +93,10 @@ This is a **Turborepo** monorepo. Worker experiments live in `apps/experiments/`
 | [AI Website Summary](apps/experiments/ai-website-summary/)                 | Summarize any webpage using Workers AI                                                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-summary)         |
 | [AI Website Tag Generator](apps/experiments/ai-website-tag-generator/)     | Generate topic tags for any website using Workers AI                                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-tag-generator)   |
 | [Screenshot API](apps/experiments/screenshot-api/)                         | Capture screenshots of any website from the edge (Browser Rendering)                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/screenshot-api)             |
+| [PDF API](apps/experiments/pdf-api/)                                       | Generate PDF documents from any webpage using Browser Rendering                           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/pdf-api)                    |
+| [Page Metrics](apps/experiments/page-metrics/)                             | Collect Puppeteer page load metrics (DOM nodes, script duration, heap)                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/page-metrics)               |
+| [Rendered Text](apps/experiments/rendered-text/)                           | Extract JavaScript-rendered visible text from any webpage                                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rendered-text)              |
+| [Browser Links](apps/experiments/browser-links/)                           | Extract unique links from JavaScript-rendered pages                                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-links)              |
 | [GitHub Repo Explainer](apps/experiments/github-repo-explainer/)           | AI explanation of any GitHub repository from README and key files                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/github-repo-explainer)      |
 | [Dependency Analyzer](apps/experiments/dependency-analyzer/)               | Analyze all external resources (scripts, styles, fonts, images)                           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/dependency-analyzer)        |
 | [Is It Down](apps/experiments/is-it-down/)                                 | Check if a website is reachable from Cloudflare's edge                                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/is-it-down)                 |
@@ -94,10 +110,15 @@ This is a **Turborepo** monorepo. Worker experiments live in `apps/experiments/`
 | [R2 Storage](apps/experiments/r2-storage/)                                 | R2 storage API with list/get/put/delete and configurable list options                     | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-storage)                 |
 | [Where Am I](apps/experiments/whereami/)                                   | Request metadata from Cloudflare's edge (request.cf geolocation, colo)                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/whereami)                   |
 | [Link Shortener](apps/experiments/link-shortener/)                         | Shorten URLs and redirect with D1 (POST /shorten, GET /:code)                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)             |
+| [KV Notes](apps/experiments/kv-notes/)                                     | Simple note storage with Workers KV (POST/GET/DELETE /notes)                              | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/kv-notes)                   |
 | [Edge Redirect Simulator](apps/experiments/edge-redirect-simulator/)       | Show redirect chains for any URL (each hop and status code)                               | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/edge-redirect-simulator)    |
+| [Response Headers](apps/experiments/response-headers/)                     | Inspect HTTP response headers for any URL from the edge                                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/response-headers)           |
 | [Durable Counter](apps/experiments/durable-counter/)                       | Globally consistent counter using Durable Objects (reference pattern)                     | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/durable-counter)            |
 | [Cron Heartbeat](apps/experiments/cron-heartbeat/)                         | Scheduled tasks with Cron Triggers; persists run metadata in KV                           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cron-heartbeat)             |
 | [Task Queue](apps/experiments/task-queue/)                                 | Enqueue background tasks with Queues; async consumer with KV stats                        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/task-queue)                 |
+| [Edge Cache](apps/experiments/edge-cache/)                                 | Fetch URLs with the Workers Cache API; report HIT/MISS/BYPASS                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/edge-cache)                 |
+| [Crypto Hash](apps/experiments/crypto-hash/)                               | Compute SHA-256/384/512 digests with the Web Crypto API at the edge                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/crypto-hash)                |
+| [WebSocket Echo](apps/experiments/websocket-echo/)                         | WebSocket echo server using WebSocketPair on Workers                                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/websocket-echo)             |
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

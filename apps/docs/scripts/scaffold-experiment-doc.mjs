@@ -79,8 +79,8 @@ const bindingNotes =
 
 const readmeHint = readme
   ? "\n<!-- README.md exists - copy API examples and setup notes from apps/experiments/" +
-  experimentName +
-  "/README.md -->\n"
+    experimentName +
+    "/README.md -->\n"
   : "";
 
 const deployUrl = `https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/${experimentName}`;

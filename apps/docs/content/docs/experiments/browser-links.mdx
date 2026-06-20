@@ -1,0 +1,97 @@
+---
+title: Browser Links
+description: Extract links from JavaScript-rendered pages using Browser Rendering
+---
+
+Load a page in a headless browser and return all unique anchor links after JavaScript rendering.
+
+## API Endpoint
+
+### GET /links
+
+**`url`** `string` (required)
+
+The website URL to inspect (must be http or https)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/links?url=https://www.cloudflare.com"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+The normalized URL that was loaded
+
+**`linkCount`** `number`
+
+Number of unique links returned
+
+**`truncated`** `boolean`
+
+Whether results were capped at 500 links
+
+**`links`** `array`
+
+Each item has `href` and `text`
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "linkCount": 42,
+  "truncated": false,
+  "links": [{ "href": "https://www.cloudflare.com/plans/", "text": "Plans" }]
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `502` - Navigation or extraction failed (`LINKS_ERROR`)
+
+## Use Cases
+
+- Crawl SPAs and client-rendered navigation
+- Build sitemaps from fully rendered pages
+- Compare static HTML links vs browser-rendered links
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-links)
+
+  </Step>
+
+  <Step>
+
+### Enable Browser Rendering
+
+    Browser Rendering must be enabled on your account.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/browser-links
+npm install
+npm run dev
+```
+
+<Callout>
+
+`npm run dev` uses `wrangler dev --remote` so a real browser instance is available.
+
+</Callout>
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`

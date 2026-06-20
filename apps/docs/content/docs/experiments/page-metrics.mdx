@@ -1,0 +1,117 @@
+---
+title: Page Metrics
+description: Collect Puppeteer page load metrics using Cloudflare Browser Rendering
+---
+
+Navigate to any URL in a headless browser and return Puppeteer page load metrics as JSON.
+
+## API Endpoint
+
+### GET /metrics
+
+Loads the page and returns metrics from `page.metrics()`.
+
+**`url`** `string` (required)
+
+The website URL to measure (must be http or https)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/metrics?url=https://www.cloudflare.com"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+The normalized URL that was measured
+
+**`metrics`** `object`
+
+Puppeteer metrics such as `Nodes`, `LayoutCount`, `ScriptDuration`, and `JSHeapUsedSize`
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "metrics": {
+    "Timestamp": 12345.678,
+    "Documents": 1,
+    "Nodes": 842,
+    "LayoutCount": 12,
+    "ScriptDuration": 0.234,
+    "JSHeapUsedSize": 1048576
+  }
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` parameter
+- `502` - Navigation or metrics collection failed (`METRICS_ERROR`)
+
+## Use Cases
+
+- Measure DOM complexity and script cost after full page load
+- Compare client-side rendering overhead across sites
+- Debug performance issues that only appear in a real browser
+- Learn Puppeteer metrics collection on Workers
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/page-metrics)
+
+  </Step>
+
+  <Step>
+
+### Enable Browser Rendering
+
+    Browser Rendering must be enabled on your account.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/metrics?url=https://www.cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/page-metrics
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/metrics?url=https://www.cloudflare.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`
+- **Puppeteer `page.metrics()`** - Page load and memory metrics
