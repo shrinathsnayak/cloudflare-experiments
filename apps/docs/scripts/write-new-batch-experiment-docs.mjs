@@ -16,7 +16,7 @@ const experiments = [
     intro:
       "Fetch any URL and extract `og:*`, `twitter:*`, `<title>`, and meta description tags with **HTMLRewriter**. Returns side-by-side preview validation for Twitter/X, Open Graph (Facebook/Slack), and Google search snippets, flagging missing required fields per platform.",
     features: [
-      "GET /inspect — extract meta tags and validate per-platform preview requirements",
+      "GET /inspect - extract meta tags and validate per-platform preview requirements",
       "Side-by-side Twitter, Open Graph, and Google preview objects",
       "Flags missing and fallback fields (e.g. og:title used when twitter:title absent)",
     ],
@@ -50,8 +50,8 @@ curl "https://your-worker.workers.dev/inspect?url=https://example.com"
 
 #### Error Codes
 
-- \`400\` — \`INVALID_URL\`
-- \`502\` — \`FETCH_ERROR\``,
+- \`400\` - \`INVALID_URL\`
+- \`502\` - \`FETCH_ERROR\``,
     useCases: [
       "Debug why a link unfurls incorrectly on Slack, Twitter, or iMessage",
       "Audit marketing pages for missing Open Graph or Twitter Card tags",
@@ -76,15 +76,15 @@ curl "https://your-worker.workers.dev/inspect?url=https://example.com"
     intro:
       "Query **DNS-over-HTTPS** resolvers (Cloudflare 1.1.1.1, Google 8.8.8.8, Quad9) in parallel for a domain and record type. Reports whether answers agree, each resolver's values, and response time.",
     features: [
-      "GET /check — parallel DoH queries across three public resolvers",
+      "GET /check - parallel DoH queries across three public resolvers",
       "Supports A, AAAA, CNAME, MX, TXT, NS record types",
       "Agreement summary plus per-resolver values and latency",
     ],
     api: `### GET /check
 
-**\`domain\`** \`string\` (required) — Hostname to query (no scheme).
+**\`domain\`** \`string\` (required) - Hostname to query (no scheme).
 
-**\`type\`** \`string\` (required) — Record type: \`A\`, \`AAAA\`, \`CNAME\`, \`MX\`, \`TXT\`, or \`NS\`.
+**\`type\`** \`string\` (required) - Record type: \`A\`, \`AAAA\`, \`CNAME\`, \`MX\`, \`TXT\`, or \`NS\`.
 
 #### Example Request
 
@@ -107,8 +107,8 @@ curl "https://your-worker.workers.dev/check?domain=example.com&type=A"
 
 #### Error Codes
 
-- \`400\` — \`INVALID_DOMAIN\`, \`INVALID_TYPE\`
-- \`502\` — \`DNS_ERROR\``,
+- \`400\` - \`INVALID_DOMAIN\`, \`INVALID_TYPE\`
+- \`502\` - \`DNS_ERROR\``,
     useCases: [
       "Verify DNS changes have propagated globally after a cutover",
       "Compare resolver behavior during TTL or nameserver migrations",
@@ -132,19 +132,19 @@ curl "https://your-worker.workers.dev/check?domain=example.com&type=A"
     intro:
       "Accept a raw payload, secret, signature header value, and algorithm. Computes the expected HMAC (Stripe/GitHub \`sha256=\` hex style) and returns whether it matches using a **timing-safe compare**.",
     features: [
-      "POST /verify — HMAC-SHA256 verification with clear comparison explanation",
+      "POST /verify - HMAC-SHA256 verification with clear comparison explanation",
       "Supports prefixed signatures (\`sha256=...\`) and raw hex",
       "Uses Web Crypto at the edge; no external libraries",
     ],
     api: `### POST /verify
 
-**\`payload\`** \`string\` (required) — Raw request body as received.
+**\`payload\`** \`string\` (required) - Raw request body as received.
 
-**\`secret\`** \`string\` (required) — Shared signing secret.
+**\`secret\`** \`string\` (required) - Shared signing secret.
 
-**\`signature\`** \`string\` (required) — Signature from the webhook header.
+**\`signature\`** \`string\` (required) - Signature from the webhook header.
 
-**\`algorithm\`** \`string\` (optional) — Default \`sha256\`.
+**\`algorithm\`** \`string\` (optional) - Default \`sha256\`.
 
 #### Example Request
 
@@ -168,7 +168,7 @@ curl -X POST "https://your-worker.workers.dev/verify" \\
 
 #### Error Codes
 
-- \`400\` — \`INVALID_BODY\`, \`MISSING_FIELD\`, \`INVALID_ALGORITHM\``,
+- \`400\` - \`INVALID_BODY\`, \`MISSING_FIELD\`, \`INVALID_ALGORITHM\``,
     useCases: [
       "Debug Stripe, GitHub, or Shopify webhook signature mismatches",
       "Learn timing-safe HMAC verification patterns for Workers",
@@ -192,19 +192,19 @@ curl -X POST "https://your-worker.workers.dev/verify" \\
     intro:
       "Send an **OPTIONS** preflight to a target URL with a simulated origin, method, and requested headers. Reports which CORS response headers are present, missing, or misconfigured relative to what the browser would require.",
     features: [
-      "POST /test — simulate Access-Control-Request-Method/Headers preflight",
+      "POST /test - simulate Access-Control-Request-Method/Headers preflight",
       "Analyzes Allow-Origin, Allow-Methods, Allow-Headers, Allow-Credentials",
       "Returns actionable pass/fail per header requirement",
     ],
     api: `### POST /test
 
-**\`url\`** \`string\` (required) — Target URL (http or https).
+**\`url\`** \`string\` (required) - Target URL (http or https).
 
-**\`origin\`** \`string\` (required) — Simulated Origin header value.
+**\`origin\`** \`string\` (required) - Simulated Origin header value.
 
-**\`method\`** \`string\` (required) — Intended request method (e.g. \`POST\`).
+**\`method\`** \`string\` (required) - Intended request method (e.g. \`POST\`).
 
-**\`headers\`** \`string[]\` (optional) — Request headers for preflight (e.g. \`["Content-Type"]\`).
+**\`headers\`** \`string[]\` (optional) - Request headers for preflight (e.g. \`["Content-Type"]\`).
 
 #### Example Request
 
@@ -216,8 +216,8 @@ curl -X POST "https://your-worker.workers.dev/test" \\
 
 #### Error Codes
 
-- \`400\` — \`INVALID_BODY\`, \`INVALID_URL\`, \`INVALID_ORIGIN\`, \`INVALID_METHOD\`
-- \`502\` — \`PREFLIGHT_ERROR\``,
+- \`400\` - \`INVALID_BODY\`, \`INVALID_URL\`, \`INVALID_ORIGIN\`, \`INVALID_METHOD\`
+- \`502\` - \`PREFLIGHT_ERROR\``,
     useCases: [
       "Debug why a browser blocks cross-origin API calls",
       "Validate CORS headers before deploying a new frontend origin",
@@ -241,24 +241,24 @@ curl -X POST "https://your-worker.workers.dev/test" \\
     intro:
       "Create configurable mock API responses (path, method, status, JSON body, optional delay) stored in **Workers KV**. Any matching request to `/mock/:slug` returns the configured response.",
     features: [
-      "POST /configs — create a mock and receive a slug",
-      "GET /configs — list all mocks",
-      "GET /mock/:slug — serve the configured response",
-      "DELETE /configs/:slug — remove a mock",
+      "POST /configs - create a mock and receive a slug",
+      "GET /configs - list all mocks",
+      "GET /mock/:slug - serve the configured response",
+      "DELETE /configs/:slug - remove a mock",
     ],
     api: `### POST /configs
 
 Create a mock endpoint configuration.
 
-**\`path\`** \`string\` (required) — Mock path (must start with \`/\`).
+**\`path\`** \`string\` (required) - Mock path (must start with \`/\`).
 
-**\`method\`** \`string\` (required) — HTTP method.
+**\`method\`** \`string\` (required) - HTTP method.
 
-**\`status\`** \`number\` (required) — Response status (100–599).
+**\`status\`** \`number\` (required) - Response status (100–599).
 
-**\`body\`** \`object\` (required) — JSON response body.
+**\`body\`** \`object\` (required) - JSON response body.
 
-**\`delayMs\`** \`number\` (optional) — Artificial delay (0–30000 ms).
+**\`delayMs\`** \`number\` (optional) - Artificial delay (0–30000 ms).
 
 ### GET /mock/:slug
 
@@ -270,8 +270,8 @@ Delete a mock by slug.
 
 #### Error Codes
 
-- \`400\` — \`INVALID_BODY\`, validation errors
-- \`404\` — \`NOT_FOUND\``,
+- \`400\` - \`INVALID_BODY\`, validation errors
+- \`404\` - \`NOT_FOUND\``,
     useCases: [
       "Stub third-party APIs during frontend development",
       "Demo API integrations without standing up a full backend",
@@ -295,15 +295,15 @@ Delete a mock by slug.
     intro:
       "Call **Workers AI** through **AI Gateway** instead of direct inference. Returns generated text plus gateway metadata (cache status, latency). Optionally compare cached vs fresh requests for the same prompt.",
     features: [
-      "POST /generate — text generation via AI Gateway",
+      "POST /generate - text generation via AI Gateway",
       "Returns latency and cache hit/miss metadata",
       "Optional compareCache mode runs cached vs skipCache requests",
     ],
     api: `### POST /generate
 
-**\`prompt\`** \`string\` (required) — Text prompt for the model.
+**\`prompt\`** \`string\` (required) - Text prompt for the model.
 
-**\`compareCache\`** \`boolean\` (optional) — Run cached and fresh requests and compare latency.
+**\`compareCache\`** \`boolean\` (optional) - Run cached and fresh requests and compare latency.
 
 Default model: \`@cf/meta/llama-3.1-8b-instruct-fast\`.
 
@@ -317,8 +317,8 @@ curl -X POST "https://your-worker.workers.dev/generate" \\
 
 #### Error Codes
 
-- \`400\` — \`INVALID_BODY\`, \`MISSING_PROMPT\`
-- \`502\` — \`AI_ERROR\``,
+- \`400\` - \`INVALID_BODY\`, \`MISSING_PROMPT\`
+- \`502\` - \`AI_ERROR\``,
     useCases: [
       "Learn AI Gateway cache behavior vs direct Workers AI calls",
       "Compare latency for repeated prompts in prototyping",
@@ -344,13 +344,13 @@ curl -X POST "https://your-worker.workers.dev/generate" \\
     intro:
       "Load a fully rendered page with **Browser Rendering**, then strip navigation, ads, and sidebars using readability-style heuristics. Returns title, author (when detectable), body text, word count, and estimated read time.",
     features: [
-      "GET /extract — rendered DOM extraction with readability heuristics",
+      "GET /extract - rendered DOM extraction with readability heuristics",
       "Returns title, author, body, wordCount, readTimeMinutes",
       "Uses @cloudflare/puppeteer like other Browser Rendering experiments",
     ],
     api: `### GET /extract
 
-**\`url\`** \`string\` (required) — Article URL (http or https).
+**\`url\`** \`string\` (required) - Article URL (http or https).
 
 #### Example Request
 
@@ -360,8 +360,8 @@ curl "https://your-worker.workers.dev/extract?url=https://example.com/article"
 
 #### Error Codes
 
-- \`400\` — \`INVALID_URL\`
-- \`502\` — \`EXTRACT_ERROR\``,
+- \`400\` - \`INVALID_URL\`
+- \`502\` - \`EXTRACT_ERROR\``,
     useCases: [
       "Build reading-mode or newsletter digest pipelines",
       "Extract main content from JavaScript-heavy news sites",
@@ -386,10 +386,10 @@ curl "https://your-worker.workers.dev/extract?url=https://example.com/article"
     intro:
       "Create a unique inbound URL per session with a **Durable Object**. Any HTTP request to that URL is captured (method, headers, body, timestamp) and can be listed or inspected for webhook debugging.",
     features: [
-      "POST /relay/new — create a capture session",
-      "ALL /relay/:id — capture inbound requests",
-      "GET /relay/:id/requests — list captures",
-      "GET /relay/:id/requests/:requestId — full request details",
+      "POST /relay/new - create a capture session",
+      "ALL /relay/:id - capture inbound requests",
+      "GET /relay/:id/requests - list captures",
+      "GET /relay/:id/requests/:requestId - full request details",
     ],
     api: `### POST /relay/new
 
@@ -415,8 +415,8 @@ Full request details including headers and body.
 
 #### Error Codes
 
-- \`404\` — \`NOT_FOUND\`
-- \`400\` — \`INVALID_ID\``,
+- \`404\` - \`NOT_FOUND\`
+- \`400\` - \`INVALID_ID\``,
     useCases: [
       "Debug Stripe, GitHub, or custom webhook payloads during integration",
       "Share a temporary inbound URL with a third party for testing",
@@ -440,9 +440,9 @@ Full request details including headers and body.
     intro:
       "Register URLs for on-demand and **Cron**-scheduled snapshots. Rendered text is stored in **R2**, content hashes and diff summaries in **D1**. View change history per tracked URL.",
     features: [
-      "POST /track — register a URL",
-      "DELETE /track?url= — unregister",
-      "GET /history?url= — snapshot diff history",
+      "POST /track - register a URL",
+      "DELETE /track?url= - unregister",
+      "GET /history?url= - snapshot diff history",
       "Scheduled handler every 30 minutes for tracked URLs",
     ],
     api: `### POST /track
@@ -463,8 +463,8 @@ Return snapshot history with content hashes and diff summaries.
 
 #### Error Codes
 
-- \`400\` — \`INVALID_URL\`, \`INVALID_BODY\`
-- \`404\` — \`NOT_TRACKED\``,
+- \`400\` - \`INVALID_URL\`, \`INVALID_BODY\`
+- \`404\` - \`NOT_TRACKED\``,
     useCases: [
       "Monitor marketing or legal pages for unexpected content changes",
       "Learn R2 + D1 + Cron + Browser Rendering together",
@@ -492,9 +492,9 @@ Return snapshot history with content hashes and diff summaries.
     intro:
       "Extend the is-it-down pattern into a persistent monitor. **Cron** pings registered URLs, logs checks to **D1**, and sends **email alerts** when a URL transitions from up to down.",
     features: [
-      "POST /monitors — register URL + alert email",
-      "DELETE /monitors/:id — remove monitor",
-      "GET /monitors/:id/history — check history and uptime percentage",
+      "POST /monitors - register URL + alert email",
+      "DELETE /monitors/:id - remove monitor",
+      "GET /monitors/:id/history - check history and uptime percentage",
       "Scheduled checks every 5 minutes",
     ],
     api: `### POST /monitors
@@ -513,8 +513,8 @@ Returns check history and uptime percentage.
 
 #### Error Codes
 
-- \`400\` — \`INVALID_URL\`, \`INVALID_EMAIL\`, \`INVALID_BODY\`
-- \`404\` — \`NOT_FOUND\``,
+- \`400\` - \`INVALID_URL\`, \`INVALID_EMAIL\`, \`INVALID_BODY\`
+- \`404\` - \`NOT_FOUND\``,
     useCases: [
       "Lightweight uptime monitoring for side projects",
       "Learn Cron + D1 + send_email alert patterns on Workers",

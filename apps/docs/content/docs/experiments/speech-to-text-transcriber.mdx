@@ -13,10 +13,10 @@ Upload an audio file and receive a transcript using **Workers AI Whisper** (`@cf
 
 ## Features
 
-- **POST /transcribe** — Multipart upload with field `audio`
-- **Whisper model** — `@cf/openai/whisper-large-v3-turbo`
-- **Validation** — Max 2 MB, `audio/*` types only
-- **Timing** — Returns `durationMs` for the transcription call
+- **POST /transcribe** - Multipart upload with field `audio`
+- **Whisper model** - `@cf/openai/whisper-large-v3-turbo`
+- **Validation** - Max 2 MB, `audio/*` types only
+- **Timing** - Returns `durationMs` for the transcription call
 
 ## API Reference
 
@@ -47,8 +47,8 @@ curl -X POST "https://your-worker.workers.dev/transcribe" \
 
 #### Error Codes
 
-- `400` — Missing or invalid audio (`INVALID_AUDIO`)
-- `502` — Transcription failed or empty result (`TRANSCRIBE_ERROR`)
+- `400` - Missing or invalid audio (`INVALID_AUDIO`)
+- `502` - Transcription failed or empty result (`TRANSCRIBE_ERROR`)
 
 ## Use Cases
 
@@ -108,5 +108,5 @@ npm run dev
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** — Whisper speech-to-text
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Whisper speech-to-text

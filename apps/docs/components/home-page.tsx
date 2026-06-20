@@ -107,7 +107,7 @@ export function HomePage() {
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">{appName}</h1>
             <p className="text-lg text-fd-muted-foreground md:text-xl">{appDescription}</p>
             <p className="text-sm text-fd-muted-foreground md:text-base">
-              Real tools and reference implementations — not Hello World demos. Learn Workers AI,
+              Real tools and reference implementations - not Hello World demos. Learn Workers AI,
               Browser Rendering, D1, R2, Durable Objects, Queues, Cron, and more by deploying code
               you can actually use.
             </p>
@@ -157,7 +157,7 @@ export function HomePage() {
           <SectionHeading
             eyebrow="Philosophy"
             title="Reference implementations, not toy examples"
-            description="Most Cloudflare tutorials stop at Hello World. This repo shows what you can actually build — one focused experiment per product capability, with tests, docs, and a deploy button."
+            description="Most Cloudflare tutorials stop at Hello World. This repo shows what you can actually build - one focused experiment per product capability, with tests, docs, and a deploy button."
           />
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {homePrinciples.map((principle) => (
@@ -222,7 +222,7 @@ curl "http://localhost:8787/summary?url=https://example.com"`}</code>
           <SectionHeading
             eyebrow="Popular"
             title="Featured experiments"
-            description="A starting point if you are not sure where to begin — each links to full API docs and a Deploy button."
+            description="A starting point if you are not sure where to begin - each links to full API docs and a Deploy button."
           />
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {featuredExperiments.map((experiment) => (
@@ -291,7 +291,7 @@ curl "http://localhost:8787/summary?url=https://example.com"`}</code>
               <SectionHeading
                 eyebrow="Structure"
                 title="Consistent experiment layout"
-                description="Every Worker under apps/experiments/ uses the same folder conventions — routes, lib, types, tests, and wrangler.json."
+                description="Every Worker under apps/experiments/ uses the same folder conventions - routes, lib, types, tests, and wrangler.json."
               />
               <ul className="mt-6 space-y-3">
                 {repoStructure.map((item) => (
@@ -315,7 +315,7 @@ curl "http://localhost:8787/summary?url=https://example.com"`}</code>
           <SectionHeading
             eyebrow="Catalog"
             title="All experiments by category"
-            description="Browse the full catalog — 60+ deployable Workers organized the same way as the documentation sidebar."
+            description="Browse the full catalog - 60+ deployable Workers organized the same way as the documentation sidebar."
           />
           <div className="mt-12 space-y-14">
             {homeCategories.map((category) => (

@@ -12,10 +12,10 @@ Create configurable mock API responses (path, method, status, JSON body, optiona
 
 ## Features
 
-- POST /configs — create a mock and receive a slug
-- GET /configs — list all mocks
-- GET /mock/:slug — serve the configured response
-- DELETE /configs/:slug — remove a mock
+- POST /configs - create a mock and receive a slug
+- GET /configs - list all mocks
+- GET /mock/:slug - serve the configured response
+- DELETE /configs/:slug - remove a mock
 
 ## API Reference
 
@@ -23,15 +23,15 @@ Create configurable mock API responses (path, method, status, JSON body, optiona
 
 Create a mock endpoint configuration.
 
-**`path`** `string` (required) — Mock path (must start with `/`).
+**`path`** `string` (required) - Mock path (must start with `/`).
 
-**`method`** `string` (required) — HTTP method.
+**`method`** `string` (required) - HTTP method.
 
-**`status`** `number` (required) — Response status (100–599).
+**`status`** `number` (required) - Response status (100–599).
 
-**`body`** `object` (required) — JSON response body.
+**`body`** `object` (required) - JSON response body.
 
-**`delayMs`** `number` (optional) — Artificial delay (0–30000 ms).
+**`delayMs`** `number` (optional) - Artificial delay (0–30000 ms).
 
 ### GET /mock/:slug
 
@@ -43,8 +43,8 @@ Delete a mock by slug.
 
 #### Error Codes
 
-- `400` — `INVALID_BODY`, validation errors
-- `404` — `NOT_FOUND`
+- `400` - `INVALID_BODY`, validation errors
+- `404` - `NOT_FOUND`
 
 ## Use Cases
 

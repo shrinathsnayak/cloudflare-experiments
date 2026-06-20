@@ -12,10 +12,10 @@ Generate **presigned PUT URLs** so browsers upload files directly to **R2** with
 
 ## Features
 
-- **POST /presign** — Returns a time-limited upload URL
-- **Direct browser upload** — Client PUTs to R2 using the signed URL
-- **Content-type validation** — Allowed types enforced at presign time
-- **Demo page** — `GET /` with file picker and upload flow
+- **POST /presign** - Returns a time-limited upload URL
+- **Direct browser upload** - Client PUTs to R2 using the signed URL
+- **Content-type validation** - Allowed types enforced at presign time
+- **Demo page** - `GET /` with file picker and upload flow
 
 ## API Reference
 
@@ -68,8 +68,8 @@ curl -X PUT "$uploadUrl" -H "Content-Type: image/png" --data-binary @photo.png
 
 #### Error Codes
 
-- `400` — Invalid JSON (`INVALID_BODY`), filename (`INVALID_FILENAME`), or content type (`INVALID_CONTENT_TYPE`)
-- `502` — Presign failed, often missing R2 credentials (`PRESIGN_ERROR`)
+- `400` - Invalid JSON (`INVALID_BODY`), filename (`INVALID_FILENAME`), or content type (`INVALID_CONTENT_TYPE`)
+- `502` - Presign failed, often missing R2 credentials (`PRESIGN_ERROR`)
 
 ### GET /
 
@@ -146,5 +146,5 @@ Open `http://localhost:8787/` for the demo upload form.
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[R2](https://developers.cloudflare.com/r2/)** — Object storage with presigned uploads
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[R2](https://developers.cloudflare.com/r2/)** - Object storage with presigned uploads

@@ -8,14 +8,14 @@ bindings:
   - DO
 ---
 
-Schedule a one-off reminder **N seconds in the future** using the Durable Object **Alarm API** (`setAlarm`). Poll `GET /status/:id` to confirm when the alarm fired — since there is no push channel in this demo, polling is the intended pattern.
+Schedule a one-off reminder **N seconds in the future** using the Durable Object **Alarm API** (`setAlarm`). Poll `GET /status/:id` to confirm when the alarm fired - since there is no push channel in this demo, polling is the intended pattern.
 
 ## Features
 
-- **POST /schedule** — Schedule a reminder with `{ seconds, message }`
-- **GET /status/:id** — Poll for `scheduled` or `fired` status
-- **Alarm API** — `storage.setAlarm()` + `alarm()` handler
-- **One DO per schedule** — Each schedule id maps to its own Durable Object instance
+- **POST /schedule** - Schedule a reminder with `{ seconds, message }`
+- **GET /status/:id** - Poll for `scheduled` or `fired` status
+- **Alarm API** - `storage.setAlarm()` + `alarm()` handler
+- **One DO per schedule** - Each schedule id maps to its own Durable Object instance
 
 ## API Reference
 
@@ -60,8 +60,8 @@ curl -X POST "https://your-worker.workers.dev/schedule" \
 
 #### Error Codes
 
-- `400` — Invalid JSON (`INVALID_BODY`), seconds (`INVALID_SECONDS`), or message (`INVALID_MESSAGE`)
-- `502` — Schedule failed (`SCHEDULE_ERROR`)
+- `400` - Invalid JSON (`INVALID_BODY`), seconds (`INVALID_SECONDS`), or message (`INVALID_MESSAGE`)
+- `502` - Schedule failed (`SCHEDULE_ERROR`)
 
 ### GET /status/:id
 
@@ -100,8 +100,8 @@ curl "https://your-worker.workers.dev/status/550e8400-e29b-41d4-a716-44665544000
 
 #### Error Codes
 
-- `400` — Missing id (`INVALID_ID`)
-- `404` — Schedule not found (`NOT_FOUND`)
+- `400` - Missing id (`INVALID_ID`)
+- `404` - Schedule not found (`NOT_FOUND`)
 
 ## Use Cases
 
@@ -169,6 +169,6 @@ curl "http://localhost:8787/status/YOUR_SCHEDULE_ID"
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** — Per-schedule state and alarms
-- **Alarm API** — One-off delayed execution via `setAlarm()`
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** - Per-schedule state and alarms
+- **Alarm API** - One-off delayed execution via `setAlarm()`

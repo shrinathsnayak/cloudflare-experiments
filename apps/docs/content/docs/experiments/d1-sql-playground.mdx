@@ -13,10 +13,10 @@ Run safe, read-only `SELECT` queries against a seeded Cloudflare D1 database. Re
 
 ## Features
 
-- **POST /query** — Execute a validated `SELECT` and receive rows plus column types
-- **Seeded schema** — `products` catalog and `experiments` table from this repo
-- **Read-only guardrails** — Rejects writes, DDL, semicolons, comments, `UNION`, and disallowed tables
-- **GET /** — Lists queryable tables
+- **POST /query** - Execute a validated `SELECT` and receive rows plus column types
+- **Seeded schema** - `products` catalog and `experiments` table from this repo
+- **Read-only guardrails** - Rejects writes, DDL, semicolons, comments, `UNION`, and disallowed tables
+- **GET /** - Lists queryable tables
 
 ## API Reference
 
@@ -62,8 +62,8 @@ curl -X POST "https://your-worker.workers.dev/query" \
 
 #### Error Codes
 
-- `400` — Invalid JSON (`INVALID_BODY`) or disallowed SQL (`INVALID_SQL`)
-- `502` — D1 execution error (`QUERY_ERROR`)
+- `400` - Invalid JSON (`INVALID_BODY`) or disallowed SQL (`INVALID_SQL`)
+- `502` - D1 execution error (`QUERY_ERROR`)
 
 ### GET /
 
@@ -161,5 +161,5 @@ Migrations live in `migrations/0000_init.sql`. Apply with `npm run db:migrate:lo
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[D1](https://developers.cloudflare.com/d1/)** — SQLite database at the edge with seeded read-only playground data
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[D1](https://developers.cloudflare.com/d1/)** - SQLite database at the edge with seeded read-only playground data

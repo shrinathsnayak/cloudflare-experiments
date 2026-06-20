@@ -7,14 +7,14 @@ tags:
   - latency
 ---
 
-Fetch a target URL from the edge and report response time plus the **Cloudflare colo** (`cf.colo`) that handled the Worker invocation. Documents honestly that each request runs in a **single PoP** — not a global multi-region sweep.
+Fetch a target URL from the edge and report response time plus the **Cloudflare colo** (`cf.colo`) that handled the Worker invocation. Documents honestly that each request runs in a **single PoP** - not a global multi-region sweep.
 
 ## Features
 
-- **GET /latency?url=** — Response time, status code, and edge location
-- **Colo metadata** — `colo`, `city`, `country` from `request.cf`
-- **Transparent limitations** — Response includes `limitation` and `tip` fields
-- **Cache bypass** — Uses `cf: { cacheTtl: 0 }` on the outbound fetch
+- **GET /latency?url=** - Response time, status code, and edge location
+- **Colo metadata** - `colo`, `city`, `country` from `request.cf`
+- **Transparent limitations** - Response includes `limitation` and `tip` fields
+- **Cache bypass** - Uses `cf: { cacheTtl: 0 }` on the outbound fetch
 
 ## API Reference
 
@@ -56,8 +56,8 @@ curl "https://your-worker.workers.dev/latency?url=https://www.cloudflare.com"
 
 #### Error Codes
 
-- `400` — Invalid URL (`INVALID_URL`)
-- `502` — Fetch failed (`FETCH_ERROR`)
+- `400` - Invalid URL (`INVALID_URL`)
+- `502` - Fetch failed (`FETCH_ERROR`)
 
 <Callout type="warning">
 
@@ -115,6 +115,6 @@ npm run dev
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **`request.cf`** — Colo and geolocation metadata
-- **Fetch API** — Outbound HTTP with cache controls
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **`request.cf`** - Colo and geolocation metadata
+- **Fetch API** - Outbound HTTP with cache controls

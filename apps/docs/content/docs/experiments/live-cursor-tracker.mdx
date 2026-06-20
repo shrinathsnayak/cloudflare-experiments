@@ -13,10 +13,10 @@ Broadcast cursor positions to every client in a shared room using a **Durable Ob
 
 ## Features
 
-- **GET /** — Demo page with canvas and WebSocket client
-- **GET /ws/:room** — WebSocket upgrade; one DO instance per room name
-- **Hibernation API** — `acceptWebSocket`, `webSocketMessage`, `webSocketClose`
-- **Colored cursors** — Each client gets a stable color and guest label
+- **GET /** - Demo page with canvas and WebSocket client
+- **GET /ws/:room** - WebSocket upgrade; one DO instance per room name
+- **Hibernation API** - `acceptWebSocket`, `webSocketMessage`, `webSocketClose`
+- **Colored cursors** - Each client gets a stable color and guest label
 
 ## API Reference
 
@@ -52,8 +52,8 @@ Send cursor position updates:
 
 #### Error Codes
 
-- `400` — Invalid room name (`INVALID_ROOM`)
-- `426` — Missing WebSocket upgrade header
+- `400` - Invalid room name (`INVALID_ROOM`)
+- `426` - Missing WebSocket upgrade header
 
 ## Use Cases
 
@@ -105,6 +105,6 @@ Open `http://localhost:8787/` in two tabs.
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** — Room-scoped WebSocket coordination
-- **WebSocket Hibernation API** — Efficient long-lived connections
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** - Room-scoped WebSocket coordination
+- **WebSocket Hibernation API** - Efficient long-lived connections

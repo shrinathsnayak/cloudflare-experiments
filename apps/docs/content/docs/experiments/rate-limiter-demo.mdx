@@ -13,10 +13,10 @@ Demonstrates the native **Workers Rate Limiting** binding. `GET /limited` enforc
 
 ## Features
 
-- **GET /limited** — Rate-limited endpoint (10 req / 60s per key)
-- **GET /status?key=** — View limit config and usage counters
-- **429 responses** — Includes `Retry-After` header and `RATE_LIMITED` code
-- **Per-key limiting** — Defaults to client IP; override with `?key=`
+- **GET /limited** - Rate-limited endpoint (10 req / 60s per key)
+- **GET /status?key=** - View limit config and usage counters
+- **429 responses** - Includes `Retry-After` header and `RATE_LIMITED` code
+- **Per-key limiting** - Defaults to client IP; override with `?key=`
 
 ## API Reference
 
@@ -148,6 +148,6 @@ npm run dev
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[Rate Limiting binding](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)** — Native per-key throttling
-- **[Workers KV](https://developers.cloudflare.com/kv/)** — Demo usage tracking
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Rate Limiting binding](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)** - Native per-key throttling
+- **[Workers KV](https://developers.cloudflare.com/kv/)** - Demo usage tracking

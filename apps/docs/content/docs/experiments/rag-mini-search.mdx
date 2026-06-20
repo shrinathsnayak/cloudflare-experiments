@@ -14,10 +14,10 @@ A minimal **retrieval-augmented generation** demo: embed a small corpus of exper
 
 ## Features
 
-- **POST /seed** — Embed and upsert demo experiment docs into Vectorize
-- **POST /ask** — Question → retrieve → generate grounded answer
-- **Cited sources** — Response includes matched experiment titles and scores
-- **Demo corpus** — 10 experiment descriptions from this repo
+- **POST /seed** - Embed and upsert demo experiment docs into Vectorize
+- **POST /ask** - Question → retrieve → generate grounded answer
+- **Cited sources** - Response includes matched experiment titles and scores
+- **Demo corpus** - 10 experiment descriptions from this repo
 
 ## API Reference
 
@@ -42,7 +42,7 @@ curl -X POST "https://your-worker.workers.dev/seed"
 
 #### Error Codes
 
-- `502` — Seeding failed (`SEED_ERROR`)
+- `502` - Seeding failed (`SEED_ERROR`)
 
 ### POST /ask
 
@@ -78,9 +78,9 @@ curl -X POST "https://your-worker.workers.dev/ask" \
 
 #### Error Codes
 
-- `400` — Invalid JSON (`INVALID_BODY`) or question (`INVALID_QUESTION`)
-- `404` — No indexed documents; run `POST /seed` first (`NOT_INDEXED`)
-- `502` — RAG pipeline error (`RAG_ERROR`)
+- `400` - Invalid JSON (`INVALID_BODY`) or question (`INVALID_QUESTION`)
+- `404` - No indexed documents; run `POST /seed` first (`NOT_INDEXED`)
+- `502` - RAG pipeline error (`RAG_ERROR`)
 
 ## Use Cases
 
@@ -136,6 +136,6 @@ npm run seed
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** — Embeddings and text generation
-- **[Vectorize](https://developers.cloudflare.com/vectorize/)** — Vector search at the edge
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Embeddings and text generation
+- **[Vectorize](https://developers.cloudflare.com/vectorize/)** - Vector search at the edge

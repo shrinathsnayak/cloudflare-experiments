@@ -11,10 +11,10 @@ Inspect TLS certificate metadata for a domain. Uses **Certificate Transparency**
 
 ## Features
 
-- **GET /inspect?domain=** — Certificate metadata + reachability
-- **CT-based cert data** — Issuer, subject, validity window, SANs
-- **HTTPS probe** — Confirms the domain is reachable over TLS
-- **Honest limitations** — Documents that full live cert chain inspection is limited in Workers
+- **GET /inspect?domain=** - Certificate metadata + reachability
+- **CT-based cert data** - Issuer, subject, validity window, SANs
+- **HTTPS probe** - Confirms the domain is reachable over TLS
+- **Honest limitations** - Documents that full live cert chain inspection is limited in Workers
 
 ## API Reference
 
@@ -61,8 +61,8 @@ curl "https://your-worker.workers.dev/inspect?domain=cloudflare.com"
 
 #### Error Codes
 
-- `400` — Invalid domain (`INVALID_DOMAIN`)
-- `502` — Lookup or probe failed (`INSPECT_ERROR`)
+- `400` - Invalid domain (`INVALID_DOMAIN`)
+- `502` - Lookup or probe failed (`INSPECT_ERROR`)
 
 <Callout>
 
@@ -118,5 +118,5 @@ curl "http://localhost:8787/inspect?domain=example.com"
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute and outbound fetch
-- **Fetch API** — HTTPS reachability probe
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute and outbound fetch
+- **Fetch API** - HTTPS reachability probe

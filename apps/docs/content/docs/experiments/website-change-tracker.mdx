@@ -15,9 +15,9 @@ Register URLs for on-demand and **Cron**-scheduled snapshots. Rendered text is s
 
 ## Features
 
-- POST /track — register a URL
-- DELETE /track?url= — unregister
-- GET /history?url= — snapshot diff history
+- POST /track - register a URL
+- DELETE /track?url= - unregister
+- GET /history?url= - snapshot diff history
 - Scheduled handler every 30 minutes for tracked URLs
 
 ## API Reference
@@ -40,8 +40,8 @@ Return snapshot history with content hashes and diff summaries.
 
 #### Error Codes
 
-- `400` — `INVALID_URL`, `INVALID_BODY`
-- `404` — `NOT_TRACKED`
+- `400` - `INVALID_URL`, `INVALID_BODY`
+- `404` - `NOT_TRACKED`
 
 ## Use Cases
 

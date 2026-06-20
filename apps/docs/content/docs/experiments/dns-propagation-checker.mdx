@@ -11,7 +11,7 @@ Query **DNS-over-HTTPS** resolvers (Cloudflare 1.1.1.1, Google 8.8.8.8, Quad9) i
 
 ## Features
 
-- GET /check — parallel DoH queries across three public resolvers
+- GET /check - parallel DoH queries across three public resolvers
 - Supports A, AAAA, CNAME, MX, TXT, NS record types
 - Agreement summary plus per-resolver values and latency
 
@@ -19,9 +19,9 @@ Query **DNS-over-HTTPS** resolvers (Cloudflare 1.1.1.1, Google 8.8.8.8, Quad9) i
 
 ### GET /check
 
-**`domain`** `string` (required) — Hostname to query (no scheme).
+**`domain`** `string` (required) - Hostname to query (no scheme).
 
-**`type`** `string` (required) — Record type: `A`, `AAAA`, `CNAME`, `MX`, `TXT`, or `NS`.
+**`type`** `string` (required) - Record type: `A`, `AAAA`, `CNAME`, `MX`, `TXT`, or `NS`.
 
 #### Example Request
 
@@ -44,8 +44,8 @@ curl "https://your-worker.workers.dev/check?domain=example.com&type=A"
 
 #### Error Codes
 
-- `400` — `INVALID_DOMAIN`, `INVALID_TYPE`
-- `502` — `DNS_ERROR`
+- `400` - `INVALID_DOMAIN`, `INVALID_TYPE`
+- `502` - `DNS_ERROR`
 
 ## Use Cases
 

@@ -11,7 +11,7 @@ Send an **OPTIONS** preflight to a target URL with a simulated origin, method, a
 
 ## Features
 
-- POST /test — simulate Access-Control-Request-Method/Headers preflight
+- POST /test - simulate Access-Control-Request-Method/Headers preflight
 - Analyzes Allow-Origin, Allow-Methods, Allow-Headers, Allow-Credentials
 - Returns actionable pass/fail per header requirement
 
@@ -19,13 +19,13 @@ Send an **OPTIONS** preflight to a target URL with a simulated origin, method, a
 
 ### POST /test
 
-**`url`** `string` (required) — Target URL (http or https).
+**`url`** `string` (required) - Target URL (http or https).
 
-**`origin`** `string` (required) — Simulated Origin header value.
+**`origin`** `string` (required) - Simulated Origin header value.
 
-**`method`** `string` (required) — Intended request method (e.g. `POST`).
+**`method`** `string` (required) - Intended request method (e.g. `POST`).
 
-**`headers`** `string[]` (optional) — Request headers for preflight (e.g. `["Content-Type"]`).
+**`headers`** `string[]` (optional) - Request headers for preflight (e.g. `["Content-Type"]`).
 
 #### Example Request
 
@@ -37,8 +37,8 @@ curl -X POST "https://your-worker.workers.dev/test" \
 
 #### Error Codes
 
-- `400` — `INVALID_BODY`, `INVALID_URL`, `INVALID_ORIGIN`, `INVALID_METHOD`
-- `502` — `PREFLIGHT_ERROR`
+- `400` - `INVALID_BODY`, `INVALID_URL`, `INVALID_ORIGIN`, `INVALID_METHOD`
+- `502` - `PREFLIGHT_ERROR`
 
 ## Use Cases
 

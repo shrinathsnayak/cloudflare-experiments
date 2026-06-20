@@ -13,7 +13,7 @@ Call **Workers AI** through **AI Gateway** instead of direct inference. Returns 
 
 ## Features
 
-- POST /generate — text generation via AI Gateway
+- POST /generate - text generation via AI Gateway
 - Returns latency and cache hit/miss metadata
 - Optional compareCache mode runs cached vs skipCache requests
 
@@ -21,9 +21,9 @@ Call **Workers AI** through **AI Gateway** instead of direct inference. Returns 
 
 ### POST /generate
 
-**`prompt`** `string` (required) — Text prompt for the model.
+**`prompt`** `string` (required) - Text prompt for the model.
 
-**`compareCache`** `boolean` (optional) — Run cached and fresh requests and compare latency.
+**`compareCache`** `boolean` (optional) - Run cached and fresh requests and compare latency.
 
 Default model: `@cf/meta/llama-3.1-8b-instruct-fast`.
 
@@ -37,8 +37,8 @@ curl -X POST "https://your-worker.workers.dev/generate" \
 
 #### Error Codes
 
-- `400` — `INVALID_BODY`, `MISSING_PROMPT`
-- `502` — `AI_ERROR`
+- `400` - `INVALID_BODY`, `MISSING_PROMPT`
+- `502` - `AI_ERROR`
 
 ## Use Cases
 

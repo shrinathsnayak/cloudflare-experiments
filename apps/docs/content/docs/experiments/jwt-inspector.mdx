@@ -11,10 +11,10 @@ Inspect JSON Web Tokens at the edge: **decode** header and payload without verif
 
 ## Features
 
-- **POST /decode** — Parse JWT header and payload (no crypto verification)
-- **POST /verify** — Verify HS256 (secret) or RS256 (public key PEM)
-- **POST /issue** — Mint test HS256 tokens with configurable expiry
-- **Web Crypto** — No external JWT libraries required
+- **POST /decode** - Parse JWT header and payload (no crypto verification)
+- **POST /verify** - Verify HS256 (secret) or RS256 (public key PEM)
+- **POST /issue** - Mint test HS256 tokens with configurable expiry
+- **Web Crypto** - No external JWT libraries required
 
 ## API Reference
 
@@ -51,7 +51,7 @@ curl -X POST "https://your-worker.workers.dev/decode" \
 
 #### Error Codes
 
-- `400` — Invalid JSON (`INVALID_BODY`), token (`INVALID_TOKEN`), or decode error (`DECODE_ERROR`)
+- `400` - Invalid JSON (`INVALID_BODY`), token (`INVALID_TOKEN`), or decode error (`DECODE_ERROR`)
 
 ### POST /verify
 
@@ -99,7 +99,7 @@ curl -X POST "https://your-worker.workers.dev/verify" \
 
 #### Error Codes
 
-- `400` — Invalid body/token (`INVALID_BODY`, `INVALID_TOKEN`, `MISSING_KEY`, `VERIFY_ERROR`)
+- `400` - Invalid body/token (`INVALID_BODY`, `INVALID_TOKEN`, `MISSING_KEY`, `VERIFY_ERROR`)
 
 ### POST /issue
 
@@ -149,8 +149,8 @@ curl -X POST "https://your-worker.workers.dev/issue" \
 
 #### Error Codes
 
-- `400` — Invalid body or secret (`INVALID_BODY`, `INVALID_SECRET`)
-- `502` — Signing failed (`ISSUE_ERROR`)
+- `400` - Invalid body or secret (`INVALID_BODY`, `INVALID_SECRET`)
+- `502` - Signing failed (`ISSUE_ERROR`)
 
 ## Use Cases
 
@@ -198,5 +198,5 @@ npm run dev
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[Web Crypto API](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)** — HMAC and RSA signature operations
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Web Crypto API](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)** - HMAC and RSA signature operations

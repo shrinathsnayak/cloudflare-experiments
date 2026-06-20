@@ -11,7 +11,7 @@ Accept a raw payload, secret, signature header value, and algorithm. Computes th
 
 ## Features
 
-- POST /verify — HMAC-SHA256 verification with clear comparison explanation
+- POST /verify - HMAC-SHA256 verification with clear comparison explanation
 - Supports prefixed signatures (`sha256=...`) and raw hex
 - Uses Web Crypto at the edge; no external libraries
 
@@ -19,13 +19,13 @@ Accept a raw payload, secret, signature header value, and algorithm. Computes th
 
 ### POST /verify
 
-**`payload`** `string` (required) — Raw request body as received.
+**`payload`** `string` (required) - Raw request body as received.
 
-**`secret`** `string` (required) — Shared signing secret.
+**`secret`** `string` (required) - Shared signing secret.
 
-**`signature`** `string` (required) — Signature from the webhook header.
+**`signature`** `string` (required) - Signature from the webhook header.
 
-**`algorithm`** `string` (optional) — Default `sha256`.
+**`algorithm`** `string` (optional) - Default `sha256`.
 
 #### Example Request
 
@@ -49,7 +49,7 @@ curl -X POST "https://your-worker.workers.dev/verify" \
 
 #### Error Codes
 
-- `400` — `INVALID_BODY`, `MISSING_FIELD`, `INVALID_ALGORITHM`
+- `400` - `INVALID_BODY`, `MISSING_FIELD`, `INVALID_ALGORITHM`
 
 ## Use Cases
 

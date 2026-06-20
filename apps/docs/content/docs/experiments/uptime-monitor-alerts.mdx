@@ -14,9 +14,9 @@ Extend the is-it-down pattern into a persistent monitor. **Cron** pings register
 
 ## Features
 
-- POST /monitors — register URL + alert email
-- DELETE /monitors/:id — remove monitor
-- GET /monitors/:id/history — check history and uptime percentage
+- POST /monitors - register URL + alert email
+- DELETE /monitors/:id - remove monitor
+- GET /monitors/:id/history - check history and uptime percentage
 - Scheduled checks every 5 minutes
 
 ## API Reference
@@ -37,8 +37,8 @@ Returns check history and uptime percentage.
 
 #### Error Codes
 
-- `400` — `INVALID_URL`, `INVALID_EMAIL`, `INVALID_BODY`
-- `404` — `NOT_FOUND`
+- `400` - `INVALID_URL`, `INVALID_EMAIL`, `INVALID_BODY`
+- `404` - `NOT_FOUND`
 
 ## Use Cases
 

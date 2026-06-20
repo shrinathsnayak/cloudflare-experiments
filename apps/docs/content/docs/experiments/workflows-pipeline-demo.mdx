@@ -15,10 +15,10 @@ A durable three-step pipeline built with **Cloudflare Workflows**: fetch a URL, 
 
 ## Features
 
-- **POST /run** — Start a workflow instance from a URL
-- **GET /status/:instanceId** — Poll status and final output
-- **Three durable steps** — fetch, summarize, store (each wrapped in `step.do()`)
-- **Pause demo** — `step.sleep("3 seconds")` between fetch and summarize
+- **POST /run** - Start a workflow instance from a URL
+- **GET /status/:instanceId** - Poll status and final output
+- **Three durable steps** - fetch, summarize, store (each wrapped in `step.do()`)
+- **Pause demo** - `step.sleep("3 seconds")` between fetch and summarize
 
 ## API Reference
 
@@ -55,8 +55,8 @@ curl -X POST "https://your-worker.workers.dev/run" \
 
 #### Error Codes
 
-- `400` — Invalid JSON (`INVALID_BODY`) or URL (`INVALID_URL`)
-- `502` — Workflow start failed (`WORKFLOW_ERROR`)
+- `400` - Invalid JSON (`INVALID_BODY`) or URL (`INVALID_URL`)
+- `502` - Workflow start failed (`WORKFLOW_ERROR`)
 
 ### GET /status/:instanceId
 
@@ -85,8 +85,8 @@ curl "https://your-worker.workers.dev/status/abc-123"
 
 #### Error Codes
 
-- `400` — Missing instance id (`INVALID_INSTANCE_ID`)
-- `404` — Instance not found (`NOT_FOUND`)
+- `400` - Missing instance id (`INVALID_INSTANCE_ID`)
+- `404` - Instance not found (`NOT_FOUND`)
 
 ## Use Cases
 
@@ -150,7 +150,7 @@ npm run dev
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[Workflows](https://developers.cloudflare.com/workflows/)** — Durable multi-step execution
-- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** — LLM summarization
-- **[R2](https://developers.cloudflare.com/r2/)** — Object storage for pipeline output
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workflows](https://developers.cloudflare.com/workflows/)** - Durable multi-step execution
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - LLM summarization
+- **[R2](https://developers.cloudflare.com/r2/)** - Object storage for pipeline output

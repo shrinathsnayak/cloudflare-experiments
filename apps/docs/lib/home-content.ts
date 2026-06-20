@@ -40,7 +40,7 @@ export const homePrinciples = [
   {
     title: "Edge-first",
     description:
-      "Every experiment runs on Cloudflare Workers at the edge — low latency, global reach, no servers to manage.",
+      "Every experiment runs on Cloudflare Workers at the edge - low latency, global reach, no servers to manage.",
   },
   {
     title: "Single responsibility",
@@ -55,7 +55,7 @@ export const homePrinciples = [
   {
     title: "Under 60 seconds",
     description:
-      "Request paths are designed to complete quickly — ideal for learning, demos, and prototyping.",
+      "Request paths are designed to complete quickly - ideal for learning, demos, and prototyping.",
   },
 ] as const;
 
@@ -64,7 +64,7 @@ export const homeWorkflow = [
     step: "01",
     title: "Pick an experiment",
     description:
-      "Browse by category — AI, scraping, monitoring, storage — or search docs by binding name like d1 or r2.",
+      "Browse by category - AI, scraping, monitoring, storage - or search docs by binding name like d1 or r2.",
   },
   {
     step: "02",
@@ -82,7 +82,7 @@ export const homeWorkflow = [
     step: "04",
     title: "Adapt the pattern",
     description:
-      "Fork the code into your project. Each experiment is MIT licensed — use it as a starting point, not a dependency.",
+      "Fork the code into your project. Each experiment is MIT licensed - use it as a starting point, not a dependency.",
   },
 ] as const;
 
@@ -148,7 +148,7 @@ export const platformCapabilities = [
     icon: FileCode,
     title: "HTMLRewriter",
     description:
-      "Parse and transform HTML without a browser — metadata, stats, social tags, and rewrites.",
+      "Parse and transform HTML without a browser - metadata, stats, social tags, and rewrites.",
     href: "experiments/html-rewriter",
   },
   {

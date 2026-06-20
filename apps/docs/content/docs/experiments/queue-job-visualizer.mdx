@@ -14,10 +14,10 @@ Enqueue simulated jobs over HTTP, process them asynchronously with a **Queues co
 
 ## Features
 
-- **POST /jobs** — Enqueue a resize or fetch job
-- **GET /jobs/:id** — Poll job status from KV
-- **Simulated failures** — Consumer retries up to 3 attempts before marking failed
-- **KV state machine** — Full transition history on each job record
+- **POST /jobs** - Enqueue a resize or fetch job
+- **GET /jobs/:id** - Poll job status from KV
+- **Simulated failures** - Consumer retries up to 3 attempts before marking failed
+- **KV state machine** - Full transition history on each job record
 
 ## API Reference
 
@@ -64,7 +64,7 @@ curl -X POST "https://your-worker.workers.dev/jobs" \
 
 #### Error Codes
 
-- `400` — Invalid JSON (`INVALID_BODY`), type (`INVALID_TYPE`), or target (`INVALID_TARGET`)
+- `400` - Invalid JSON (`INVALID_BODY`), type (`INVALID_TYPE`), or target (`INVALID_TARGET`)
 
 ### GET /jobs/:id
 
@@ -93,7 +93,7 @@ curl "https://your-worker.workers.dev/jobs/550e8400-e29b-41d4-a716-446655440000"
 
 #### Error Codes
 
-- `404` — Job not found (`NOT_FOUND`)
+- `404` - Job not found (`NOT_FOUND`)
 
 <Callout>
 
@@ -162,6 +162,6 @@ npm run dev
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-- **[Queues](https://developers.cloudflare.com/queues/)** — Async job processing
-- **[Workers KV](https://developers.cloudflare.com/kv/)** — Job status storage
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Queues](https://developers.cloudflare.com/queues/)** - Async job processing
+- **[Workers KV](https://developers.cloudflare.com/kv/)** - Job status storage
