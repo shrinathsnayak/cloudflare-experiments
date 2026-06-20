@@ -1,19 +1,27 @@
 ---
-title: Dependency Analyzer
-description: Analyze all external resources and dependencies loaded by a webpage
+title: "Dependency Analyzer"
+description: "Analyze all external resources and dependencies loaded by a webpage"
+icon: "Package"
+tags:
+  - scraping
 ---
-
 Analyze all external resources and dependencies loaded by any webpage. Discover scripts, stylesheets, images, fonts, and iframes to understand a site's external dependencies and third-party integrations.
 
-## API Endpoint
+## API Reference
 
 ### GET /analyze
 
 Analyze all external dependencies of a webpage by providing its URL.
 
-**`url`** `string` (required)
-
-The URL of the webpage to analyze. Must be a valid HTTP or HTTPS URL.
+<TypeTable
+  type={{
+    url: {
+      description: "The URL of the webpage to analyze. Must be a valid HTTP or HTTPS URL.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -108,63 +116,6 @@ Array of unique absolute URLs of embedded iframes via `<iframe src="...">`. Usef
 }
 ```
 
-## Deployment
-
-<Steps>
-  <Step>
-
-### Clone the repository
-
-    ```bash
-    git clone https://github.com/your-org/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/dependency-analyzer
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Install dependencies
-
-    ```bash
-    npm install
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Test locally
-
-    ```bash
-    npm run dev
-    ```
-
-    The API will be available at `http://localhost:8787`
-
-  </Step>
-  
-  <Step>
-
-### Deploy to Cloudflare Workers
-
-    ```bash
-    npm run deploy
-    ```
-
-  </Step>
-</Steps>
-
-## Use Cases
-
-- **Dependency Audits**: Identify all third-party dependencies and external resources
-- **Performance Analysis**: Discover resource-heavy pages loading too many external files
-- **Security Reviews**: Find all external scripts and potential security risks
-- **Privacy Compliance**: Identify third-party trackers and analytics scripts
-- **License Compliance**: Discover all fonts and resources that may require licensing
-- **CDN Optimization**: Identify candidates for CDN migration or consolidation
-- **Competitive Analysis**: Understand what services and tools competitors use
-
 ## Technical Details
 
 - Built with [Hono](https://hono.dev/) framework
@@ -215,3 +166,73 @@ Array of unique absolute URLs of embedded iframes via `<iframe src="...">`. Usef
 - Relative URLs are resolved using the base URL of the page
 - The tool fetches and analyzes the initial HTML only (does not execute JavaScript)
 - Resources loaded dynamically after page load are not captured
+
+## Use Cases
+
+
+- **Dependency Audits**: Identify all third-party dependencies and external resources
+- **Performance Analysis**: Discover resource-heavy pages loading too many external files
+- **Security Reviews**: Find all external scripts and potential security risks
+- **Privacy Compliance**: Identify third-party trackers and analytics scripts
+- **License Compliance**: Discover all fonts and resources that may require licensing
+- **CDN Optimization**: Identify candidates for CDN migration or consolidation
+- **Competitive Analysis**: Understand what services and tools competitors use
+
+## Limitations
+
+
+- Static HTML only; assets loaded dynamically by JavaScript are not detected
+- HTML body is capped before parsing
+- Fetch timeout on slow or unreachable origins
+- Single URL per request; no site-wide crawling
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/dependency-analyzer)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    No additional configuration required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/analyze?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/dependency-analyzer
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/analyze?url=https://example.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote HTML retrieval and parsing
+
+

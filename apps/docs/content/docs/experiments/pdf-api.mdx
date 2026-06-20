@@ -1,19 +1,29 @@
 ---
-title: PDF API
-description: Generate PDF documents from any webpage using Cloudflare Browser Rendering
+title: "PDF API"
+description: "Generate PDF documents from any webpage using Cloudflare Browser Rendering"
+icon: "FileType"
+tags:
+  - browser
+bindings:
+  - BROWSER
 ---
-
 Generate a PDF from any URL using Browser Rendering and Puppeteer's `page.pdf()` API.
 
-## API Endpoint
+## API Reference
 
 ### GET /pdf
 
 Renders the specified URL in a headless browser and returns a PDF document.
 
-**`url`** `string` (required)
-
-The website URL to render (must be http or https)
+<TypeTable
+  type={{
+    url: {
+      description: "The website URL to render (must be http or https)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -47,10 +57,19 @@ Cache-Control: public, max-age=60
 
 ## Use Cases
 
+
 - Convert web pages to printable PDF documents
 - Archive rendered page content with styles
 - Generate invoices or reports from HTML pages
 - Learn Browser Rendering PDF generation with Workers bindings
+
+## Limitations
+
+
+- Requires Browser Rendering enabled on your Cloudflare account
+- Local development needs `npx wrangler dev --remote`
+- Navigation timeout; complex or infinite-scroll pages may fail
+- Fixed viewport; no PDF margin, format, or page-size options
 
 ## Deployment
 
@@ -107,4 +126,6 @@ curl "http://localhost:8787/pdf?url=https://www.cloudflare.com" --output test.pd
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`
-- **Puppeteer `page.pdf()`** - PDF generation from rendered pages
+- **[Puppeteer `page.pdf()`](https://developers.cloudflare.com/browser-rendering/platform/puppeteer/)** - PDF generation from rendered pages
+
+

@@ -1,8 +1,13 @@
 ---
 title: "AI Website Tag Generator"
 description: "Generate topic tags for any website using Workers AI on the edge"
+icon: "Tags"
+tags:
+  - ai
+  - workers-ai
+bindings:
+  - AI
 ---
-
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -25,9 +30,15 @@ The AI Website Tag Generator experiment fetches any webpage, extracts its conten
 
 Generate topic tags for any webpage.
 
-**`url`** `string` (required)
-
-The webpage URL or hostname to tag. Use `http://` or `https://` for full URLs, or a bare hostname like `example.com`.
+<TypeTable
+  type={{
+    url: {
+      description: "The webpage URL or hostname to tag. Use `http://` or `https://` for full URLs, or a bare hostname like `example.com`.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Response
 
@@ -77,59 +88,8 @@ Machine-readable error code.
 }
 ```
 
-## Deployment
-
-<Steps>
-  <Step>
-
-### Clone and install dependencies
-
-    ```bash
-    git clone https://github.com/shrinathsnayak/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/ai-website-tag-generator
-    npm install
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Test locally
-
-    ```bash
-    npm run dev
-    ```
-
-    Then open: `http://localhost:8787/tags?url=https://cloudflare.com`
-
-  </Step>
-  
-  <Step>
-
-### Deploy to Cloudflare Workers
-
-    ```bash
-    npm run deploy
-    ```
-
-    Requires a Cloudflare account with Workers AI enabled.
-
-  </Step>
-</Steps>
-
-### One-Click Deploy
-
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-tag-generator)
-
-Click the button above to deploy this Worker directly to your Cloudflare account. Fork the repository and update the URL to deploy from your own fork.
-
-## Cloudflare Features Used
-
-- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
-- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Run LLMs on the edge with the `AI` binding
-- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for fetching webpages
-
 ## Use Cases
+
 
 - **Content tagging** - Auto-tag articles or bookmarks by topic
 - **SEO and discovery** - Suggest categories or related topics from page content
@@ -138,9 +98,59 @@ Click the button above to deploy this Worker directly to your Cloudflare account
 
 ## Limitations
 
+
 - **JavaScript-heavy sites** - Only static HTML is fetched; client-rendered content is not executed
 - **Workers AI limits** - Subject to [Workers AI usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
 - **Fetch and size limits** - Same constraints as other URL-based experiments (timeout, HTML size cap)
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-tag-generator)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Enable the **Workers AI** binding (`AI`) in your Worker settings. The deploy button configures this automatically via `wrangler.json`. Requires a Cloudflare account with Workers AI enabled.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/tags?url=https://www.cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/ai-website-tag-generator
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/tags?url=https://www.cloudflare.com"
+```
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Run LLMs on the edge with the `AI` binding
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for fetching webpages
 
 ## Next Steps
 
@@ -161,3 +171,5 @@ Click the button above to deploy this Worker directly to your Cloudflare account
     Explore other Cloudflare experiments
   </Card>
 </Cards>
+
+

@@ -1,27 +1,37 @@
 ---
 title: "Analytics Engine"
 description: "Write custom events to Workers Analytics Engine at the edge"
+icon: "ChartBar"
+tags:
+  - stateful
+bindings:
+  - ANALYTICS
 ---
-
 Record custom analytics events from a Worker using [Workers Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/). The `experiment_events` dataset is auto-created on first write - no manual dashboard setup required.
 
-## API Endpoint
+## API Reference
 
 ### POST /track
 
 Writes a named event with an optional numeric value and tag to the Analytics Engine dataset.
 
-**`event`** `string` (required)
-
-Event name (non-empty string, max 100 characters)
-
-**`value`** `number` (optional)
-
-Numeric value to record (defaults to `1`)
-
-**`tag`** `string` (optional)
-
-Optional string tag stored as a blob alongside the event
+<TypeTable
+  type={{
+    event: {
+      description: "Event name (non-empty string, max 100 characters)",
+      type: "string",
+      required: true,
+    },
+    value: {
+      description: "Numeric value to record (defaults to `1`)",
+      type: "number",
+    },
+    tag: {
+      description: "Optional string tag stored as a blob alongside the event",
+      type: "string",
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -69,10 +79,18 @@ The numeric value that was written
 
 ## Use Cases
 
+
 - Emit custom metrics from edge Workers without a third-party analytics SDK
 - Track feature usage, clicks, or conversions with named events and tags
 - Learn Analytics Engine `writeDataPoint` in a minimal stateless API
 - Prototype observability pipelines before wiring dashboards and SQL queries
+
+## Limitations
+
+
+- Writes datapoints only; no query or dashboard API in this experiment
+- No sampling, aggregation, or retention configuration
+- Requires an Analytics Engine binding in `wrangler.json`
 
 ## Deployment
 
@@ -126,3 +144,5 @@ curl -X POST "http://localhost:8787/track" \
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Workers Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/)** - `experiment_events` dataset via `ANALYTICS` binding
+
+

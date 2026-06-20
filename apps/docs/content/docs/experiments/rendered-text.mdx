@@ -1,19 +1,29 @@
 ---
-title: Rendered Text
-description: Extract JavaScript-rendered visible text using Cloudflare Browser Rendering
+title: "Rendered Text"
+description: "Extract JavaScript-rendered visible text using Cloudflare Browser Rendering"
+icon: "FileText"
+tags:
+  - browser
+bindings:
+  - BROWSER
 ---
-
 Load any URL in a headless browser and extract the visible page text after JavaScript has executed.
 
-## API Endpoint
+## API Reference
 
 ### GET /text
 
 Returns the document title and normalized visible text from `document.body.innerText`.
 
-**`url`** `string` (required)
-
-The website URL to extract text from (must be http or https)
+<TypeTable
+  type={{
+    url: {
+      description: "The website URL to extract text from (must be http or https)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -69,10 +79,19 @@ Whether the text was truncated at 50,000 characters
 
 ## Use Cases
 
+
 - Scrape single-page apps and client-rendered content
 - Feed rendered page text to LLM pipelines
 - Compare static fetch vs browser-rendered output
 - Build search indexes for JavaScript-heavy sites
+
+## Limitations
+
+
+- Requires Browser Rendering enabled on your Cloudflare account
+- Local development needs `npx wrangler dev --remote`
+- Extracted text is truncated at a maximum length
+- Navigation timeout on slow or script-heavy pages
 
 ## Deployment
 
@@ -122,4 +141,6 @@ curl "http://localhost:8787/text?url=https://www.cloudflare.com"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`
-- **DOM evaluation** - Extract rendered text after `networkidle0`
+- **[Puppeteer DOM evaluation](https://developers.cloudflare.com/browser-rendering/platform/puppeteer/)** - Extract rendered text after `networkidle0`
+
+

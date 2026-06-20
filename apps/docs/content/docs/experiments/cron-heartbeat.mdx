@@ -1,11 +1,15 @@
 ---
 title: "Cron Heartbeat"
 description: "Reference implementation for Cron Triggers - scheduled tasks with run metadata stored in KV"
+icon: "Clock"
+tags:
+  - stateful
+bindings:
+  - KV
 ---
-
 A minimal reference for **Cron Triggers**: a `scheduled()` handler runs every 5 minutes and writes run metadata to **Workers KV**. An HTTP route reads that metadata back.
 
-## API Endpoint
+## API Reference
 
 ### GET /status
 
@@ -49,10 +53,18 @@ Before the first cron fires, `lastRun` and `lastCron` are `null` and `runCount` 
 
 ## Use Cases
 
+
 - Learn how to implement a `scheduled()` handler in Workers
 - Periodic health checks, cache warming, or cleanup jobs
 - Background maintenance without external cron services
 - Storing cron run history in KV for observability
+
+## Limitations
+
+
+- Cron schedule is fixed in `wrangler.json`; change and redeploy to adjust timing
+- Stores last-run metadata in KV only; not a full job scheduler
+- Demonstration worker; no alerting or retry logic on failed runs
 
 ## Deployment
 
@@ -105,5 +117,8 @@ curl "http://localhost:8787/cdn-cgi/handler/scheduled"
 
 ## Cloudflare Features Used
 
-- [Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/) - scheduled Worker invocations
-- [Workers KV](https://developers.cloudflare.com/kv/) - persist run metadata across invocations
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/)** - scheduled Worker invocations
+- **[Workers KV](https://developers.cloudflare.com/kv/)** - persist run metadata across invocations
+
+

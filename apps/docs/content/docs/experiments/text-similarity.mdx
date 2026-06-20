@@ -1,23 +1,42 @@
 ---
 title: "Text Similarity"
 description: "Compare text similarity with Workers AI embeddings at the edge"
+icon: "GitCompareArrows"
+tags:
+  - ai
+  - embeddings
+bindings:
+  - AI
 ---
-
 Compare two text strings for semantic similarity using [Workers AI](https://developers.cloudflare.com/workers-ai/) embeddings and cosine similarity. Returns a score between 0 and 1.
 
-## API Endpoint
+## Features
+
+- Compare two text strings for semantic similarity (score 0–1)
+- Workers AI embeddings via `@cf/baai/bge-base-en-v1.5`
+- Cosine similarity computed at the edge
+- Stateless GET API with `text1` and `text2` query parameters
+
+## API Reference
 
 ### GET /similarity
 
 Computes the cosine similarity between embeddings of two text inputs.
 
-**`text1`** `string` (required)
-
-First text to compare (max 10,000 characters)
-
-**`text2`** `string` (required)
-
-Second text to compare (max 10,000 characters)
+<TypeTable
+  type={{
+    text1: {
+      description: "First text to compare (max 10,000 characters)",
+      type: "string",
+      required: true,
+    },
+    text2: {
+      description: "Second text to compare (max 10,000 characters)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -64,10 +83,18 @@ Cosine similarity score between 0 and 1 (higher means more similar)
 
 ## Use Cases
 
+
 - Detect duplicate or near-duplicate content at the edge
 - Rank search results or FAQ matches by semantic relevance
 - Learn Workers AI embedding models and vector similarity
 - Build lightweight deduplication or matching APIs without a vector database
+
+## Limitations
+
+
+- Workers AI is subject to [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
+- Each input string length is capped
+- Compares two strings only; no corpus or vector database search
 
 ## Deployment
 
@@ -117,3 +144,5 @@ curl "http://localhost:8787/similarity?text1=hello&text2=hi"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - `@cf/baai/bge-base-en-v1.5` text embedding model
+
+

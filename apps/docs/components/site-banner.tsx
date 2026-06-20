@@ -6,7 +6,7 @@ export function SiteBanner() {
     <Banner
       height="2rem"
       changeLayout
-      className="bg-[#f38020] text-sm text-white"
+      className="bg-[#f38020] text-sm text-white font-light"
     >
       {siteBanner.text}
     </Banner>

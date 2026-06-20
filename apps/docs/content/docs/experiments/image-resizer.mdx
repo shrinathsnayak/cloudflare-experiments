@@ -1,31 +1,39 @@
 ---
 title: "Image Resizer"
 description: "Resize remote images with Cloudflare Image Resizing at the edge"
+icon: "ImageDown"
+tags:
+  - edge
 ---
-
 Fetch and resize remote images using Cloudflare [Image Resizing](https://developers.cloudflare.com/images/transform-images/) via the `fetch` API and `cf.image` options. Returns the resized image binary with the appropriate `Content-Type` header.
 
-## API Endpoint
+## API Reference
 
 ### GET /resize
 
 Fetches a remote image and returns a resized version.
 
-**`url`** `string` (required)
-
-Source image URL (`http://` or `https://` only)
-
-**`width`** `number` (optional)
-
-Target width in pixels (1–4096). At least one of `width` or `height` is required.
-
-**`height`** `number` (optional)
-
-Target height in pixels (1–4096). At least one of `width` or `height` is required.
-
-**`fit`** `string` (optional)
-
-Resize fit mode: `scale-down` (default), `contain`, `cover`, `crop`, or `pad`
+<TypeTable
+  type={{
+    url: {
+      description: "Source image URL (`http://` or `https://` only)",
+      type: "string",
+      required: true,
+    },
+    width: {
+      description: "Target width in pixels (1–4096). At least one of `width` or `height` is required.",
+      type: "number",
+    },
+    height: {
+      description: "Target height in pixels (1–4096). At least one of `width` or `height` is required.",
+      type: "number",
+    },
+    fit: {
+      description: "Resize fit mode: `scale-down` (default), `contain`, `cover`, `crop`, or `pad`",
+      type: "string",
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -57,10 +65,19 @@ Returns the resized image as binary data with an appropriate `Content-Type` head
 
 ## Use Cases
 
+
 - Serve dynamically resized thumbnails from any remote image URL
 - Learn Cloudflare Image Resizing options via Workers `fetch`
 - Build on-the-fly image proxy endpoints at the edge
 - Reduce bandwidth by resizing images before delivery to clients
+
+## Limitations
+
+
+- Remote image fetch is subject to a timeout
+- Resizing options are limited to the query params exposed by this experiment
+- Origin must allow Cloudflare to fetch the image URL
+- Single image per request; no batch processing
 
 ## Deployment
 
@@ -111,3 +128,5 @@ curl "http://localhost:8787/resize?url=https://example.com/image.jpg&width=800&f
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Image Resizing](https://developers.cloudflare.com/images/transform-images/)** - `fetch` with `cf.image` transform options
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote image retrieval
+
+

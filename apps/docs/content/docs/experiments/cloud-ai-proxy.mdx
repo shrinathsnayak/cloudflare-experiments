@@ -1,8 +1,13 @@
 ---
 title: "Cloud AI Proxy"
 description: "Call Workers AI with any model and prompt from a single public endpoint"
+icon: "Cpu"
+tags:
+  - ai
+  - workers-ai
+bindings:
+  - AI
 ---
-
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -64,17 +69,20 @@ curl -X POST https://your-worker.workers.dev/chat \
 
 Query params: `model` (required), `prompt` (required), optional `max_tokens`.
 
-**`model`** `string` (required)
-
-Workers AI model ID (e.g. `@cf/meta/llama-3.1-8b-instruct-fast`).
-
-**`prompt`** `string` (required)
-
-The prompt text. URL-encoded.
-
-**`max_tokens`** `number`
-
-Max tokens to generate (1–4096). Optional.
+<TypeTable
+  type={{
+    model: {
+      description: "Workers AI model ID (e.g. `@cf/meta/llama-3.1-8b-instruct-fast`).",
+      type: "string",
+      required: true,
+    },
+    prompt: {
+      description: "The prompt text. URL-encoded.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -87,52 +95,70 @@ curl "https://your-worker.workers.dev/chat?model=@cf/meta/llama-3.1-8b-instruct-
 - **400 Bad Request** - `INVALID_BODY`, `MISSING_MODEL`, `MISSING_PROMPT`, or `INVALID_MAX_TOKENS`
 - **502 Bad Gateway** - `AI_ERROR` (model run failed)
 
-## Run locally
+## Use Cases
+
+
+- Try Workers AI models from curl, Postman, or external tools without managing bindings
+- Prototype chat APIs before adding authentication and rate limiting
+- Compare model outputs by swapping the `model` parameter
+- Integrate edge AI into apps via a simple HTTP proxy
+
+## Limitations
+
+
+- Public endpoint with no authentication or rate limiting by default
+- Workers AI is subject to [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
+- `max_tokens` is capped at 4096
+- Text generation only; no streaming responses or tool calling
+
+## Deployment
 
 <Steps>
   <Step>
 
-### Clone and enter the experiment
+### Click the deploy button
 
-    ```bash
-    git clone https://github.com/shrinathsnayak/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/cloud-ai-proxy
-    ```
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cloud-ai-proxy)
 
   </Step>
+
   <Step>
 
-### Install and start the dev server
+### Deploy
 
-    ```bash
-    npm install
-    npm run dev
-    ```
+    Enable the **Workers AI** binding (`AI`) in your Worker settings. The deploy button configures this automatically via `wrangler.json`. Requires a Cloudflare account with Workers AI enabled.
 
   </Step>
+
   <Step>
 
-### Call the endpoint
+### Test your deployment
 
-    Use `http://localhost:8787/chat` with POST (JSON body) or GET (query params).
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/chat" \
+      -H "Content-Type: application/json" \
+      -d '{"model":"@cf/meta/llama-3.1-8b-instruct-fast","prompt":"Say hello in one sentence."}'
+    ```
 
   </Step>
 </Steps>
 
-Requires a Cloudflare account with Workers AI enabled. See [Workers AI](https://developers.cloudflare.com/workers-ai/) for setup.
+## Local Development
 
-## Deploy
+```bash
+cd apps/experiments/cloud-ai-proxy
+npm install
+npm run dev
+```
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cloud-ai-proxy)
+Call the endpoint at `http://localhost:8787/chat` with POST (JSON body) or GET (query params). Requires a Cloudflare account with Workers AI enabled.
 
-Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments). To use your own fork, change the owner in the deploy URL.
+## Cloudflare Features Used
 
-## Cloudflare features used
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - `AI` binding for text generation
 
-- **Workers** - Edge runtime
-- **Workers AI** - `AI` binding for text generation
-
-## Related resources
+## Next Steps
 
 <Cards>
   <Card
@@ -144,3 +170,5 @@ Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinaths
     href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cloud-ai-proxy"
   ></Card>
 </Cards>
+
+

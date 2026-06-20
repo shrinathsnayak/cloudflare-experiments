@@ -1,8 +1,12 @@
 ---
 title: "AI Bot Visibility Checker"
 description: "Check if a URL is configured to allow or block AI crawlers like GPTBot, ClaudeBot, and others"
+icon: "Bot"
+tags:
+  - ai
+  - seo
+full: true
 ---
-
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -32,9 +36,15 @@ The AI Bot Visibility Checker analyzes a webpage's `robots.txt` file and page-le
 
 Check AI crawler visibility configuration for a URL.
 
-**`url`** `string` (required)
-
-The target URL to check. Must use `http://` or `https://` scheme.
+<TypeTable
+  type={{
+    url: {
+      description: "The target URL to check. Must use `http://` or `https://` scheme.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Response
 
@@ -358,143 +368,6 @@ Allow: /
 
 The parser extracts per-user-agent rules and applies path matching with longest-prefix-wins logic.
 
-## Setup & Deployment
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) v18 or later
-- A [Cloudflare account](https://dash.cloudflare.com/sign-up)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed
-
-### Local Development
-
-<Steps>
-  <Step>
-
-### Clone and install dependencies
-
-    ```bash
-    git clone https://github.com/shrinathsnayak/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/ai-bot-visibility
-    npm install
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Start the development server
-
-    ```bash
-    npm run dev
-    ```
-
-    This starts Wrangler in dev mode. No bindings required.
-
-  </Step>
-  
-  <Step>
-
-### Test the endpoint
-
-    ```bash
-    curl "http://localhost:8787/check?url=https://www.cloudflare.com"
-    ```
-
-  </Step>
-</Steps>
-
-### Deploy to Production
-
-<Steps>
-  <Step>
-
-### Authenticate with Cloudflare
-
-    ```bash
-    wrangler login
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Deploy the Worker
-
-    ```bash
-    npm run deploy
-    ```
-
-    This publishes your Worker to `*.workers.dev` or your custom domain.
-
-  </Step>
-  
-  <Step>
-
-### Test the production endpoint
-
-    ```bash
-    curl "https://ai-bot-visibility.YOUR_SUBDOMAIN.workers.dev/check?url=https://example.com"
-    ```
-
-  </Step>
-</Steps>
-
-### One-Click Deploy
-
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-bot-visibility)
-
-Click the button above to deploy this Worker directly to your Cloudflare account. You can fork the repository and update the URL to deploy from your own fork.
-
-## Configuration
-
-No bindings or environment variables are required. The `wrangler.toml` is minimal:
-
-```toml
-name = "ai-bot-visibility"
-main = "src/index.ts"
-compatibility_date = "2024-01-01"
-```
-
-## Dependencies
-
-```json
-{
-  "dependencies": {
-    "hono": "^4.6.12"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241127.0",
-    "typescript": "^5.7.2",
-    "wrangler": "^4"
-  }
-}
-```
-
-## Cloudflare Features Used
-
-- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
-- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for fetching pages and robots.txt
-- **Edge Networking** - Low-latency requests from global edge locations
-
-## Use Cases
-
-- **SEO Tools** - Add AI crawler visibility checks to SEO audit dashboards
-- **CMS Plugins** - Integrate into WordPress/Drupal to show AI bot status
-- **Privacy Compliance** - Monitor which AI platforms can access your content
-- **Analytics Dashboards** - Track AI crawler access policies across sites
-- **Browser Extensions** - Show AI visibility status for the current page
-- **Web Scraping Tools** - Check if your scraper is allowed before crawling
-
-## Limitations
-
-- **Configuration only**: Does not verify actual indexing by AI platforms (no public APIs exist)
-- **Static analysis**: Does not execute JavaScript; only analyzes HTML and headers
-- **No authentication**: Cannot check auth-protected pages
-- **robots.txt compliance**: Assumes crawlers respect robots.txt (not legally enforced)
-- **Limited crawlers**: Only checks 14 known AI crawlers (list can be extended)
-- **No sitemap parsing**: Only checks individual URLs, not entire sitemaps
-
 ## Advanced Usage
 
 ### Adding Custom Crawlers
@@ -537,35 +410,6 @@ app.get("/site-check", async (c) => {
 });
 ```
 
-## Related Resources
-
-<Cards>
-  <Card
-    title="robots.txt Specification"
-    href="https://developers.google.com/search/docs/crawling-indexing/robots/intro"
-  >
-    Learn about robots.txt syntax and best practices
-  </Card>
-  <Card
-    title="Meta Robots Tag"
-    href="https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag"
-  >
-    Documentation for meta robots directives
-  </Card>
-  <Card
-    title="AI Crawl Control"
-    href="https://blog.cloudflare.com/declaring-your-aindependence-block-ai-bots-scrapers-and-crawlers-with-a-single-click"
-  >
-    Cloudflare's AI crawler blocking feature
-  </Card>
-  <Card
-    title="GitHub Repository"
-    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-bot-visibility"
-  >
-    View the complete source code
-  </Card>
-</Cards>
-
 ## FAQ
 
 <Accordions>
@@ -597,19 +441,129 @@ app.get("/site-check", async (c) => {
   </Accordion>
 </Accordions>
 
+## Use Cases
+
+
+- **SEO Tools** - Add AI crawler visibility checks to SEO audit dashboards
+- **CMS Plugins** - Integrate into WordPress/Drupal to show AI bot status
+- **Privacy Compliance** - Monitor which AI platforms can access your content
+- **Analytics Dashboards** - Track AI crawler access policies across sites
+- **Browser Extensions** - Show AI visibility status for the current page
+- **Web Scraping Tools** - Check if your scraper is allowed before crawling
+
+## Limitations
+
+
+- **Configuration only**: Does not verify actual indexing by AI platforms (no public APIs exist)
+- **Static analysis**: Does not execute JavaScript; only analyzes HTML and headers
+- **No authentication**: Cannot check auth-protected pages
+- **robots.txt compliance**: Assumes crawlers respect robots.txt (not legally enforced)
+- **Limited crawlers**: Only checks 14 known AI crawlers (list can be extended)
+- **No sitemap parsing**: Only checks individual URLs, not entire sitemaps
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-bot-visibility)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard to deploy the Worker to your Cloudflare account. No additional configuration or bindings required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/check?url=https://www.cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/ai-bot-visibility
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/check?url=https://www.cloudflare.com"
+```
+
+## Configuration
+
+No bindings or environment variables are required. The `wrangler.json` is minimal:
+
+```json
+{
+  "name": "ai-bot-visibility",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-01-01"
+}
+```
+
+### Dependencies
+
+```json
+{
+  "dependencies": {
+    "hono": "^4.6.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^4"
+  }
+}
+```
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for fetching pages and robots.txt
+- **[Edge network](https://developers.cloudflare.com/workers/reference/how-workers-works/)** - Low-latency requests from global edge locations
+
 ## Next Steps
 
 <Cards>
-  <Card title="More Experiments" href="/">
-    Explore other Cloudflare experiments
+  <Card
+    title="robots.txt Specification"
+    href="https://developers.google.com/search/docs/crawling-indexing/robots/intro"
+  >
+    Learn about robots.txt syntax and best practices
   </Card>
-  <Card title="Workers Documentation" href="https://developers.cloudflare.com/workers/">
-    Learn more about Cloudflare Workers
+  <Card
+    title="Meta Robots Tag"
+    href="https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag"
+  >
+    Documentation for meta robots directives
   </Card>
-  <Card title="Hono Framework" href="https://hono.dev">
-    Explore the Hono web framework
+  <Card
+    title="AI Crawl Control"
+    href="https://blog.cloudflare.com/declaring-your-aindependence-block-ai-bots-scrapers-and-crawlers-with-a-single-click"
+  >
+    Cloudflare's AI crawler blocking feature
   </Card>
-  <Card title="Contribute" href="https://github.com/shrinathsnayak/cloudflare-experiments">
-    Contribute to the experiments repository
+  <Card
+    title="GitHub Repository"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-bot-visibility"
+  >
+    View the complete source code
   </Card>
 </Cards>
+
+

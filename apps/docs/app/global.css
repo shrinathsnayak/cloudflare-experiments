@@ -8,6 +8,8 @@
   --color-brand: #f38020;
 }
 
+#nd-sidebar,
+#nd-sidebar-mobile,
 #nd-toc {
   --color-fd-primary: var(--color-brand);
   --color-fd-primary-foreground: #ffffff;

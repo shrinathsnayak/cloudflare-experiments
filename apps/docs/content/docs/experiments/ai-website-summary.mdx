@@ -1,8 +1,13 @@
 ---
 title: "AI Website Summary"
 description: "Summarize any webpage using Workers AI on the edge"
+icon: "Sparkles"
+tags:
+  - ai
+  - workers-ai
+bindings:
+  - AI
 ---
-
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -25,9 +30,15 @@ The AI Website Summary experiment demonstrates how to fetch any webpage, extract
 
 Generate an AI summary of any webpage.
 
-**`url`** `string` (required)
-
-The webpage URL to summarize. Must use `http://` or `https://` scheme.
+<TypeTable
+  type={{
+    url: {
+      description: "The webpage URL to summarize. Must use `http://` or `https://` scheme.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Response
 
@@ -191,110 +202,83 @@ app.get("/summary", async (c) => {
 });
 ```
 
-## Setup & Deployment
+## Use Cases
 
-### Prerequisites
 
-- [Node.js](https://nodejs.org/) v18 or later
-- A [Cloudflare account](https://dash.cloudflare.com/sign-up)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed
+- **Content Curation** - Automatically generate summaries for bookmarking tools
+- **Research Assistants** - Quickly preview webpage content before visiting
+- **News Aggregators** - Create summaries for article feeds
+- **Browser Extensions** - Add "summarize this page" functionality
+- **Slack/Discord Bots** - Share link summaries in team chats
 
-### Local Development
+## Limitations
+
+
+- **JavaScript-heavy sites**: Only static HTML is fetched; JavaScript-rendered content is not executed
+- **Rate limits**: Workers AI has [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) based on your plan
+- **Fetch timeout**: Requests that take longer than 15 seconds will fail
+- **Size limit**: HTML content is capped at 128KB; body text is truncated to 6000 characters
+
+## Deployment
 
 <Steps>
   <Step>
 
-### Clone and install dependencies
+### Click the deploy button
 
-    ```bash
-    git clone https://github.com/shrinathsnayak/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/ai-website-summary
-    npm install
-    ```
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-summary)
 
   </Step>
-  
+
   <Step>
 
-### Start the development server
+### Deploy
 
-    ```bash
-    npm run dev
-    ```
-
-    This starts Wrangler in dev mode with Workers AI bindings.
+    Enable the **Workers AI** binding (`AI`) in your Worker settings. The deploy button configures this automatically via `wrangler.json`. Requires a Cloudflare account with Workers AI enabled.
 
   </Step>
-  
+
   <Step>
 
-### Test the endpoint
+### Test your deployment
 
     ```bash
-    curl "http://localhost:8787/summary?url=https://www.cloudflare.com"
+    curl "https://your-worker.workers.dev/summary?url=https://www.cloudflare.com"
     ```
 
   </Step>
 </Steps>
 
-### Deploy to Production
+## Local Development
 
-<Steps>
-  <Step>
+```bash
+cd apps/experiments/ai-website-summary
+npm install
+npm run dev
+```
 
-### Authenticate with Cloudflare
+Test locally:
 
-    ```bash
-    wrangler login
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Deploy the Worker
-
-    ```bash
-    npm run deploy
-    ```
-
-    This publishes your Worker to `*.workers.dev` or your custom domain.
-
-  </Step>
-  
-  <Step>
-
-### Test the production endpoint
-
-    ```bash
-    curl "https://ai-website-summary.YOUR_SUBDOMAIN.workers.dev/summary?url=https://blog.cloudflare.com"
-    ```
-
-  </Step>
-</Steps>
-
-### One-Click Deploy
-
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-summary)
-
-Click the button above to deploy this Worker directly to your Cloudflare account. You can fork the repository and update the URL to deploy from your own fork.
+```bash
+curl "http://localhost:8787/summary?url=https://www.cloudflare.com"
+```
 
 ## Configuration
 
-The Worker automatically binds to Workers AI. The `wrangler.toml` configuration includes:
+The Worker automatically binds to Workers AI. The `wrangler.json` configuration includes:
 
-```toml
-name = "ai-website-summary"
-main = "src/index.ts"
-compatibility_date = "2024-01-01"
-
-[ai]
-binding = "AI"
+```json
+{
+  "name": "ai-website-summary",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-01-01",
+  "ai": { "binding": "AI" }
+}
 ```
 
 No additional environment variables or secrets are required.
 
-## Dependencies
+### Dependencies
 
 ```json
 {
@@ -308,27 +292,11 @@ No additional environment variables or secrets are required.
   }
 }
 ```
-
 ## Cloudflare Features Used
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
 - **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Run LLMs on the edge with the `AI` binding
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for fetching webpages
-
-## Use Cases
-
-- **Content Curation** - Automatically generate summaries for bookmarking tools
-- **Research Assistants** - Quickly preview webpage content before visiting
-- **News Aggregators** - Create summaries for article feeds
-- **Browser Extensions** - Add "summarize this page" functionality
-- **Slack/Discord Bots** - Share link summaries in team chats
-
-## Limitations
-
-- **JavaScript-heavy sites**: Only static HTML is fetched; JavaScript-rendered content is not executed
-- **Rate limits**: Workers AI has [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) based on your plan
-- **Fetch timeout**: Requests that take longer than 15 seconds will fail
-- **Size limit**: HTML content is capped at 128KB; body text is truncated to 6000 characters
 
 ## Next Steps
 
@@ -349,3 +317,5 @@ No additional environment variables or secrets are required.
     Explore other Cloudflare experiments
   </Card>
 </Cards>
+
+

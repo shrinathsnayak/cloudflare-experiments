@@ -24,9 +24,24 @@ Generate and maintain docs at `apps/docs/content/docs/experiments/<name>.mdx` fr
 3. `apps/experiments/<name>/src/types/` - request/response types
 4. `apps/experiments/<name>/wrangler.json` - bindings (AI, R2, D1, KV, browser, etc.)
 5. `apps/experiments/<name>/README.md` - examples, setup notes (do not copy blindly; verify against code)
-6. Closest existing doc for tone/structure:
-   - **Simple** (single GET, no bindings): `apps/docs/content/docs/experiments/is-it-down.mdx`, `whereami.mdx`
-   - **Full** (AI, multi-step, config): `apps/docs/content/docs/experiments/ai-website-summary.mdx`
+6. Closest existing doc for tone/structure: all experiment pages share the same **H2 section order** below; optional sections are omitted when not applicable.
+
+## Canonical section order
+
+Every experiment doc uses these **H2 headings in this order** (skip sections that do not apply):
+
+1. **Features** — bullet list of capabilities (recommended for AI and multi-capability workers)
+2. **API Reference** — endpoints, params, examples, errors (always present)
+3. _Optional middle sections_ — e.g. Implementation Details, Technical Details, Monitored AI Crawlers, Architecture, Setup (complex workers only)
+4. **Use Cases** — 3–5 bullets
+5. **Limitations** — constraints and caveats
+6. **Deployment** — `<Steps>` with deploy button, deploy notes, test curl
+7. **Local Development** — install, dev, local test curl
+8. **Configuration** — wrangler bindings, secrets, dependencies (when relevant)
+9. **Cloudflare Features Used** — linked bullets to Cloudflare docs
+10. **Next Steps** — optional `<Cards>` linking related docs
+
+Rename legacy headings when editing: `API Endpoint(s)` → **API Reference**, `Setup & Deployment` / `Deploy` → **Deployment**, `Run locally` → **Local Development**.
 
 ## Workflow: new experiment
 
@@ -46,28 +61,21 @@ Or copy `.cursor/skills/experiment-docs/template.mdx` to `apps/docs/content/docs
 
 Required sections (in order):
 
-| Section                  | Content                                                                                   |
-| ------------------------ | ----------------------------------------------------------------------------------------- |
-| Frontmatter              | `title`, `description` (matches worker; description ≤ ~160 chars for SEO)                 |
-| Intro                    | 1–2 sentences: what it does + primary Cloudflare capability                               |
-| API Endpoint(s)          | One `### METHOD /path` per route; params with `` **`name`** `type` `` + required/optional |
-| Example request          | `curl` with `https://your-worker.workers.dev/...`                                         |
-| Response fields          | Each JSON field: name, type, short description                                            |
-| Example response         | Valid JSON block                                                                          |
-| Error responses          | `{ error, code }` examples; list HTTP status + codes                                      |
-| Use Cases                | 3–5 bullet points                                                                         |
-| Deployment               | `<Steps>` with deploy button, deploy note, test curl                                      |
-| Local Development        | `cd apps/experiments/<name>`, install, dev, test curl                                     |
-| Cloudflare Features Used | Bullets linking to Cloudflare docs                                                        |
+| Section                  | Content                                                                   |
+| ------------------------ | ------------------------------------------------------------------------- |
+| Frontmatter              | `title`, `description` (matches worker; description ≤ ~160 chars for SEO) |
+| Intro                    | 1–2 sentences: what it does + primary Cloudflare capability               |
+| Features                 | Optional bullet list of capabilities                                      |
+| API Reference            | One `### METHOD /path` per route; params, examples, errors                |
+| Use Cases                | 3–5 bullet points                                                         |
+| Limitations              | Timeouts, size limits, local vs deployed behavior                         |
+| Deployment               | `<Steps>` with deploy button, deploy note, test curl                      |
+| Local Development        | `cd apps/experiments/<name>`, install, dev, test curl                     |
+| Configuration            | Optional: `wrangler.json` bindings, secrets, dependencies                 |
+| Cloudflare Features Used | Bullets linking to Cloudflare docs                                        |
+| Next Steps               | Optional `<Cards>` linking related docs                                   |
 
-Optional (add when relevant):
-
-- `<Callout type="warning">` for experimental workers or AI usage
-- **Features** list (capabilities beyond raw API)
-- **Implementation Details** / request flow `<Steps>` for AI or multi-hop workers
-- **Configuration** - `wrangler.json` bindings, secrets, D1 schema
-- **Limitations** - timeouts, size limits, local vs deployed behavior
-- **Next Steps** - `<Cards>` linking to related docs or Cloudflare products
+Optional middle sections (between API Reference and Use Cases): Implementation Details, Technical Details, Architecture, Setup, etc.
 
 ### 3. Register navigation
 

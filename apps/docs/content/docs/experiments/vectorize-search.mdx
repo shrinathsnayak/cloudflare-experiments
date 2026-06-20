@@ -1,23 +1,36 @@
 ---
 title: "Vectorize Search"
 description: "Semantic search with Workers AI embeddings and Vectorize at the edge"
+icon: "Search"
+tags:
+  - storage
+  - ai
+bindings:
+  - AI
+  - VECTORIZE
 ---
-
 Upsert text documents as vectors and search them by natural language using [Workers AI](https://developers.cloudflare.com/workers-ai/) embeddings and [Vectorize](https://developers.cloudflare.com/vectorize/) at the edge.
 
-## API Endpoints
+## API Reference
 
 ### POST /upsert
 
 Embeds text with Workers AI and upserts the vector into Vectorize with metadata.
 
-**`id`** `string` (required)
-
-Unique document identifier (non-empty string)
-
-**`text`** `string` (required)
-
-Text to embed and store (max 10,000 characters)
+<TypeTable
+  type={{
+    id: {
+      description: "Unique document identifier (non-empty string)",
+      type: "string",
+      required: true,
+    },
+    text: {
+      description: "Text to embed and store (max 10,000 characters)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -59,13 +72,19 @@ The document id that was upserted
 
 Embeds the query with Workers AI and returns the nearest Vectorize matches.
 
-**`q`** `string` (required)
-
-Search query (max 10,000 characters)
-
-**`topK`** `number` (optional)
-
-Number of results to return (1–20, default 5)
+<TypeTable
+  type={{
+    q: {
+      description: "Search query (max 10,000 characters)",
+      type: "string",
+      required: true,
+    },
+    topK: {
+      description: "Number of results to return (1–20, default 5)",
+      type: "number",
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -113,10 +132,19 @@ Matching documents, each with `id`, `score`, and `text`
 
 ## Use Cases
 
+
 - Build semantic search over product docs or support articles at the edge
 - Prototype RAG pipelines with Vectorize as the vector store
 - Learn Workers AI embeddings with `@cf/baai/bge-base-en-v1.5`
 - Compare cosine similarity search without running a separate vector database
+
+## Limitations
+
+
+- Demo index; vectors are tied to your Vectorize binding and redeploy lifecycle
+- Text length is capped before embedding
+- Requires Workers AI and Vectorize bindings
+- Semantic search over the demo corpus only; not a production RAG pipeline
 
 ## Deployment
 
@@ -190,3 +218,5 @@ curl "http://localhost:8787/search?q=edge%20computing&topK=5"
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - `@cf/baai/bge-base-en-v1.5` text embeddings
 - **[Vectorize](https://developers.cloudflare.com/vectorize/)** - `experiment-search` index (768 dims, cosine)
+
+

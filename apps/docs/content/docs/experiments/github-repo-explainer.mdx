@@ -1,8 +1,13 @@
 ---
 title: "GitHub Repo Explainer"
 description: "Generate AI-powered explanations of any GitHub repository using Workers AI"
+icon: "GitBranch"
+tags:
+  - ai
+  - workers-ai
+bindings:
+  - AI
 ---
-
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -26,13 +31,15 @@ The GitHub Repo Explainer fetches README files and key configuration files from 
 
 Generate a comprehensive AI explanation of a GitHub repository.
 
-**`url`** `string` (required)
-
-The GitHub repository URL. Accepts formats:
-
-- `https://github.com/owner/repo`
-- `https://github.com/owner/repo.git`
-- `owner/repo` (shorthand)
+<TypeTable
+  type={{
+    url: {
+      description: "The GitHub repository URL. Accepts formats: - `https://github.com/owner/repo` - `https://github.com/owner/repo.git` - `owner/repo` (shorthand)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Response
 
@@ -303,151 +310,6 @@ Content:
 ${context}`;
 ```
 
-## Setup & Deployment
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) v18 or later
-- A [Cloudflare account](https://dash.cloudflare.com/sign-up)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed
-
-### Local Development
-
-<Steps>
-  <Step>
-
-### Clone and install dependencies
-
-    ```bash
-    git clone https://github.com/shrinathsnayak/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/github-repo-explainer
-    npm install
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Start the development server
-
-    ```bash
-    npm run dev
-    ```
-
-    This starts Wrangler in dev mode with Workers AI bindings.
-
-  </Step>
-  
-  <Step>
-
-### Test the endpoint
-
-    ```bash
-    curl "http://localhost:8787/repo?url=https://github.com/cloudflare/workers-sdk"
-    ```
-
-  </Step>
-</Steps>
-
-### Deploy to Production
-
-<Steps>
-  <Step>
-
-### Authenticate with Cloudflare
-
-    ```bash
-    wrangler login
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Deploy the Worker
-
-    ```bash
-    npm run deploy
-    ```
-
-    This publishes your Worker to `*.workers.dev` or your custom domain.
-
-  </Step>
-  
-  <Step>
-
-### Test the production endpoint
-
-    ```bash
-    curl "https://github-repo-explainer.YOUR_SUBDOMAIN.workers.dev/repo?url=hono/hono"
-    ```
-
-  </Step>
-</Steps>
-
-### One-Click Deploy
-
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/github-repo-explainer)
-
-Click the button above to deploy this Worker directly to your Cloudflare account. You can fork the repository and update the URL to deploy from your own fork.
-
-## Configuration
-
-The Worker automatically binds to Workers AI. The `wrangler.toml` configuration includes:
-
-```toml
-name = "github-repo-explainer"
-main = "src/index.ts"
-compatibility_date = "2024-01-01"
-
-[ai]
-binding = "AI"
-```
-
-No additional environment variables or secrets are required. GitHub API is used without authentication (subject to rate limits).
-
-## Dependencies
-
-```json
-{
-  "dependencies": {
-    "hono": "^4.6.12",
-    "jsonrepair": "^3.13.2"
-  },
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241127.0",
-    "typescript": "^5.7.2",
-    "wrangler": "^4"
-  }
-}
-```
-
-The `jsonrepair` package helps handle malformed JSON responses from the AI model.
-
-## Cloudflare Features Used
-
-- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
-- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Run LLMs on the edge with the `AI` binding
-- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for GitHub API requests
-
-## Use Cases
-
-- **Developer Onboarding** - Quickly understand new codebases before contributing
-- **Tech Stack Analysis** - Identify technologies and dependencies in projects
-- **Project Discovery** - Evaluate open-source libraries for your needs
-- **Documentation Generation** - Auto-generate project overviews
-- **Code Review Tools** - Provide context about repository structure
-- **IDE Extensions** - Add "explain this repo" functionality to editors
-
-## Limitations
-
-- **Public repositories only**: Private repos require GitHub authentication (not implemented)
-- **Rate limits**: GitHub API has [rate limits](https://docs.github.com/en/rest/overview/rate-limits) (60 requests/hour unauthenticated)
-- **File selection**: Only fetches files from the root directory (no subdirectories)
-- **Content size**: README limited to 24KB, individual files to 4KB, total context to 22KB
-- **AI accuracy**: Responses depend on model performance and may vary
-- **No git history**: Only analyzes the current main branch content
-
 ## Advanced Usage
 
 ### Adding GitHub Authentication
@@ -481,6 +343,108 @@ const priorityNames = [
 ];
 ```
 
+## Use Cases
+
+
+- **Developer Onboarding** - Quickly understand new codebases before contributing
+- **Tech Stack Analysis** - Identify technologies and dependencies in projects
+- **Project Discovery** - Evaluate open-source libraries for your needs
+- **Documentation Generation** - Auto-generate project overviews
+- **Code Review Tools** - Provide context about repository structure
+- **IDE Extensions** - Add "explain this repo" functionality to editors
+
+## Limitations
+
+
+- **Public repositories only**: Private repos require GitHub authentication (not implemented)
+- **Rate limits**: GitHub API has [rate limits](https://docs.github.com/en/rest/overview/rate-limits) (60 requests/hour unauthenticated)
+- **File selection**: Only fetches files from the root directory (no subdirectories)
+- **Content size**: README limited to 24KB, individual files to 4KB, total context to 22KB
+- **AI accuracy**: Responses depend on model performance and may vary
+- **No git history**: Only analyzes the current main branch content
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/github-repo-explainer)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Enable the **Workers AI** binding (`AI`) in your Worker settings. The deploy button configures this automatically via `wrangler.json`. Requires a Cloudflare account with Workers AI enabled.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/repo?url=https://github.com/cloudflare/workers-sdk"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/github-repo-explainer
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/repo?url=https://github.com/cloudflare/workers-sdk"
+```
+
+## Configuration
+
+The Worker automatically binds to Workers AI. The `wrangler.json` configuration includes:
+
+```json
+{
+  "name": "github-repo-explainer",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-01-01",
+  "ai": { "binding": "AI" }
+}
+```
+
+No additional environment variables or secrets are required. GitHub API is used without authentication (subject to rate limits).
+
+### Dependencies
+
+```json
+{
+  "dependencies": {
+    "hono": "^4.6.12",
+    "jsonrepair": "^3.13.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^4"
+  }
+}
+```
+
+The `jsonrepair` package helps handle malformed JSON responses from the AI model.
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Run LLMs on the edge with the `AI` binding
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for GitHub API requests
+
 ## Next Steps
 
 <Cards>
@@ -500,3 +464,5 @@ const priorityNames = [
     Explore other Cloudflare experiments
   </Card>
 </Cards>
+
+

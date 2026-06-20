@@ -1,19 +1,27 @@
 ---
-title: Website to llms.txt
-description: Convert any webpage into llms.txt format for LLM consumption
+title: "Website to llms.txt"
+description: "Convert any webpage into llms.txt format for LLM consumption"
+icon: "FileText"
+tags:
+  - scraping
 ---
-
 Convert any webpage into the llms.txt format, a structured markdown format optimized for Large Language Model consumption. Extracts title, description, key links, and contact information in a standardized format that LLMs can easily parse.
 
-## API Endpoint
+## API Reference
 
 ### GET /llms.txt
 
 Convert a webpage to llms.txt format by providing its URL.
 
-**`url`** `string` (required)
-
-The URL of the webpage to convert. Must be a valid HTTP or HTTPS URL.
+<TypeTable
+  type={{
+    url: {
+      description: "The URL of the webpage to convert. Must be a valid HTTP or HTTPS URL.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -79,62 +87,6 @@ The llms.txt format follows this structure:
 }
 ```
 
-## Deployment
-
-<Steps>
-  <Step>
-
-### Clone the repository
-
-    ```bash
-    git clone https://github.com/your-org/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/website-to-llms-txt
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Install dependencies
-
-    ```bash
-    npm install
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Test locally
-
-    ```bash
-    npm run dev
-    ```
-
-    The API will be available at `http://localhost:8787`
-
-  </Step>
-  
-  <Step>
-
-### Deploy to Cloudflare Workers
-
-    ```bash
-    npm run deploy
-    ```
-
-  </Step>
-</Steps>
-
-## Use Cases
-
-- **LLM Context**: Provide structured website information to language models
-- **AI Assistants**: Enable AI to understand website structure and navigation
-- **Documentation Parsing**: Convert documentation sites into LLM-friendly format
-- **Content Summarization**: Extract key information for AI-powered summaries
-- **Chatbot Training**: Generate training data from website content
-- **RAG Systems**: Prepare website data for retrieval-augmented generation
-
 ## Technical Details
 
 - Built with [Hono](https://hono.dev/) framework
@@ -171,3 +123,71 @@ The llms.txt format follows this structure:
 
 - Extracts mailto: links if available
 - Falls back to website URL if no contact links found
+
+## Use Cases
+
+
+- **LLM Context**: Provide structured website information to language models
+- **AI Assistants**: Enable AI to understand website structure and navigation
+- **Documentation Parsing**: Convert documentation sites into LLM-friendly format
+- **Content Summarization**: Extract key information for AI-powered summaries
+- **Chatbot Training**: Generate training data from website content
+- **RAG Systems**: Prepare website data for retrieval-augmented generation
+
+## Limitations
+
+
+- Static HTML extraction; client-rendered content is not executed
+- Produces a simplified llms.txt for one URL, not a full site crawl
+- Contact section only finds `mailto:` links present in the HTML
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/website-to-llms-txt)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    No additional configuration required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/llms.txt?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/website-to-llms-txt
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/llms.txt?url=https://example.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote HTML retrieval for llms.txt conversion
+
+

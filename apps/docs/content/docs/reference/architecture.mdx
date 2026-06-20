@@ -1,9 +1,42 @@
 ---
 title: Architecture & Design Patterns
 description: Common architecture patterns, tech stack, and design decisions across experiments
+full: true
 ---
 
 All experiments follow consistent architectural patterns and design principles. This guide explains the shared architecture, tech stack, and best practices used throughout the repository.
+
+## Standard Experiment Layout
+
+<Files>
+  <Folder name="apps/experiments/<name>" defaultOpen>
+    <Folder name="src" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="routes" defaultOpen>
+        <File name="check.ts" />
+      </Folder>
+      <Folder name="lib">
+        <File name="url.ts" />
+        <File name="fetch.ts" />
+      </Folder>
+      <Folder name="utils">
+        <File name="response.ts" />
+      </Folder>
+      <Folder name="types">
+        <File name="env.d.ts" />
+      </Folder>
+      <Folder name="constants">
+        <File name="defaults.ts" />
+      </Folder>
+    </Folder>
+    <Folder name="test">
+      <File name="smoke.test.ts" />
+    </Folder>
+    <File name="wrangler.json" />
+    <File name="package.json" />
+    <File name="README.md" />
+  </Folder>
+</Files>
 
 ## Tech Stack
 

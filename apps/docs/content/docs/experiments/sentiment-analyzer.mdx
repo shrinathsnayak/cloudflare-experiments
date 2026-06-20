@@ -1,19 +1,37 @@
 ---
 title: "Sentiment Analyzer"
 description: "Analyze text sentiment with Workers AI at the edge"
+icon: "Smile"
+tags:
+  - ai
+  - workers-ai
+bindings:
+  - AI
 ---
-
 Classify text sentiment as positive or negative using [Workers AI](https://developers.cloudflare.com/workers-ai/) and DistilBERT. Returns a label and confidence score for any short text input.
 
-## API Endpoint
+## Features
+
+- Classify text as positive or negative with confidence scores
+- Workers AI DistilBERT model at the edge
+- Single GET endpoint with a `text` query parameter
+- No external ML API keys required
+
+## API Reference
 
 ### GET /sentiment
 
 Analyzes the sentiment of the provided text.
 
-**`text`** `string` (required)
-
-Text to classify (max 10,000 characters)
+<TypeTable
+  type={{
+    text: {
+      description: "Text to classify (max 10,000 characters)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -59,10 +77,18 @@ Confidence score for the predicted label (0–1)
 
 ## Use Cases
 
+
 - Score customer feedback and reviews at the edge
 - Filter or route messages by sentiment in real time
 - Learn Workers AI classification models in a stateless Worker
 - Build moderation or analytics pipelines without external ML APIs
+
+## Limitations
+
+
+- Workers AI is subject to [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
+- Input text length is capped
+- Accuracy varies on very short, sarcastic, or multilingual text
 
 ## Deployment
 
@@ -112,3 +138,5 @@ curl "http://localhost:8787/sentiment?text=This%20pizza%20is%20great!"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - `@cf/huggingface/distilbert-sst-2-int8` sentiment classification model
+
+

@@ -1,19 +1,27 @@
 ---
-title: Website Metadata Extractor
-description: Extract metadata from any webpage including title, description, Open Graph tags, and canonical URL
+title: "Website Metadata Extractor"
+description: "Extract metadata from any webpage including title, description, Open Graph tags, and canonical URL"
+icon: "FileSearch"
+tags:
+  - scraping
 ---
-
 Extract comprehensive metadata from any webpage including title, description, Open Graph properties, and canonical URL. Perfect for building link previews, SEO analysis tools, or content aggregators.
 
-## API Endpoint
+## API Reference
 
 ### GET /metadata
 
 Extract metadata from a webpage by providing its URL.
 
-**`url`** `string` (required)
-
-The URL of the webpage to extract metadata from. Must be a valid HTTP or HTTPS URL.
+<TypeTable
+  type={{
+    url: {
+      description: "The URL of the webpage to extract metadata from. Must be a valid HTTP or HTTPS URL.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -114,61 +122,6 @@ Open Graph site name (og:site_name)
 }
 ```
 
-## Deployment
-
-<Steps>
-  <Step>
-
-### Clone the repository
-
-    ```bash
-    git clone https://github.com/your-org/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/website-metadata-extractor
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Install dependencies
-
-    ```bash
-    npm install
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Test locally
-
-    ```bash
-    npm run dev
-    ```
-
-    The API will be available at `http://localhost:8787`
-
-  </Step>
-  
-  <Step>
-
-### Deploy to Cloudflare Workers
-
-    ```bash
-    npm run deploy
-    ```
-
-  </Step>
-</Steps>
-
-## Use Cases
-
-- **Link Previews**: Generate rich previews for shared links in chat applications
-- **SEO Analysis**: Audit metadata across multiple pages
-- **Content Aggregation**: Collect and display metadata from external sources
-- **Social Media Tools**: Extract Open Graph data for social sharing optimization
-- **Bookmark Managers**: Automatically fetch metadata when saving URLs
-
 ## Technical Details
 
 - Built with [Hono](https://hono.dev/) framework
@@ -176,3 +129,70 @@ Open Graph site name (og:site_name)
 - HTML parsing with regex-based extraction
 - Fetches and processes pages up to the configured size limit
 - Returns structured JSON with comprehensive metadata
+
+## Use Cases
+
+
+- **Link Previews**: Generate rich previews for shared links in chat applications
+- **SEO Analysis**: Audit metadata across multiple pages
+- **Content Aggregation**: Collect and display metadata from external sources
+- **Social Media Tools**: Extract Open Graph data for social sharing optimization
+- **Bookmark Managers**: Automatically fetch metadata when saving URLs
+
+## Limitations
+
+
+- Static HTML only; tags set by client-side JavaScript may be missing
+- Fetch timeout and HTML size limits on upstream pages
+- Single URL per request; no batch extraction
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/website-metadata-extractor)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    No additional configuration required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/metadata?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/website-metadata-extractor
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/metadata?url=https://example.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests for HTML metadata extraction
+
+

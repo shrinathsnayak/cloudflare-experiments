@@ -1,19 +1,30 @@
 ---
 title: "Task Queue"
 description: "Reference implementation for Queues - enqueue tasks over HTTP and process them asynchronously"
+icon: "ListOrdered"
+tags:
+  - stateful
+bindings:
+  - QUEUE
+  - KV
 ---
-
 A minimal reference for **Queues**: HTTP requests enqueue messages via a producer binding; a `queue()` consumer processes them in the background. KV tracks enqueue and process counts.
 
-## API Endpoints
+## API Reference
 
 ### POST /enqueue
 
 Enqueues a message for async processing.
 
-**`message`** `string` (required)
-
-Task payload (max 500 characters).
+<TypeTable
+  type={{
+    message: {
+      description: "Task payload (max 500 characters).",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -65,10 +76,18 @@ curl "https://your-worker.workers.dev/stats"
 
 ## Use Cases
 
+
 - Learn producer (`TASK_QUEUE.send`) and consumer (`queue()`) setup
 - Decouple HTTP responses from slow background work
 - Webhook delivery, email sending, or data pipeline triggers
 - Building retryable async workflows on Cloudflare
+
+## Limitations
+
+
+- Demo queue with basic stats; no dead-letter queue or idempotency guarantees
+- Message length is capped
+- Requires Queue and KV bindings; not a stateless Worker
 
 ## Deployment
 
@@ -119,5 +138,8 @@ npm run dev
 
 ## Cloudflare Features Used
 
-- [Queues](https://developers.cloudflare.com/queues/) - async message processing
-- [Workers KV](https://developers.cloudflare.com/kv/) - enqueue/process statistics
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Queues](https://developers.cloudflare.com/queues/)** - async message processing
+- **[Workers KV](https://developers.cloudflare.com/kv/)** - enqueue/process statistics
+
+

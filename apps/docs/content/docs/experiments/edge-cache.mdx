@@ -1,23 +1,31 @@
 ---
-title: Edge Cache
-description: Fetch URLs with the Workers Cache API at the edge
+title: "Edge Cache"
+description: "Fetch URLs with the Workers Cache API at the edge"
+icon: "Database"
+tags:
+  - edge
 ---
-
 Fetch external URLs through the Workers Cache API and report whether each response was served from cache, fetched from origin, or bypassed.
 
-## API Endpoint
+## API Reference
 
 ### GET /fetch
 
 Fetches a URL and returns cache metadata without streaming the full response body back to the client.
 
-**`url`** `string` (required)
-
-The target URL to fetch (must be http or https)
-
-**`bypass`** `string` (optional)
-
-Set to `1`, `true`, or `yes` to skip cache lookup and storage
+<TypeTable
+  type={{
+    url: {
+      description: "The target URL to fetch (must be http or https)",
+      type: "string",
+      required: true,
+    },
+    bypass: {
+      description: "Set to `1`, `true`, or `yes` to skip cache lookup and storage",
+      type: "string",
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -73,10 +81,18 @@ Response body size in bytes
 
 ## Use Cases
 
+
 - Learn how to use `caches.default` in Workers
 - Cache expensive origin fetches at the edge
 - Compare cache hit vs miss behavior during development
 - Build read-through cache patterns for APIs and static content
+
+## Limitations
+
+
+- Uses the default cache with no custom TTL or cache-key logic in this demo
+- Cache is per-colo; entries are not globally consistent
+- Only caches successful GET fetch responses for the requested URL
 
 ## Deployment
 
@@ -129,3 +145,5 @@ curl "http://localhost:8787/fetch?url=https://www.cloudflare.com"
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/)** - Edge response caching via `caches.default`
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Origin requests from Workers
+
+

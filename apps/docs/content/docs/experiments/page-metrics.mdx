@@ -1,19 +1,29 @@
 ---
-title: Page Metrics
-description: Collect Puppeteer page load metrics using Cloudflare Browser Rendering
+title: "Page Metrics"
+description: "Collect Puppeteer page load metrics using Cloudflare Browser Rendering"
+icon: "Gauge"
+tags:
+  - browser
+bindings:
+  - BROWSER
 ---
-
 Navigate to any URL in a headless browser and return Puppeteer page load metrics as JSON.
 
-## API Endpoint
+## API Reference
 
 ### GET /metrics
 
 Loads the page and returns metrics from `page.metrics()`.
 
-**`url`** `string` (required)
-
-The website URL to measure (must be http or https)
+<TypeTable
+  type={{
+    url: {
+      description: "The website URL to measure (must be http or https)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -61,10 +71,19 @@ Puppeteer metrics such as `Nodes`, `LayoutCount`, `ScriptDuration`, and `JSHeapU
 
 ## Use Cases
 
+
 - Measure DOM complexity and script cost after full page load
 - Compare client-side rendering overhead across sites
 - Debug performance issues that only appear in a real browser
 - Learn Puppeteer metrics collection on Workers
+
+## Limitations
+
+
+- Requires Browser Rendering enabled on your Cloudflare account
+- Local development needs `npx wrangler dev --remote`
+- Metrics reflect one page load at a fixed 1280×800 viewport
+- Navigation timeout may fail on heavy single-page applications
 
 ## Deployment
 
@@ -114,4 +133,6 @@ curl "http://localhost:8787/metrics?url=https://www.cloudflare.com"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`
-- **Puppeteer `page.metrics()`** - Page load and memory metrics
+- **[Puppeteer `page.metrics()`](https://developers.cloudflare.com/browser-rendering/platform/puppeteer/)** - Page load and memory metrics
+
+

@@ -1,23 +1,34 @@
 ---
-title: KV Notes
-description: Simple note storage with Workers KV at the edge
+title: "KV Notes"
+description: "Simple note storage with Workers KV at the edge"
+icon: "StickyNote"
+tags:
+  - storage
+bindings:
+  - KV
 ---
-
 Store and retrieve small text notes using a dedicated Workers KV namespace.
 
-## API Endpoints
+## API Reference
 
 ### POST /notes
 
 Create or update a note.
 
-**`id`** `string` (required)
-
-Note identifier (letters, numbers, `_`, `-`; max 64 characters)
-
-**`content`** `string` (required)
-
-Note body (max 4,000 characters)
+<TypeTable
+  type={{
+    id: {
+      description: "Note identifier (letters, numbers, `_`, `-`; max 64 characters)",
+      type: "string",
+      required: true,
+    },
+    content: {
+      description: "Note body (max 4,000 characters)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -62,9 +73,17 @@ Delete a note by id.
 
 ## Use Cases
 
+
 - Learn KV read/write/delete patterns without D1
 - Store small configuration blobs at the edge
 - Prototype simple key-value APIs before adding auth
+
+## Limitations
+
+
+- Note IDs are capped at 64 characters; content at 4,000 characters
+- No authentication; any client can read, write, or delete by ID
+- KV is eventually consistent across edge locations
 
 ## Deployment
 
@@ -98,3 +117,5 @@ npm run dev
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Workers KV](https://developers.cloudflare.com/kv/)** - Global key-value storage
+
+

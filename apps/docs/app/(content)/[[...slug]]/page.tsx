@@ -1,6 +1,7 @@
 import { JsonLd } from "@/components/json-ld";
 import { getPageMarkdownUrl, source } from "@/lib/source";
 import { createDocsPageJsonLd, createDocsPageMetadata } from "@/lib/seo";
+import { gitConfig } from "@/lib/shared";
 import {
   DocsBody,
   DocsDescription,
@@ -13,7 +14,6 @@ import { notFound } from "next/navigation";
 import { getMDXComponents } from "@/components/mdx";
 import type { Metadata } from "next";
 import { createRelativeLink } from "fumadocs-ui/mdx";
-import { gitConfig } from "@/lib/shared";
 
 export default async function Page(props: PageProps<"/[[...slug]]">) {
   const params = await props.params;
@@ -22,19 +22,21 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
 
   const MDX = page.data.body;
   const markdownUrl = getPageMarkdownUrl(page).url;
+  const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`;
 
   return (
     <>
       <JsonLd data={createDocsPageJsonLd(page)} />
-      <DocsPage toc={page.data.toc} full={page.data.full}>
+      <DocsPage
+        toc={page.data.toc}
+        full={page.data.full}
+        tableOfContent={{ enabled: true }}
+      >
         <DocsTitle>{page.data.title}</DocsTitle>
         <DocsDescription>{page.data.description}</DocsDescription>
         <div className="flex flex-row flex-wrap items-center gap-2 not-prose">
           <MarkdownCopyButton markdownUrl={markdownUrl} />
-          <ViewOptionsPopover
-            markdownUrl={markdownUrl}
-            githubUrl={`https://github.com/${gitConfig.user}/${gitConfig.repo}/blob/${gitConfig.branch}/apps/docs/content/docs/${page.path}`}
-          />
+          <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubUrl} />
         </div>
         <DocsBody>
           <MDX

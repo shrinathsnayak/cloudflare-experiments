@@ -9,20 +9,24 @@ Contributions should follow the project's coding and structure rules to keep the
 
 Every experiment lives under `apps/experiments/<name>/` with this standardized layout:
 
-```
-apps/experiments/<name>/
-├── src/
-│   ├── index.ts          # Hono app, mount routes, export default { fetch: app.fetch }
-│   ├── routes/           # Route handlers only (one file per route or logical group)
-│   ├── lib/              # Domain logic (fetch, URL validation, parsing)
-│   ├── utils/            # Shared helpers (jsonError, jsonSuccess, etc.)
-│   ├── constants/        # Optional config/literals
-│   └── types/            # All types; env in env.d.ts
-├── package.json
-├── wrangler.toml         # or wrangler.json; bindings here
-├── tsconfig.json
-└── README.md
-```
+<Files>
+  <Folder name="apps/experiments/<name>" defaultOpen>
+    <Folder name="src" defaultOpen>
+      <File name="index.ts" />
+      <Folder name="routes" />
+      <Folder name="lib" />
+      <Folder name="utils" />
+      <Folder name="types" />
+      <Folder name="constants" />
+    </Folder>
+    <File name="package.json" />
+    <File name="wrangler.json" />
+    <File name="tsconfig.json" />
+    <File name="README.md" />
+  </Folder>
+</Files>
+
+Directory purposes:
 
 ### Directory Breakdown
 

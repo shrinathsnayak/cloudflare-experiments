@@ -1,19 +1,29 @@
 ---
 title: "Screenshot API"
 description: "Capture screenshots of any website from the edge using Cloudflare Browser Rendering"
+icon: "Camera"
+tags:
+  - browser
+bindings:
+  - BROWSER
 ---
-
 Capture screenshots of any website from Cloudflare's edge network using Browser Rendering and Puppeteer.
 
-## API Endpoint
+## API Reference
 
 ### GET /screenshot
 
 Captures a PNG screenshot of the specified URL.
 
-**`url`** `string` (required)
-
-The website URL to screenshot (must be http or https)
+<TypeTable
+  type={{
+    url: {
+      description: "The website URL to screenshot (must be http or https)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -61,6 +71,22 @@ The API uses the following configuration:
 - **Wait condition**: `networkidle0` (waits until network is idle)
 - **Navigation timeout**: 20 seconds
 - **Image format**: PNG
+
+## Use Cases
+
+
+- Capture visual snapshots of web pages from the edge
+- Generate thumbnails or previews for link-sharing tools
+- Archive how a page looked at a point in time
+- Learn Browser Rendering with Puppeteer on Workers
+
+## Limitations
+
+
+- Requires Browser Rendering enabled on your Cloudflare account
+- Fixed 1280×800 viewport; no custom dimensions in this experiment
+- 20-second navigation timeout; `networkidle0` may fail on busy sites
+- Local development needs `npx wrangler dev --remote`
 
 ## Deployment
 
@@ -113,6 +139,8 @@ curl "http://localhost:8787/screenshot?url=https://www.cloudflare.com" \
 
 ## Cloudflare Features Used
 
-- **Workers** - Edge compute runtime
-- **Browser Rendering** - Headless Chromium via Puppeteer
-- **Fetch API** - Network requests within the browser
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via Puppeteer
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Network requests within the browser
+
+

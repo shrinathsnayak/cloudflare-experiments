@@ -1,19 +1,27 @@
 ---
-title: Website to API
-description: Turn any webpage into structured JSON with title, headings, links, and images
+title: "Website to API"
+description: "Turn any webpage into structured JSON with title, headings, links, and images"
+icon: "Code"
+tags:
+  - scraping
 ---
-
 Convert any webpage into clean, structured JSON data. Extract the title, all headings with their hierarchy, internal and external links, and images. Perfect for web scraping, content analysis, or building custom search indices.
 
-## API Endpoint
+## API Reference
 
 ### GET /api
 
 Transform a webpage into structured JSON by providing its URL.
 
-**`url`** `string` (required)
-
-The URL of the webpage to convert. Must be a valid HTTP or HTTPS URL.
+<TypeTable
+  type={{
+    url: {
+      description: "The URL of the webpage to convert. Must be a valid HTTP or HTTPS URL.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -116,62 +124,6 @@ Array of unique absolute image URLs extracted from `<img>` tags. All relative UR
 }
 ```
 
-## Deployment
-
-<Steps>
-  <Step>
-
-### Clone the repository
-
-    ```bash
-    git clone https://github.com/your-org/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/website-to-api
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Install dependencies
-
-    ```bash
-    npm install
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Test locally
-
-    ```bash
-    npm run dev
-    ```
-
-    The API will be available at `http://localhost:8787`
-
-  </Step>
-  
-  <Step>
-
-### Deploy to Cloudflare Workers
-
-    ```bash
-    npm run deploy
-    ```
-
-  </Step>
-</Steps>
-
-## Use Cases
-
-- **Web Scraping**: Extract structured data from websites without parsing HTML
-- **Content Analysis**: Analyze page structure and heading hierarchy
-- **Link Extraction**: Build sitemaps or discover related content
-- **Search Indexing**: Extract text and structure for custom search engines
-- **Content Migration**: Extract content when migrating between platforms
-- **SEO Audits**: Analyze heading structure and internal linking
-
 ## Technical Details
 
 - Built with [Hono](https://hono.dev/) framework
@@ -188,3 +140,71 @@ Array of unique absolute image URLs extracted from `<img>` tags. All relative UR
 - JavaScript URLs (javascript:) are excluded from the links array
 - Duplicate links and images are automatically removed
 - Relative URLs are resolved based on the requested page URL
+
+## Use Cases
+
+
+- **Web Scraping**: Extract structured data from websites without parsing HTML
+- **Content Analysis**: Analyze page structure and heading hierarchy
+- **Link Extraction**: Build sitemaps or discover related content
+- **Search Indexing**: Extract text and structure for custom search engines
+- **Content Migration**: Extract content when migrating between platforms
+- **SEO Audits**: Analyze heading structure and internal linking
+
+## Limitations
+
+
+- Static HTML parsing only; JavaScript-rendered content is not available
+- Fetch timeout and HTML size limits apply
+- Structure extraction is heuristic; not a full DOM or accessibility tree
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/website-to-api)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    No additional configuration required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/api?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/website-to-api
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/api?url=https://example.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote HTML retrieval and structured parsing
+
+

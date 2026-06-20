@@ -1,19 +1,27 @@
 ---
 title: "HTML Rewriter"
 description: "Extract HTML stats and transform pages with HTMLRewriter at the edge"
+icon: "FileCode"
+tags:
+  - scraping
 ---
-
 Fetch remote HTML pages and analyze or transform them using the [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) API. Stream-parse documents at the edge to count elements or inject content without loading a full DOM parser.
 
-## API Endpoint
+## API Reference
 
 ### GET /stats
 
 Fetches a page and returns HTML statistics collected via HTMLRewriter handlers.
 
-**`url`** `string` (required)
-
-Page URL to analyze (`http://` or `https://` only)
+<TypeTable
+  type={{
+    url: {
+      description: "Page URL to analyze (`http://` or `https://` only)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -71,13 +79,19 @@ Count of each heading tag (e.g. `h1`, `h2`) found on the page
 
 Fetches a page and injects a banner `<div>` at the top of `<body>` using HTMLRewriter.
 
-**`url`** `string` (required)
-
-Page URL to transform (`http://` or `https://` only)
-
-**`banner`** `string` (optional)
-
-Banner text to inject (default: `Transformed by Cloudflare HTMLRewriter at the edge`)
+<TypeTable
+  type={{
+    url: {
+      description: "Page URL to transform (`http://` or `https://` only)",
+      type: "string",
+      required: true,
+    },
+    banner: {
+      description: "Banner text to inject (default: `Transformed by Cloudflare HTMLRewriter at the edge`)",
+      type: "string",
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -123,10 +137,19 @@ The transformed HTML document
 
 ## Use Cases
 
+
 - Audit page structure (links, images, headings) without a headless browser
 - Inject edge banners or notices into proxied HTML responses
 - Learn streaming HTML transformation with HTMLRewriter handlers
 - Build lightweight HTML analysis tools at the edge
+
+## Limitations
+
+
+- Static HTML fetch only; JavaScript-rendered content is not executed
+- HTML body size is capped before streaming through HTMLRewriter
+- Single URL per request; no multi-page crawling
+- Fetch timeout on slow origins
 
 ## Deployment
 
@@ -178,3 +201,5 @@ curl "http://localhost:8787/transform?url=https://example.com"
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/)** - Streaming HTML parsing and transformation
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote HTML retrieval
+
+

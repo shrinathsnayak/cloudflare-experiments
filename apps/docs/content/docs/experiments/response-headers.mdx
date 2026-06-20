@@ -1,19 +1,27 @@
 ---
-title: Response Headers
-description: Inspect HTTP response headers for any URL from the edge
+title: "Response Headers"
+description: "Inspect HTTP response headers for any URL from the edge"
+icon: "List"
+tags:
+  - network
 ---
-
 Fetch any URL and return its HTTP status and response headers as JSON.
 
-## API Endpoint
+## API Reference
 
 ### GET /headers
 
 Uses `HEAD` first and falls back to `GET` when the origin does not support `HEAD`.
 
-**`url`** `string` (required)
-
-The target URL (must be http or https)
+<TypeTable
+  type={{
+    url: {
+      description: "The target URL (must be http or https)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -63,9 +71,17 @@ Response headers as key/value pairs
 
 ## Use Cases
 
+
 - Debug cache and security headers from the edge
 - Compare response headers across origins
 - Learn HEAD vs GET fallback patterns in Workers
+
+## Limitations
+
+
+- Uses HEAD with GET fallback; some origins return different headers per method
+- Single URL per request
+- Fetch timeout on slow origins
 
 ## Deployment
 
@@ -101,3 +117,5 @@ npm run dev
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests from the edge
+
+

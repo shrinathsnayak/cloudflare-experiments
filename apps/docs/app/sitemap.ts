@@ -5,7 +5,7 @@ import type { MetadataRoute } from "next";
 export default function sitemap(): MetadataRoute.Sitemap {
   const docsPages = source.getPages().map((page) => ({
     url: `${siteUrl}${page.url}`,
-    lastModified: new Date(),
+    lastModified: page.data.lastModified ?? new Date(),
     changeFrequency: "weekly" as const,
     priority: page.url === docsRoute ? 1 : 0.8,
   }));

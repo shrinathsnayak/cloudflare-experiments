@@ -1,19 +1,27 @@
 ---
 title: "Edge Redirect Simulator"
 description: "Show redirect chains for any URL from Cloudflare's edge-each hop and status code"
+icon: "Route"
+tags:
+  - network
 ---
-
 Show redirect chains for any URL from Cloudflare's edge. The Worker follows HTTP redirects (301, 302, 303, 307, 308) and returns each hop with its status code, so you can see exactly how a URL resolves.
 
-## API Endpoint
+## API Reference
 
 ### GET /redirect-chain
 
 Follow redirects for a URL and return the chain of hops.
 
-**`url`** `string` (required)
-
-The URL to trace. Use a full URL (`https://cloudflare.com`) or hostname (`example.com`). Only `http` and `https` are allowed.
+<TypeTable
+  type={{
+    url: {
+      description: "The URL to trace. Use a full URL (`https://cloudflare.com`) or hostname (`example.com`). Only `http` and `https` are allowed.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -75,6 +83,22 @@ Display form: `example.com → 301` → `www.example.com → 302` → `final.exa
 
 If the chain hits a redirect with no `Location` or exceeds the hop limit, the response is still **200** with the `chain` collected so far and an `error` message in the body.
 
+## Use Cases
+
+
+- **Debug redirects** - See the full chain from short URL or vanity domain to final destination
+- **SEO and canonicalization** - Verify 301/302 chains and final URLs
+- **Security and compliance** - Audit where redirects lead before clicking
+- **Integration testing** - Confirm redirect behavior from the edge
+
+## Limitations
+
+
+- Stops after 20 redirects to prevent infinite loops
+- Does not follow meta refresh or JavaScript-based redirects
+- Fetch timeout applies per hop on slow origins
+- Reports redirect chain from the edge; results may differ from a browser
+
 ## Deployment
 
 <Steps>
@@ -115,18 +139,11 @@ npm run dev
 
 Then open: `http://localhost:8787/redirect-chain?url=https://cloudflare.com`
 
-## Use Cases
-
-- **Debug redirects** - See the full chain from short URL or vanity domain to final destination
-- **SEO and canonicalization** - Verify 301/302 chains and final URLs
-- **Security and compliance** - Audit where redirects lead before clicking
-- **Integration testing** - Confirm redirect behavior from the edge
-
 ## Cloudflare Features Used
 
-- **Workers** - Edge compute runtime
-- **Fetch API** - HTTP requests with `redirect: "manual"` to capture each hop
-- **Edge Networking** - Redirect chain observed from Cloudflare's global network
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests with `redirect: "manual"` to capture each hop
+- **[Edge network](https://developers.cloudflare.com/workers/reference/how-workers-works/)** - Redirect chain observed from Cloudflare's global network
 
 ## Next Steps
 
@@ -147,3 +164,5 @@ Then open: `http://localhost:8787/redirect-chain?url=https://cloudflare.com`
     Explore other Cloudflare experiments
   </Card>
 </Cards>
+
+

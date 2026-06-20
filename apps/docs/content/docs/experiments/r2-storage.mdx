@@ -1,8 +1,13 @@
 ---
-title: R2 Storage API
-description: Upload and serve files with Cloudflare R2 storage - private and public buckets with list, get, put, and delete operations
+title: "R2 Storage API"
+description: "Upload and serve files with Cloudflare R2 storage - private and public buckets with list, get, put, and delete operations"
+icon: "HardDrive"
+tags:
+  - storage
+bindings:
+  - R2
+full: true
 ---
-
 <Callout type="idea">
 
 Upload images and files to R2 with configurable private and public access. Objects in the private bucket are only accessible through the Worker, while public bucket objects get a direct URL.
@@ -16,84 +21,6 @@ Upload images and files to R2 with configurable private and public access. Objec
 - **List operations** with pagination, prefix filtering, and directory-style delimiters
 - **Custom metadata** support via `X-Custom-Metadata-*` headers
 - **Content-Type** handling for serving images and other media
-
-## Setup
-
-<Steps>
-  <Step>
-
-### Create R2 buckets
-
-    In the [Cloudflare dashboard](https://dash.cloudflare.com/) → **R2** → **Create bucket**:
-
-    1. Create `r2-storage-bucket` (private - default settings)
-    2. Create `r2-storage-public` (for public files)
-
-  </Step>
-
-  <Step>
-
-### Enable public access
-
-    For the **public bucket only**:
-
-    1. Go to **R2** → select `r2-storage-public` → **Settings**
-    2. Under **Public Development URL**, click **Enable**
-    3. Type `allow` when prompted and confirm
-    4. Copy the public bucket URL (looks like `https://pub-xxxxx.r2.dev`)
-
-    <Callout>
-
-You can also use a custom domain instead of the `r2.dev` URL
-
-</Callout>
-  </Step>
-
-  <Step>
-
-### Configure wrangler.json
-
-    Update your `wrangler.json` with the bucket bindings:
-
-    ```json
-    {
-      "r2_buckets": [
-        {
-          "binding": "BUCKET",
-          "bucket_name": "r2-storage-bucket"
-        },
-        {
-          "binding": "PUBLIC_BUCKET",
-          "bucket_name": "r2-storage-public"
-        }
-      ],
-      "vars": {
-        "PUBLIC_BUCKET_URL": "https://pub-xxxxx.r2.dev"
-      }
-    }
-    ```
-
-    Replace `https://pub-xxxxx.r2.dev` with your actual public bucket URL.
-
-  </Step>
-
-  <Step>
-
-### Run locally
-
-    ```bash
-    cd apps/experiments/r2-storage
-    npm install
-    npm run dev -- --remote
-    ```
-
-    <Callout>
-
-Use `--remote` to connect to real R2 buckets. The public URL won't work with local buckets.
-
-</Callout>
-  </Step>
-</Steps>
 
 ## API Reference
 
@@ -441,7 +368,109 @@ curl -X DELETE "https://your-worker.workers.dev/object?key=images/old-photo.png&
 </Tab>
 </Tabs>
 
+## Setup
+
+<Steps>
+  <Step>
+
+### Create R2 buckets
+
+    In the [Cloudflare dashboard](https://dash.cloudflare.com/) → **R2** → **Create bucket**:
+
+    1. Create `r2-storage-bucket` (private - default settings)
+    2. Create `r2-storage-public` (for public files)
+
+  </Step>
+
+  <Step>
+
+### Enable public access
+
+    For the **public bucket only**:
+
+    1. Go to **R2** → select `r2-storage-public` → **Settings**
+    2. Under **Public Development URL**, click **Enable**
+    3. Type `allow` when prompted and confirm
+    4. Copy the public bucket URL (looks like `https://pub-xxxxx.r2.dev`)
+
+    <Callout>
+
+You can also use a custom domain instead of the `r2.dev` URL
+
+</Callout>
+  </Step>
+
+  <Step>
+
+### Configure wrangler.json
+
+    Update your `wrangler.json` with the bucket bindings:
+
+    ```json
+    {
+      "r2_buckets": [
+        {
+          "binding": "BUCKET",
+          "bucket_name": "r2-storage-bucket"
+        },
+        {
+          "binding": "PUBLIC_BUCKET",
+          "bucket_name": "r2-storage-public"
+        }
+      ],
+      "vars": {
+        "PUBLIC_BUCKET_URL": "https://pub-xxxxx.r2.dev"
+      }
+    }
+    ```
+
+    Replace `https://pub-xxxxx.r2.dev` with your actual public bucket URL.
+
+  </Step>
+
+  <Step>
+
+### Run locally
+
+    ```bash
+    cd apps/experiments/r2-storage
+    npm install
+    npm run dev -- --remote
+    ```
+
+    <Callout>
+
+Use `--remote` to connect to real R2 buckets. The public URL won't work with local buckets.
+
+</Callout>
+  </Step>
+</Steps>
+
+## Error Responses
+
+All errors return JSON with this structure:
+
+```json
+{
+  "error": "Error message",
+  "code": "ERROR_CODE"
+}
+```
+
+**`error`** `string`
+
+Human-readable error message
+
+**`code`** `string`
+
+Error code: `INVALID_QUERY`, `NOT_FOUND`, `MISSING_PARAM`, `INTERNAL_ERROR`
+
+## Source Code
+
+View the complete source code on GitHub: [r2-storage](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-storage)
+
 ## Use Cases
+
 
 ### Image hosting
 
@@ -484,23 +513,15 @@ curl "https://your-worker.workers.dev/list?prefix=images/&public=true"
 curl "https://your-worker.workers.dev/list?delimiter=/&public=true"
 ```
 
-## Environment Variables
+## Limitations
 
-**`param`** `string`
 
-Base URL for the public R2 bucket (e.g., `https://pub-xxxxx.r2.dev`). Required to return public URLs in upload responses. Set in `wrangler.json` under `vars` or in the dashboard under **Workers & Pages** → **Settings** → **Variables**.
+- No authentication on API endpoints in this demo
+- List operations return at most 1,000 keys per request
+- Requires R2 bucket bindings and optional public URL configuration
+- Not a multipart upload or large-file streaming demo
 
-## Bindings
-
-**`param`** `R2Bucket`
-
-Private R2 bucket binding (name: `r2-storage-bucket`)
-
-**`param`** `R2Bucket`
-
-Public R2 bucket binding (name: `r2-storage-public`)
-
-## Deploy
+## Deployment
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-storage)
 
@@ -542,32 +563,29 @@ Public R2 bucket binding (name: `r2-storage-public`)
   </Step>
 </Steps>
 
-## Error Responses
+## Configuration
 
-All errors return JSON with this structure:
+### Environment Variables
 
-```json
-{
-  "error": "Error message",
-  "code": "ERROR_CODE"
-}
-```
+**`param`** `string`
 
-**`error`** `string`
+Base URL for the public R2 bucket (e.g., `https://pub-xxxxx.r2.dev`). Required to return public URLs in upload responses. Set in `wrangler.json` under `vars` or in the dashboard under **Workers & Pages** → **Settings** → **Variables**.
 
-Human-readable error message
+### Bindings
 
-**`code`** `string`
+**`param`** `R2Bucket`
 
-Error code: `INVALID_QUERY`, `NOT_FOUND`, `MISSING_PARAM`, `INTERNAL_ERROR`
+Private R2 bucket binding (name: `r2-storage-bucket`)
 
-## Source Code
+**`param`** `R2Bucket`
 
-View the complete source code on GitHub: [r2-storage](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-storage)
+Public R2 bucket binding (name: `r2-storage-public`)
 
-## Cloudflare Features
+## Cloudflare Features Used
 
-- **Workers**: Serverless compute at the edge
-- **R2**: Object storage with zero egress fees
-- **Public buckets**: Direct public access to objects
-- **Hono**: Lightweight web framework
+- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless compute at the edge
+- **[R2](https://developers.cloudflare.com/r2/)** - Object storage with zero egress fees
+- **[Public buckets](https://developers.cloudflare.com/r2/buckets/public-buckets/)** - Direct public access to objects
+- **[Hono](https://hono.dev/)** - Lightweight web framework
+
+

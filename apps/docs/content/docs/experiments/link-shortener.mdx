@@ -1,8 +1,13 @@
 ---
-title: Link Shortener
-description: URL shortener using Cloudflare D1 and KV - shorten links and redirect with edge caching
+title: "Link Shortener"
+description: "URL shortener using Cloudflare D1 and KV - shorten links and redirect with edge caching"
+icon: "Link2"
+tags:
+  - storage
+bindings:
+  - D1
+  - KV
 ---
-
 <Callout type="idea">
 
 Create short links that redirect to long URLs. Uses D1 as the source of truth with KV as a read-through cache for fast redirects.
@@ -17,6 +22,111 @@ Create short links that redirect to long URLs. Uses D1 as the source of truth wi
 - **KV cache**: Read-through cache for fast redirects
 - **6-character codes**: Random alphanumeric short codes (e.g., `a1B2c3`)
 - **Collision handling**: Automatic retry on duplicate codes
+
+## API Reference
+
+### Shorten URL
+
+<Card title="POST /shorten">Create a short link for a long URL.</Card>
+
+#### Request Body
+
+**`param`** `string` (required)
+
+The long URL to shorten. Must start with `http://` or `https://`.
+
+#### Response
+
+**`code`** `string`
+
+The generated short code (6 alphanumeric characters)
+
+**`url`** `string`
+
+The original long URL
+
+#### Example
+
+```bash
+curl -X POST https://your-worker.workers.dev/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://www.cloudflare.com/products/workers/"}'
+```
+
+```json Response (201 Created)
+{
+  "code": "a1B2c3",
+  "url": "https://www.cloudflare.com/products/workers/"
+}
+```
+
+```json Error: Invalid URL (400)
+{
+  "error": "Missing or invalid body field: url (http or https only)",
+  "code": "INVALID_URL"
+}
+```
+
+```json Error: Invalid JSON (400)
+{
+  "error": "Invalid or missing JSON body",
+  "code": "INVALID_BODY"
+}
+```
+
+#### Usage
+
+After creating a short link, redirect by visiting:
+
+```
+https://your-worker.workers.dev/a1B2c3
+```
+
+---
+
+### Redirect
+
+<Card title="GET /:code">Redirect to the original URL associated with the short code.</Card>
+
+#### Path Parameters
+
+**`param`** `string` (required)
+
+The short code (6 alphanumeric characters)
+
+#### Response
+
+- **302 Found**: Redirects to the original URL
+- **404 Not Found**: If the code doesn't exist
+
+#### Example
+
+```bash
+# Follow redirects
+curl -L https://your-worker.workers.dev/a1B2c3
+
+# Show redirect without following (see Location header)
+curl -I https://your-worker.workers.dev/a1B2c3
+```
+
+```http Success (302 Found)
+HTTP/1.1 302 Found
+Location: https://www.cloudflare.com/products/workers/
+```
+
+```json Error: Not found (404)
+{
+  "error": "Short link not found",
+  "code": "NOT_FOUND"
+}
+```
+
+```json Error: Invalid code (404)
+{
+  "error": "Invalid short code",
+  "code": "INVALID_CODE"
+}
+```
 
 ## Architecture
 
@@ -143,111 +253,6 @@ For local development, create a preview namespace: `npx wrangler kv namespace cr
   </Step>
 </Steps>
 
-## API Reference
-
-### Shorten URL
-
-<Card title="POST /shorten">Create a short link for a long URL.</Card>
-
-#### Request Body
-
-**`param`** `string` (required)
-
-The long URL to shorten. Must start with `http://` or `https://`.
-
-#### Response
-
-**`code`** `string`
-
-The generated short code (6 alphanumeric characters)
-
-**`url`** `string`
-
-The original long URL
-
-#### Example
-
-```bash
-curl -X POST https://your-worker.workers.dev/shorten \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://www.cloudflare.com/products/workers/"}'
-```
-
-```json Response (201 Created)
-{
-  "code": "a1B2c3",
-  "url": "https://www.cloudflare.com/products/workers/"
-}
-```
-
-```json Error: Invalid URL (400)
-{
-  "error": "Missing or invalid body field: url (http or https only)",
-  "code": "INVALID_URL"
-}
-```
-
-```json Error: Invalid JSON (400)
-{
-  "error": "Invalid or missing JSON body",
-  "code": "INVALID_BODY"
-}
-```
-
-#### Usage
-
-After creating a short link, redirect by visiting:
-
-```
-https://your-worker.workers.dev/a1B2c3
-```
-
----
-
-### Redirect
-
-<Card title="GET /:code">Redirect to the original URL associated with the short code.</Card>
-
-#### Path Parameters
-
-**`param`** `string` (required)
-
-The short code (6 alphanumeric characters)
-
-#### Response
-
-- **302 Found**: Redirects to the original URL
-- **404 Not Found**: If the code doesn't exist
-
-#### Example
-
-```bash
-# Follow redirects
-curl -L https://your-worker.workers.dev/a1B2c3
-
-# Show redirect without following (see Location header)
-curl -I https://your-worker.workers.dev/a1B2c3
-```
-
-```http Success (302 Found)
-HTTP/1.1 302 Found
-Location: https://www.cloudflare.com/products/workers/
-```
-
-```json Error: Not found (404)
-{
-  "error": "Short link not found",
-  "code": "NOT_FOUND"
-}
-```
-
-```json Error: Invalid code (404)
-{
-  "error": "Invalid short code",
-  "code": "INVALID_CODE"
-}
-```
-
 ## Database Schema
 
 ### links table
@@ -358,7 +363,50 @@ npx wrangler kv key list --namespace-id=YOUR_KV_ID
 npx wrangler kv key get "link:xY3pQz" --namespace-id=YOUR_KV_ID
 ```
 
+## Monitoring
+
+### View logs
+
+```bash
+# Tail production logs
+npx wrangler tail
+
+# Filter for errors
+npx wrangler tail --status error
+```
+
+### Analytics
+
+View request metrics in the [Cloudflare dashboard](https://dash.cloudflare.com/):
+
+- **Workers & Pages** → your Worker → **Metrics**
+- See request volume, error rate, and response times
+
+## Error Responses
+
+All errors return JSON:
+
+```json
+{
+  "error": "Human-readable error message",
+  "code": "ERROR_CODE"
+}
+```
+
+**`error`** `string`
+
+Description of what went wrong
+
+**`code`** `string`
+
+Error code: `INVALID_BODY`, `INVALID_URL`, `NOT_FOUND`, `INVALID_CODE`, `INTERNAL_ERROR`
+
+## Source Code
+
+View the complete source code on GitHub: [link-shortener](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)
+
 ## Use Cases
+
 
 ### Marketing campaigns
 
@@ -398,17 +446,16 @@ curl -X POST https://short.example.com/shorten \
 # Generate QR code for: https://short.example.com/x7Y2kL
 ```
 
-## Bindings
+## Limitations
 
-**`param`** `D1Database`
 
-D1 database binding (name: `link-shortener-db`)
+- No expiration: Links never expire (implement TTL if needed)
+- No analytics: No tracking of clicks or usage (add D1 table if needed)
+- No custom codes: Codes are always randomly generated
+- No link updates: Cannot change the URL for an existing code
+- No deletion: Cannot delete links after creation (add DELETE endpoint if needed)
 
-**`param`** `KVNamespace`
-
-KV namespace binding for caching redirects
-
-## Deploy
+## Deployment
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)
 
@@ -465,59 +512,23 @@ KV namespace binding for caching redirects
   </Step>
 </Steps>
 
-## Monitoring
+## Configuration
 
-### View logs
+### Bindings
 
-```bash
-# Tail production logs
-npx wrangler tail
+**`param`** `D1Database`
 
-# Filter for errors
-npx wrangler tail --status error
-```
+D1 database binding (name: `link-shortener-db`)
 
-### Analytics
+**`param`** `KVNamespace`
 
-View request metrics in the [Cloudflare dashboard](https://dash.cloudflare.com/):
+KV namespace binding for caching redirects
 
-- **Workers & Pages** → your Worker → **Metrics**
-- See request volume, error rate, and response times
+## Cloudflare Features Used
 
-## Limitations
+- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless compute at the edge
+- **[D1](https://developers.cloudflare.com/d1/)** - SQLite database at the edge (primary storage)
+- **[Workers KV](https://developers.cloudflare.com/kv/)** - Key-value store (read-through cache)
+- **[Hono](https://hono.dev/)** - Lightweight web framework
 
-- No expiration: Links never expire (implement TTL if needed)
-- No analytics: No tracking of clicks or usage (add D1 table if needed)
-- No custom codes: Codes are always randomly generated
-- No link updates: Cannot change the URL for an existing code
-- No deletion: Cannot delete links after creation (add DELETE endpoint if needed)
 
-## Error Responses
-
-All errors return JSON:
-
-```json
-{
-  "error": "Human-readable error message",
-  "code": "ERROR_CODE"
-}
-```
-
-**`error`** `string`
-
-Description of what went wrong
-
-**`code`** `string`
-
-Error code: `INVALID_BODY`, `INVALID_URL`, `NOT_FOUND`, `INVALID_CODE`, `INTERNAL_ERROR`
-
-## Source Code
-
-View the complete source code on GitHub: [link-shortener](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)
-
-## Cloudflare Features
-
-- **Workers**: Serverless compute at the edge
-- **D1**: SQLite database at the edge (primary storage)
-- **KV**: Key-value store (read-through cache)
-- **Hono**: Lightweight web framework

@@ -1,19 +1,29 @@
 ---
-title: Website DevTools Inspector
-description: Inspect any website like browser DevTools - analyze headers, cookies, scripts, assets, and metadata
+title: "Website DevTools Inspector"
+description: "Inspect any website like browser DevTools - analyze headers, cookies, scripts, assets, and metadata"
+icon: "Search"
+tags:
+  - scraping
+bindings:
+  - BROWSER
 ---
-
 Inspect any website with a comprehensive analysis similar to browser DevTools. Get HTTP headers, cookies, response time, metadata, and all loaded resources including scripts, stylesheets, images, and links.
 
-## API Endpoint
+## API Reference
 
 ### GET /devtools
 
 Perform a comprehensive inspection of a webpage by providing its URL.
 
-**`url`** `string` (required)
-
-The URL of the webpage to inspect. Must be a valid HTTP or HTTPS URL.
+<TypeTable
+  type={{
+    url: {
+      description: "The URL of the webpage to inspect. Must be a valid HTTP or HTTPS URL.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -149,63 +159,6 @@ Array of unique absolute URLs from `<a href="...">`. Excludes anchor links (#) a
 }
 ```
 
-## Deployment
-
-<Steps>
-  <Step>
-
-### Clone the repository
-
-    ```bash
-    git clone https://github.com/your-org/cloudflare-experiments
-    cd cloudflare-experiments/apps/experiments/website-devtools-inspector
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Install dependencies
-
-    ```bash
-    npm install
-    ```
-
-  </Step>
-  
-  <Step>
-
-### Test locally
-
-    ```bash
-    npm run dev
-    ```
-
-    The API will be available at `http://localhost:8787`
-
-  </Step>
-  
-  <Step>
-
-### Deploy to Cloudflare Workers
-
-    ```bash
-    npm run deploy
-    ```
-
-  </Step>
-</Steps>
-
-## Use Cases
-
-- **Performance Monitoring**: Track response times and identify slow-loading resources
-- **Security Audits**: Analyze headers, cookies, and security configurations
-- **Asset Analysis**: Discover all external dependencies and third-party scripts
-- **SEO Audits**: Inspect metadata and canonical URLs
-- **Debugging**: Investigate website structure and loaded resources
-- **Competitive Analysis**: Understand technology stack and external services used
-- **Compliance Checks**: Verify cookie policies and header configurations
-
 ## Technical Details
 
 - Built with [Hono](https://hono.dev/) framework
@@ -243,3 +196,73 @@ Array of unique absolute URLs from `<a href="...">`. Excludes anchor links (#) a
 - Measured in milliseconds from request initiation to response completion
 - Includes network latency and initial content download
 - Rounded to the nearest millisecond
+
+## Use Cases
+
+
+- **Performance Monitoring**: Track response times and identify slow-loading resources
+- **Security Audits**: Analyze headers, cookies, and security configurations
+- **Asset Analysis**: Discover all external dependencies and third-party scripts
+- **SEO Audits**: Inspect metadata and canonical URLs
+- **Debugging**: Investigate website structure and loaded resources
+- **Competitive Analysis**: Understand technology stack and external services used
+- **Compliance Checks**: Verify cookie policies and header configurations
+
+## Limitations
+
+
+- Static HTML fetch for most fields; not a live browser DevTools session
+- HTML body is capped at 1MB before parsing
+- Cannot inspect authenticated or paywalled pages
+- No runtime network waterfall, console, or step-through debugging
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/website-devtools-inspector)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    No additional configuration required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/devtools?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/website-devtools-inspector
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/devtools?url=https://example.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests for headers, HTML, and timing data
+
+

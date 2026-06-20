@@ -1,19 +1,27 @@
 ---
 title: "URL DNS Lookup"
 description: "Get DNS records for the hostname of any URL using Cloudflare's DNS over HTTPS"
+icon: "Globe"
+tags:
+  - network
 ---
-
 Retrieve all DNS record types for any URL's hostname using Cloudflare's DNS over HTTPS (DoH) API.
 
-## API Endpoint
+## API Reference
 
 ### GET /dns
 
 Extracts the hostname from the provided URL and returns all available DNS records.
 
-**`url`** `string` (required)
-
-Any http or https URL. The hostname will be extracted and looked up.
+<TypeTable
+  type={{
+    url: {
+      description: "Any http or https URL. The hostname will be extracted and looked up.",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -140,6 +148,29 @@ The API queries for the following DNS record types:
 - **SOA** - Start of authority
 - **CAA** - Certificate authority authorization
 
+## Implementation Details
+
+- Uses Cloudflare's public DNS over HTTPS (DoH) API
+- Queries all record types in parallel for fast responses
+- Stateless - no database or KV storage required
+- Timeout protection on DoH requests
+
+## Use Cases
+
+
+- Resolve DNS records for the hostname extracted from any URL
+- Debug DNS configuration during deployments or migrations
+- Build diagnostic tools without running `dig` locally
+- Verify mail (MX), certificate (CAA), or CDN (CNAME) records from the edge
+
+## Limitations
+
+
+- Uses the hostname only; URL path and query string are ignored
+- Queries a fixed set of record types; no PTR or SRV in this experiment
+- DoH timeout if upstream DNS is slow or unreachable
+- Results reflect public DNS; may differ from resolver-specific or split-horizon views
+
 ## Deployment
 
 <Steps>
@@ -184,15 +215,10 @@ Test locally:
 curl "http://localhost:8787/dns?url=https://www.cloudflare.com"
 ```
 
-## Implementation Details
-
-- Uses Cloudflare's public DNS over HTTPS (DoH) API
-- Queries all record types in parallel for fast responses
-- Stateless - no database or KV storage required
-- Timeout protection on DoH requests
-
 ## Cloudflare Features Used
 
-- **Workers** - Edge compute runtime
-- **Fetch API** - HTTP requests to Cloudflare DoH
-- **Edge Networking** - Low-latency DNS lookups
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests to Cloudflare DoH
+- **[Edge network](https://developers.cloudflare.com/workers/reference/how-workers-works/)** - Low-latency DNS lookups
+
+

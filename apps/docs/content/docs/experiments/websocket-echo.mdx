@@ -1,11 +1,13 @@
 ---
-title: WebSocket Echo
-description: WebSocket echo server running on Cloudflare Workers
+title: "WebSocket Echo"
+description: "WebSocket echo server running on Cloudflare Workers"
+icon: "Radio"
+tags:
+  - edge
 ---
-
 Upgrade HTTP requests to WebSocket connections and echo every message back from the edge using the Workers WebSocket API.
 
-## API Endpoint
+## API Reference
 
 ### GET /echo
 
@@ -40,10 +42,18 @@ When the request is not a WebSocket upgrade, the worker returns HTTP 426:
 
 ## Use Cases
 
+
 - Learn WebSocket upgrades with `WebSocketPair` in Workers
 - Test real-time clients against a minimal echo server
 - Prototype bidirectional edge apps before adding Durable Objects
 - Debug WebSocket connectivity from browsers and CLI tools
+
+## Limitations
+
+
+- Echo server only; no persistence, rooms, or broadcast between clients
+- No authentication or explicit message size limits in this demo
+- WebSocket connections are subject to Worker CPU and duration limits
 
 ## Deployment
 
@@ -87,3 +97,5 @@ Connect to `ws://localhost:8787/echo` with a WebSocket client.
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[WebSockets](https://developers.cloudflare.com/workers/runtime-apis/websockets/)** - `WebSocketPair` for bidirectional messaging
+
+

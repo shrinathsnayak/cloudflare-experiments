@@ -1,19 +1,37 @@
 ---
 title: "AI Image Generator"
 description: "Generate images from text prompts with Workers AI at the edge"
+icon: "Image"
+tags:
+  - ai
+  - workers-ai
+bindings:
+  - AI
 ---
-
 Generate PNG images from text prompts using [Workers AI](https://developers.cloudflare.com/workers-ai/) and the `@cf/black-forest-labs/flux-1-schnell` model at the edge.
 
-## API Endpoint
+## Features
+
+- Generate PNG images from text prompts at the edge
+- Workers AI image model (`@cf/black-forest-labs/flux-1-schnell`)
+- Returns binary image responses directly from the Worker
+- No external image API keys required
+
+## API Reference
 
 ### GET /generate
 
 Generates a PNG image from the provided text prompt.
 
-**`prompt`** `string` (required)
-
-Text prompt describing the image (max 1,000 characters)
+<TypeTable
+  type={{
+    prompt: {
+      description: "Text prompt describing the image (max 1,000 characters)",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
 
 #### Example Request
 
@@ -46,10 +64,19 @@ Content-Type: image/png
 
 ## Use Cases
 
+
 - Prototype AI image generation without external API keys
 - Generate placeholder or marketing visuals from text at the edge
 - Learn Workers AI image models in a stateless Worker
 - Build creative tools that return binary image responses directly
+
+## Limitations
+
+
+- Workers AI image generation is subject to [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
+- Fixed model and parameters; no style, size, or batch controls in this experiment
+- Returns a single PNG per request; no async jobs or storage
+- Public endpoint with no authentication or rate limiting
 
 ## Deployment
 
@@ -101,3 +128,5 @@ curl "http://localhost:8787/generate?prompt=a%20cyberpunk%20cityscape" \
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - `@cf/black-forest-labs/flux-1-schnell` image generation model
+
+

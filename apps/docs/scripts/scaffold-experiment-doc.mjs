@@ -77,10 +77,23 @@ const bindingNotes =
     ? `Configure bindings: ${bindings.join(", ")}. See wrangler.json and experiment README.`
     : "No additional configuration required.";
 
+const BINDING_DOCS = {
+  "Workers AI (`AI` binding)": "[Workers AI](https://developers.cloudflare.com/workers-ai/)",
+  R2: "[R2](https://developers.cloudflare.com/r2/)",
+  D1: "[D1](https://developers.cloudflare.com/d1/)",
+  KV: "[Workers KV](https://developers.cloudflare.com/kv/)",
+  "Browser Rendering": "[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)",
+};
+
+const bindingLines =
+  bindings.length > 0
+    ? bindings.map((b) => `- ${BINDING_DOCS[b] ?? `**${b}**`} - TODO: describe how this experiment uses the binding`).join("\n")
+    : "- TODO: list Cloudflare products used (if any beyond Workers)";
+
 const readmeHint = readme
   ? "\n<!-- README.md exists - copy API examples and setup notes from apps/experiments/" +
-    experimentName +
-    "/README.md -->\n"
+  experimentName +
+  "/README.md -->\n"
   : "";
 
 const deployUrl = `https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/${experimentName}`;
@@ -94,7 +107,7 @@ ${description}
 
 <!-- TODO: Expand intro - what Cloudflare capability this demonstrates -->
 ${readmeHint}
-## API Endpoint
+## API Reference
 
 ### ${method} ${pathOnly}
 
@@ -139,6 +152,11 @@ curl "https://your-worker.workers.dev${exampleQuery}"
 ## Use Cases
 
 - TODO
+- TODO
+- TODO
+
+## Limitations
+
 - TODO
 - TODO
 
@@ -189,7 +207,7 @@ curl "http://localhost:8787${exampleQuery}"
 ## Cloudflare Features Used
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
-${bindings.map((b) => `- **${b.split(" ")[0]}** - TODO: link to Cloudflare docs`).join("\n")}
+${bindingLines}
 `;
 
 writeFileSync(outPath, mdx);
