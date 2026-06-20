@@ -1,0 +1,523 @@
+---
+title: Link Shortener
+description: URL shortener using Cloudflare D1 and KV - shorten links and redirect with edge caching
+---
+
+<Callout type="idea">
+
+Create short links that redirect to long URLs. Uses D1 as the source of truth with KV as a read-through cache for fast redirects.
+
+</Callout>
+
+## Features
+
+- **POST /shorten**: Create a short link from a long URL
+- **GET /:code**: Redirect to the original URL (302 redirect)
+- **D1 database**: Primary storage for all links
+- **KV cache**: Read-through cache for fast redirects
+- **6-character codes**: Random alphanumeric short codes (e.g., `a1B2c3`)
+- **Collision handling**: Automatic retry on duplicate codes
+
+## Architecture
+
+1. **Shorten**: Insert into D1, then cache in KV
+2. **Redirect**: Read from KV first; on cache miss, read from D1 and populate cache
+3. **Source of truth**: D1 database (`links` table)
+
+## Setup
+
+<Steps>
+  <Step>
+
+### Install dependencies
+
+    ```bash
+    cd apps/experiments/link-shortener
+    npm install
+    ```
+
+  </Step>
+
+  <Step>
+
+### Create D1 database
+
+    ```bash
+    npx wrangler d1 create link-shortener-db
+    ```
+
+    This returns output like:
+    ```
+    database_id = "a1b2c3d4-1234-5678-abcd-123456789abc"
+    ```
+
+    Copy the `database_id` value.
+
+  </Step>
+
+  <Step>
+
+### Create KV namespace
+
+    ```bash
+    npx wrangler kv namespace create LINKS_CACHE
+    ```
+
+    This returns output like:
+    ```
+    id = "0123456789abcdef0123456789abcdef"
+    ```
+
+    Copy the `id` value.
+
+    <Callout type="idea">
+
+For local development, create a preview namespace: `npx wrangler kv namespace create LINKS_CACHE --preview`
+
+</Callout>
+  </Step>
+
+  <Step>
+
+### Update wrangler.json
+
+    Replace the placeholder IDs with your actual values:
+
+    ```json
+    {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "link-shortener-db",
+          "database_id": "a1b2c3d4-1234-5678-abcd-123456789abc"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "LINKS_CACHE",
+          "id": "0123456789abcdef0123456789abcdef"
+        }
+      ]
+    }
+    ```
+
+  </Step>
+
+  <Step>
+
+### Run migrations
+
+    Apply the database schema:
+
+    **Local database** (for development):
+    ```bash
+    npm run db:migrate:local
+    ```
+
+    **Remote database** (for production):
+    ```bash
+    npm run db:migrate
+    ```
+
+    This creates the `links` table:
+    ```sql
+    CREATE TABLE links (
+      code TEXT PRIMARY KEY,
+      url TEXT NOT NULL,
+      created_at INTEGER NOT NULL DEFAULT (unixepoch())
+    );
+    ```
+
+  </Step>
+
+  <Step>
+
+### Run locally
+
+    ```bash
+    npm run dev
+    ```
+
+    Your Worker will be available at `http://localhost:8787`
+
+  </Step>
+</Steps>
+
+## API Reference
+
+### Shorten URL
+
+<Card title="POST /shorten">Create a short link for a long URL.</Card>
+
+#### Request Body
+
+**`param`** `string` (required)
+
+The long URL to shorten. Must start with `http://` or `https://`.
+
+#### Response
+
+**`code`** `string`
+
+The generated short code (6 alphanumeric characters)
+
+**`url`** `string`
+
+The original long URL
+
+#### Example
+
+```bash
+curl -X POST https://your-worker.workers.dev/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://www.cloudflare.com/products/workers/"}'
+```
+
+```json Response (201 Created)
+{
+  "code": "a1B2c3",
+  "url": "https://www.cloudflare.com/products/workers/"
+}
+```
+
+```json Error: Invalid URL (400)
+{
+  "error": "Missing or invalid body field: url (http or https only)",
+  "code": "INVALID_URL"
+}
+```
+
+```json Error: Invalid JSON (400)
+{
+  "error": "Invalid or missing JSON body",
+  "code": "INVALID_BODY"
+}
+```
+
+#### Usage
+
+After creating a short link, redirect by visiting:
+
+```
+https://your-worker.workers.dev/a1B2c3
+```
+
+---
+
+### Redirect
+
+<Card title="GET /:code">Redirect to the original URL associated with the short code.</Card>
+
+#### Path Parameters
+
+**`param`** `string` (required)
+
+The short code (6 alphanumeric characters)
+
+#### Response
+
+- **302 Found**: Redirects to the original URL
+- **404 Not Found**: If the code doesn't exist
+
+#### Example
+
+```bash
+# Follow redirects
+curl -L https://your-worker.workers.dev/a1B2c3
+
+# Show redirect without following (see Location header)
+curl -I https://your-worker.workers.dev/a1B2c3
+```
+
+```http Success (302 Found)
+HTTP/1.1 302 Found
+Location: https://www.cloudflare.com/products/workers/
+```
+
+```json Error: Not found (404)
+{
+  "error": "Short link not found",
+  "code": "NOT_FOUND"
+}
+```
+
+```json Error: Invalid code (404)
+{
+  "error": "Invalid short code",
+  "code": "INVALID_CODE"
+}
+```
+
+## Database Schema
+
+### links table
+
+**`param`** `TEXT` (required)
+
+Short code (PRIMARY KEY)
+
+**`param`** `TEXT` (required)
+
+Original long URL
+
+**`param`** `INTEGER`
+
+Unix timestamp (auto-generated)
+
+#### Schema SQL
+
+```sql
+CREATE TABLE IF NOT EXISTS links (
+  code TEXT PRIMARY KEY,
+  url TEXT NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (unixepoch())
+);
+```
+
+## How It Works
+
+### Shortening flow
+
+1. Client sends `POST /shorten` with `{"url": "https://..."}`
+2. Worker validates URL (must be http/https)
+3. Generate random 6-character code from `[a-zA-Z0-9]`
+4. Insert into D1: `INSERT INTO links (code, url) VALUES (?, ?)`
+5. If UNIQUE constraint fails (collision), retry with new code (max 5 attempts)
+6. Cache in KV: `LINKS_CACHE.put("link:code", url)`
+7. Return `{"code": "...", "url": "..."}` with 201 status
+
+### Redirect flow
+
+1. Client requests `GET /:code`
+2. Validate code format (alphanumeric only)
+3. Check KV cache: `LINKS_CACHE.get("link:code")`
+4. **Cache hit**: Return 302 redirect immediately
+5. **Cache miss**: Query D1: `SELECT url FROM links WHERE code = ?`
+6. If found: cache result in KV, then return 302 redirect
+7. If not found: return 404 error
+
+### Code generation
+
+Codes are generated using cryptographically random bytes:
+
+```typescript
+const CODE_LENGTH = 6;
+const CODE_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+function generateCode(): string {
+  let code = "";
+  const bytes = new Uint8Array(CODE_LENGTH);
+  crypto.getRandomValues(bytes);
+  for (let i = 0; i < CODE_LENGTH; i++) {
+    code += CODE_CHARS[bytes[i] % CODE_CHARS.length];
+  }
+  return code;
+}
+```
+
+Total possible codes: 62^6 = 56.8 billion
+
+## Testing
+
+### Local testing
+
+```bash
+# Start dev server
+npm run dev
+
+# Shorten a URL
+curl -X POST http://localhost:8787/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'
+
+# Output: {"code":"xY3pQz","url":"https://example.com"}
+
+# Test redirect
+curl -I http://localhost:8787/xY3pQz
+
+# Output: Location: https://example.com
+```
+
+### Query the database
+
+```bash
+# Local database
+npx wrangler d1 execute link-shortener-db --local --command "SELECT * FROM links"
+
+# Remote database
+npx wrangler d1 execute link-shortener-db --command "SELECT * FROM links"
+```
+
+### Inspect KV cache
+
+```bash
+# List all keys
+npx wrangler kv key list --namespace-id=YOUR_KV_ID
+
+# Get a specific cached link
+npx wrangler kv key get "link:xY3pQz" --namespace-id=YOUR_KV_ID
+```
+
+## Use Cases
+
+### Marketing campaigns
+
+Create memorable short links for campaigns:
+
+```bash
+curl -X POST https://short.example.com/shorten \
+  -d '{"url": "https://example.com/summer-sale?utm_campaign=twitter"}'
+
+# Share: https://short.example.com/a1B2c3
+```
+
+### API URL shortening
+
+Integrate into your app:
+
+```javascript
+const response = await fetch("https://your-worker.workers.dev/shorten", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ url: longUrl }),
+});
+
+const { code, url } = await response.json();
+const shortUrl = `https://your-worker.workers.dev/${code}`;
+```
+
+### QR code generation
+
+Shorter URLs = simpler QR codes:
+
+```bash
+# Create short link
+curl -X POST https://short.example.com/shorten \
+  -d '{"url": "https://example.com/very/long/path/to/product"}'
+
+# Generate QR code for: https://short.example.com/x7Y2kL
+```
+
+## Bindings
+
+**`param`** `D1Database`
+
+D1 database binding (name: `link-shortener-db`)
+
+**`param`** `KVNamespace`
+
+KV namespace binding for caching redirects
+
+## Deploy
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)
+
+<Steps>
+  <Step>
+
+### Deploy Worker
+
+    Click the deploy button above or run:
+    ```bash
+    npm run deploy
+    ```
+
+  </Step>
+
+  <Step>
+
+### Create production resources
+
+    If not already created:
+    ```bash
+    # Create D1 database
+    npx wrangler d1 create link-shortener-db
+
+    # Create KV namespace
+    npx wrangler kv namespace create LINKS_CACHE
+    ```
+
+    Update `wrangler.json` with the returned IDs.
+
+  </Step>
+
+  <Step>
+
+### Run migrations
+
+    Apply the schema to your production database:
+    ```bash
+    npm run db:migrate
+    ```
+
+  </Step>
+
+  <Step>
+
+### Test production
+
+    ```bash
+    curl -X POST https://your-worker.workers.dev/shorten \
+      -H "Content-Type: application/json" \
+      -d '{"url": "https://www.cloudflare.com"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Monitoring
+
+### View logs
+
+```bash
+# Tail production logs
+npx wrangler tail
+
+# Filter for errors
+npx wrangler tail --status error
+```
+
+### Analytics
+
+View request metrics in the [Cloudflare dashboard](https://dash.cloudflare.com/):
+
+- **Workers & Pages** → your Worker → **Metrics**
+- See request volume, error rate, and response times
+
+## Limitations
+
+- No expiration: Links never expire (implement TTL if needed)
+- No analytics: No tracking of clicks or usage (add D1 table if needed)
+- No custom codes: Codes are always randomly generated
+- No link updates: Cannot change the URL for an existing code
+- No deletion: Cannot delete links after creation (add DELETE endpoint if needed)
+
+## Error Responses
+
+All errors return JSON:
+
+```json
+{
+  "error": "Human-readable error message",
+  "code": "ERROR_CODE"
+}
+```
+
+**`error`** `string`
+
+Description of what went wrong
+
+**`code`** `string`
+
+Error code: `INVALID_BODY`, `INVALID_URL`, `NOT_FOUND`, `INVALID_CODE`, `INTERNAL_ERROR`
+
+## Source Code
+
+View the complete source code on GitHub: [link-shortener](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)
+
+## Cloudflare Features
+
+- **Workers**: Serverless compute at the edge
+- **D1**: SQLite database at the edge (primary storage)
+- **KV**: Key-value store (read-through cache)
+- **Hono**: Lightweight web framework

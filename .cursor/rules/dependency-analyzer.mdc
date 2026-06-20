@@ -1,6 +1,6 @@
 ---
 description: Contract for dependency-analyzer (route, params, response)
-globs: experiments/dependency-analyzer/**/*.ts
+globs: apps/experiments/dependency-analyzer/**/*.ts
 alwaysApply: false
 ---
 

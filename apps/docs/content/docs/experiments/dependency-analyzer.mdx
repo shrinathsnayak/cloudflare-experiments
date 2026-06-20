@@ -1,0 +1,217 @@
+---
+title: Dependency Analyzer
+description: Analyze all external resources and dependencies loaded by a webpage
+---
+
+Analyze all external resources and dependencies loaded by any webpage. Discover scripts, stylesheets, images, fonts, and iframes to understand a site's external dependencies and third-party integrations.
+
+## API Endpoint
+
+### GET /analyze
+
+Analyze all external dependencies of a webpage by providing its URL.
+
+**`url`** `string` (required)
+
+The URL of the webpage to analyze. Must be a valid HTTP or HTTPS URL.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/analyze?url=https://www.cloudflare.com"
+```
+
+#### Response Structure
+
+**`success`** `boolean`
+
+Indicates if the request was successful
+
+**`data`** `object`
+
+The analyzed dependencies from the webpage
+
+**`data.scripts`** `string[]`
+
+Array of unique absolute URLs of JavaScript files loaded via `<script src="...">`. Includes all external scripts referenced in the HTML.
+
+**`data.stylesheets`** `string[]`
+
+Array of unique absolute URLs of CSS files loaded via `<link rel="stylesheet" href="...">`. Includes all external stylesheets.
+
+**`data.images`** `string[]`
+
+Array of unique absolute URLs of images. Extracts from both `<img src="...">` and `<source src="...">` tags.
+
+**`data.fonts`** `string[]`
+
+Array of unique absolute URLs of font files. Extracts from: - `<link rel="preload" as="font" href="...">` - CSS `url()` declarations for .woff, .woff2, .ttf, .otf, and .eot files
+
+**`data.iframes`** `string[]`
+
+Array of unique absolute URLs of embedded iframes via `<iframe src="...">`. Useful for identifying third-party embeds.
+
+#### Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "scripts": [
+      "https://www.cloudflare.com/js/main.bundle.js",
+      "https://www.googletagmanager.com/gtag/js?id=UA-12345678",
+      "https://static.cloudflareinsights.com/beacon.min.js",
+      "https://ajax.cloudflare.com/cdn-cgi/scripts/analytics.js"
+    ],
+    "stylesheets": [
+      "https://www.cloudflare.com/css/main.css",
+      "https://www.cloudflare.com/css/responsive.css",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700"
+    ],
+    "images": [
+      "https://www.cloudflare.com/img/logo.svg",
+      "https://www.cloudflare.com/img/hero-background.jpg",
+      "https://imagedelivery.net/abc123/hero.png/public"
+    ],
+    "fonts": [
+      "https://www.cloudflare.com/fonts/inter-regular.woff2",
+      "https://www.cloudflare.com/fonts/inter-bold.woff2",
+      "https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2"
+    ],
+    "iframes": [
+      "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "https://player.vimeo.com/video/123456789"
+    ]
+  }
+}
+```
+
+## Error Responses
+
+### Invalid URL
+
+```json
+{
+  "success": false,
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+### Fetch Error
+
+```json
+{
+  "success": false,
+  "error": "HTTP 404",
+  "code": "FETCH_ERROR"
+}
+```
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Clone the repository
+
+    ```bash
+    git clone https://github.com/your-org/cloudflare-experiments
+    cd cloudflare-experiments/apps/experiments/dependency-analyzer
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Install dependencies
+
+    ```bash
+    npm install
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Test locally
+
+    ```bash
+    npm run dev
+    ```
+
+    The API will be available at `http://localhost:8787`
+
+  </Step>
+  
+  <Step>
+
+### Deploy to Cloudflare Workers
+
+    ```bash
+    npm run deploy
+    ```
+
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **Dependency Audits**: Identify all third-party dependencies and external resources
+- **Performance Analysis**: Discover resource-heavy pages loading too many external files
+- **Security Reviews**: Find all external scripts and potential security risks
+- **Privacy Compliance**: Identify third-party trackers and analytics scripts
+- **License Compliance**: Discover all fonts and resources that may require licensing
+- **CDN Optimization**: Identify candidates for CDN migration or consolidation
+- **Competitive Analysis**: Understand what services and tools competitors use
+
+## Technical Details
+
+- Built with [Hono](https://hono.dev/) framework
+- Runs on Cloudflare Workers
+- Regex-based HTML parsing for fast extraction
+- Automatically resolves relative URLs to absolute URLs
+- Deduplicates all resource URLs
+- Extracts fonts from both link tags and CSS url() declarations
+
+## Extraction Details
+
+### Scripts
+
+- Extracted from `<script src="...">` tags
+- Includes inline and external JavaScript references
+- Does not include inline script content
+
+### Stylesheets
+
+- Extracted from `<link rel="stylesheet" href="...">`
+- Includes both standard and alternate stylesheets
+- Matches various ordering of rel and href attributes
+
+### Images
+
+- Extracted from `<img src="...">` tags
+- Also extracts from `<source src="...">` for responsive images
+- All formats supported (jpg, png, svg, gif, webp, etc.)
+
+### Fonts
+
+- Extracted from `<link rel="preload" as="font">` or `<link rel="stylesheet" as="font">`
+- Also extracts from CSS `url()` declarations matching font extensions:
+  - .woff and .woff2 (Web Open Font Format)
+  - .ttf (TrueType Font)
+  - .otf (OpenType Font)
+  - .eot (Embedded OpenType)
+
+### Iframes
+
+- Extracted from `<iframe src="...">` tags
+- Useful for identifying embeds from YouTube, Vimeo, Google Maps, etc.
+- Includes both same-origin and cross-origin iframes
+
+## Notes
+
+- All resource URLs are deduplicated across each category
+- Relative URLs are resolved using the base URL of the page
+- The tool fetches and analyzes the initial HTML only (does not execute JavaScript)
+- Resources loaded dynamically after page load are not captured

@@ -1,0 +1,538 @@
+---
+title: Adding New Experiments
+description: Step-by-step guide to creating and adding new experiments to Cloudflare Experiments
+---
+
+This guide walks you through the process of adding a new experiment to the Cloudflare Experiments repository.
+
+## Before You Start
+
+<Callout>
+
+Always open an issue using the [Experiment idea template](https://github.com/shrinathsnayak/cloudflare-experiments/issues/new) to discuss your experiment with maintainers before implementing it.
+
+</Callout>
+
+### What Makes a Good Experiment?
+
+A good experiment:
+
+- Demonstrates a **specific Cloudflare capability** (Workers AI, Browser Rendering, D1, KV, R2, etc.)
+- Solves a **real developer need** (not just "Hello World")
+- Is **edge-first** and runs in under 60 seconds
+- Has a **single responsibility** (one experiment = one capability)
+- Is **independently deployable** without dependencies on other experiments
+- Provides **practical value** that developers would actually use
+
+## Step-by-Step Process
+
+<Steps>
+  <Step>
+
+### Open an experiment idea issue
+
+    Use the [Experiment idea template](https://github.com/shrinathsnayak/cloudflare-experiments/issues/new) to propose your experiment. Include:
+    - What Cloudflare capability it demonstrates
+    - What problem it solves
+    - Basic description of how it works
+    - Any special bindings or resources needed (D1, KV, AI, etc.)
+
+    Wait for maintainer feedback before proceeding.
+
+  </Step>
+
+  <Step>
+
+### Create the experiment directory
+
+    Create a new directory under `apps/experiments/<name>/`:
+    ```bash
+    mkdir -p apps/experiments/my-experiment
+    cd apps/experiments/my-experiment
+    ```
+
+    Use kebab-case for the experiment name (e.g. `is-it-down`, `link-shortener`).
+
+  </Step>
+
+  <Step>
+
+### Set up the project structure
+
+    Create the standard directory structure:
+    ```bash
+    mkdir -p src/{routes,lib,utils,types,constants}
+    ```
+
+    Your directory should look like:
+    ```
+    apps/experiments/my-experiment/
+    ├── src/
+    │   ├── index.ts
+    │   ├── routes/
+    │   ├── lib/
+    │   ├── utils/
+    │   ├── types/
+    │   └── constants/
+    ├── package.json
+    ├── wrangler.toml
+    ├── tsconfig.json
+    └── README.md
+    ```
+
+  </Step>
+
+  <Step>
+
+### Initialize package.json
+
+    Create a `package.json` with the required dependencies:
+    ```json
+    {
+      "name": "my-experiment",
+      "version": "1.0.0",
+      "type": "module",
+      "scripts": {
+        "dev": "wrangler dev",
+        "deploy": "wrangler deploy"
+      },
+      "dependencies": {
+        "hono": "^4.0.0"
+      },
+      "devDependencies": {
+        "@cloudflare/workers-types": "^4.0.0",
+        "typescript": "^5.0.0",
+        "wrangler": "^3.0.0"
+      }
+    }
+    ```
+
+    Then install dependencies:
+    ```bash
+    npm install
+    ```
+
+  </Step>
+
+  <Step>
+
+### Create wrangler.toml
+
+    Configure your Worker with `wrangler.toml`:
+    ```toml
+    name = "my-experiment"
+    main = "src/index.ts"
+    compatibility_date = "2024-01-01"
+
+    # Add bindings as needed:
+    # [[d1_databases]]
+    # binding = "DB"
+    # database_name = "my-database"
+    # database_id = "..."
+
+    # [[kv_namespaces]]
+    # binding = "MY_KV"
+    # id = "..."
+    ```
+
+    Or use `wrangler.json` if you prefer JSON format.
+
+  </Step>
+
+  <Step>
+
+### Set up TypeScript configuration
+
+    Create `tsconfig.json`:
+    ```json
+    {
+      "compilerOptions": {
+        "target": "ES2022",
+        "module": "ES2022",
+        "lib": ["ES2022"],
+        "types": ["@cloudflare/workers-types"],
+        "strict": true,
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true
+      },
+      "include": ["src/**/*"],
+      "exclude": ["node_modules"]
+    }
+    ```
+
+  </Step>
+
+  <Step>
+
+### Implement the Worker
+
+    Follow the [code standards](/docs/code-standards) to implement your Worker:
+
+    **Create `src/types/env.d.ts`:**
+    ```typescript
+    /// <reference types="@cloudflare/workers-types" />
+
+    export interface Env {
+      // Add your bindings here
+      // DB: D1Database;
+      // MY_KV: KVNamespace;
+    }
+    ```
+
+    **Create `src/utils/response.ts`:**
+    ```typescript
+    import type { Context } from "hono";
+
+    export function jsonError(c: Context, message: string, code: string, status: 400 | 404 | 502 = 400) {
+      return c.json({ error: message, code }, { status });
+    }
+
+    export function jsonSuccess<T>(c: Context, data: T, status: 200 = 200) {
+      return c.json(data, { status });
+    }
+    ```
+
+    **Create `src/lib/url.ts` (if handling URL params):**
+    ```typescript
+    /**
+     * Validates and normalizes a URL for safe fetching.
+     * Returns the URL string or null if invalid/not allowed.
+     */
+    export function validateUrl(input: string | undefined): string | null {
+      if (!input || typeof input !== "string") return null;
+      const trimmed = input.trim();
+      if (!trimmed) return null;
+      try {
+        const url = new URL(trimmed);
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+          return null;
+        }
+        return url.href;
+      } catch {
+        return null;
+      }
+    }
+    ```
+
+    **Create your route handlers in `src/routes/`:**
+    ```typescript
+    import { Hono } from "hono";
+    import type { Env } from "../types/env";
+    import { jsonError, jsonSuccess } from "../utils/response";
+
+    const app = new Hono<{ Bindings: Env }>();
+
+    app.get("/my-route", async (c) => {
+      // Your logic here
+      return jsonSuccess(c, { message: "Success" });
+    });
+
+    export default app;
+    ```
+
+    **Create `src/index.ts`:**
+    ```typescript
+    import { Hono } from "hono";
+    import type { Env } from "./types/env";
+    import myRoutes from "./routes/my-route";
+
+    const app = new Hono<{ Bindings: Env }>();
+
+    app.route("/", myRoutes);
+
+    app.get("/", (c) => {
+      return c.json({
+        name: "my-experiment",
+        description: "What this experiment does",
+        usage: "GET /my-route",
+      });
+    });
+
+    app.onError((err, c) => {
+      return c.json({ error: err.message, code: "INTERNAL_ERROR" }, 500);
+    });
+
+    export default {
+      fetch: app.fetch,
+    };
+    ```
+
+  </Step>
+
+  <Step>
+
+### Test locally
+
+    Run your experiment locally:
+    ```bash
+    npm run dev
+    ```
+
+    Test your endpoints:
+    ```bash
+    curl http://localhost:8787/my-route
+    ```
+
+    Verify:
+    - All routes work as expected
+    - Error handling works correctly
+    - TypeScript has no errors
+
+  </Step>
+
+  <Step>
+
+### Create README.md
+
+    Document your experiment with a comprehensive README:
+    ```markdown
+    # My Experiment
+
+    Brief description of what this experiment does.
+
+    ## Features
+
+    - Feature 1
+    - Feature 2
+
+    ## API
+
+    ### `GET /my-route`
+
+    | Query | Required | Description |
+    | ----- | -------- | ----------- |
+    | `param` | Yes | Description |
+
+    **Example**
+
+    ```http
+    GET /my-route?param=value
+    ```
+
+    **Response**
+
+    ```json
+    {
+      "result": "data"
+    }
+    ```
+
+    **Errors**
+
+    - `400` - Invalid parameter
+
+    ## Run locally
+
+    ```bash
+    cd apps/experiments/my-experiment
+    npm install
+    npm run dev
+    ```
+
+    ## Deploy
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/YOUR_USERNAME/cloudflare-experiments/tree/main/apps/experiments/my-experiment)
+
+    ## Cloudflare features used
+
+    - Workers
+    - List relevant features
+    ```
+
+  </Step>
+
+  <Step>
+
+### Add to root README.md
+
+    Add a row to the experiments table in the root `README.md`:
+    ```markdown
+    | [My Experiment](apps/experiments/my-experiment/) | Brief description | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/YOUR_USERNAME/cloudflare-experiments/tree/main/apps/experiments/my-experiment) |
+    ```
+
+  </Step>
+
+  <Step>
+
+### Submit a pull request
+
+    Create a PR with:
+    - Clear title: "Add [experiment-name] experiment"
+    - Description linking to the experiment idea issue
+    - Screenshots or examples of the API in action (if applicable)
+    - Confirmation that `npx wrangler deploy` works
+
+    Fill in the PR template with all required information.
+
+  </Step>
+</Steps>
+
+## Common Patterns and Examples
+
+### Using Reference Experiments
+
+You can use existing experiments as references:
+
+<Accordions>
+<Accordion title="Simple stateless experiment">
+  **Reference: `whereami` or `is-it-down`**
+
+These experiments:
+
+- Don't use persistent storage
+- Have simple route handlers
+- Focus on edge networking
+
+Good for: Simple APIs, URL validators, fetch-based tools
+
+</Accordion>
+
+<Accordion title="Experiment with database">
+  **Reference: `link-shortener`**
+
+This experiment:
+
+- Uses D1 for primary storage
+- Uses KV for read cache
+- Handles database errors gracefully
+- Implements retry logic for unique constraints
+
+Good for: CRUD operations, data persistence, caching patterns
+
+</Accordion>
+
+<Accordion title="Experiment with AI">
+  **Reference: `ai-website-summary` or `github-repo-explainer`**
+
+These experiments:
+
+- Use Workers AI binding
+- Handle streaming responses
+- Process external content
+
+Good for: AI-powered tools, content analysis, summarization
+
+</Accordion>
+
+<Accordion title="Experiment with Browser Rendering">
+  **Reference: `screenshot-api`**
+
+This experiment:
+
+- Uses Browser Rendering API
+- Handles binary responses (images)
+- Implements proper timeouts
+
+Good for: Screenshot tools, browser automation, PDF generation
+
+</Accordion>
+</Accordions>
+### Error Handling Patterns
+
+**Handling fetch errors:**
+
+```typescript
+export async function fetchWithTiming(url: string): Promise<FetchResult> {
+  const start = Date.now();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      signal: controller.signal,
+      headers: { "User-Agent": "Cloudflare-Experiments/1.0" },
+    });
+    const responseTimeMs = Date.now() - start;
+    clearTimeout(timeoutId);
+    return {
+      ok: res.ok,
+      statusCode: res.status,
+      responseTimeMs,
+    };
+  } catch (e) {
+    clearTimeout(timeoutId);
+    const responseTimeMs = Date.now() - start;
+    const message = e instanceof Error ? e.message : "Unknown error";
+    return {
+      ok: false,
+      statusCode: 0,
+      responseTimeMs,
+      error: message,
+    };
+  }
+}
+```
+
+**Handling JSON parsing errors:**
+
+```typescript
+let body: RequestBody;
+try {
+  body = (await c.req.json()) as RequestBody;
+} catch {
+  return jsonError(c, "Invalid or missing JSON body", "INVALID_BODY");
+}
+```
+
+**Handling database constraint errors:**
+
+```typescript
+try {
+  await db.prepare("INSERT INTO table (id, data) VALUES (?, ?)").bind(id, data).run();
+  return jsonSuccess(c, { id });
+} catch (e) {
+  const err = e as { message?: string };
+  if (err.message?.includes("UNIQUE constraint")) {
+    return jsonError(c, "Record already exists", "DUPLICATE_ENTRY");
+  }
+  throw e; // Let global error handler deal with it
+}
+```
+
+## Deployment Checklist
+
+Before submitting your PR, verify:
+
+- [ ] `npm run dev` works locally
+- [ ] `npx wrangler deploy` deploys successfully
+- [ ] All endpoints return proper JSON responses
+- [ ] Error codes are descriptive (e.g. `INVALID_URL`, not `ERROR`)
+- [ ] Global error handler returns consistent 500 responses
+- [ ] README.md documents all API endpoints
+- [ ] Bindings are declared in both `wrangler.toml` and `src/types/env.d.ts`
+- [ ] TypeScript strict mode passes with no errors
+- [ ] No `any` types in the code
+- [ ] Added experiment to root README.md table
+
+## Getting Help
+
+<Accordions>
+<Accordion title="What if I'm not sure which Cloudflare feature to use?">
+  Open a [Discussion](https://github.com/shrinathsnayak/cloudflare-experiments/discussions) describing what you want to build. The community can help suggest the right Cloudflare features.
+</Accordion>
+
+<Accordion title="Can I use multiple Cloudflare features in one experiment?">
+  Yes, but the experiment should have a single clear purpose. For example, `link-shortener` uses
+  both D1 and KV, but its purpose is clear: shorten URLs.
+</Accordion>
+
+<Accordion title="Do I need to create database migrations?">
+  Include the SQL schema in your README.md so users can set up the database. For D1, users will run
+  `wrangler d1 execute` with your schema.
+</Accordion>
+
+<Accordion title="How do I handle secrets?">
+  Use Cloudflare secrets via `wrangler secret put SECRET_NAME`. Document required secrets in your README.md. Never commit actual secret values.
+</Accordion>
+</Accordions>
+## Next Steps
+
+- Review the [Code Standards](/docs/code-standards) for implementation details
+- Check the [Contributing Guide](/docs/contributing) for PR guidelines
+- Browse [existing experiments](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments) for inspiration
+- Open an [experiment idea issue](https://github.com/shrinathsnayak/cloudflare-experiments/issues/new) to get started
+
+Thank you for contributing to Cloudflare Experiments!

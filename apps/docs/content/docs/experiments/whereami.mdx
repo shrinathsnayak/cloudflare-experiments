@@ -1,0 +1,148 @@
+---
+title: "Where Am I?"
+description: "Get request metadata from Cloudflare's edge including geolocation, colo, and more"
+---
+
+Retrieve detailed metadata about incoming requests from Cloudflare's edge network, including geographic location, data center, ASN, and timezone.
+
+## API Endpoint
+
+### GET /whereami
+
+Returns the Cloudflare `request.cf` object containing metadata about the incoming request.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/whereami"
+```
+
+#### Success Response
+
+The response includes whatever Cloudflare injects into `request.cf` for the incoming request. Common fields include:
+
+**`country`** `string`
+
+Two-letter ISO 3166-1 country code (e.g., "US", "GB")
+
+**`city`** `string`
+
+City name (e.g., "San Francisco")
+
+**`region`** `string`
+
+Region or state name (e.g., "California")
+
+**`timezone`** `string`
+
+IANA timezone identifier (e.g., "America/Los_Angeles")
+
+**`colo`** `string`
+
+Cloudflare data center IATA code (e.g., "SFO", "LHR")
+
+**`asn`** `number`
+
+Autonomous System Number of the client's ISP
+
+```json
+{
+  "country": "US",
+  "city": "San Francisco",
+  "region": "California",
+  "timezone": "America/Los_Angeles",
+  "colo": "SFO",
+  "asn": 13335
+}
+```
+
+<Callout>
+
+The exact fields returned depend on Cloudflare's detection capabilities. During local development, the response may be empty or contain minimal data. Full metadata is available when deployed.
+
+</Callout>
+
+## Use Cases
+
+- Determine visitor geographic location without external APIs
+- Display localized content based on country/region
+- Show the nearest edge data center serving the request
+- Analyze traffic patterns by ASN or location
+- Build geographic routing logic
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/whereami)
+
+  </Step>
+  
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard to deploy the Worker to your Cloudflare account. No additional configuration required.
+
+  </Step>
+  
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/whereami"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/whereami
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/whereami"
+```
+
+<Callout type="warning">
+
+Local development will return an empty object or minimal data since `request.cf` is only populated by Cloudflare's edge network.
+
+</Callout>
+
+## Additional Request Metadata Fields
+
+Depending on the request, the `cf` object may also include:
+
+- `latitude` / `longitude` — Geographic coordinates
+- `postalCode` — Postal/ZIP code
+- `metroCode` — Metro area code
+- `continent` — Two-letter continent code
+- `regionCode` — ISO 3166-2 region code
+- `tlsVersion` — TLS version used (e.g., "TLSv1.3")
+- `tlsCipher` — TLS cipher suite
+- `httpProtocol` — HTTP protocol version (e.g., "HTTP/2")
+
+See the [Cloudflare request.cf documentation](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties) for a complete list.
+
+## Implementation Details
+
+- Completely stateless — no external requests
+- No database or KV storage required
+- Returns raw `request.cf` object from Cloudflare
+- Works immediately after deployment
+
+## Cloudflare Features Used
+
+- **Workers** — Edge compute runtime
+- **request.cf** — Incoming request metadata including geolocation

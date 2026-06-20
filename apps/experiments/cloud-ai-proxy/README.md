@@ -53,7 +53,7 @@ GET /chat?model=@cf/meta/llama-3.1-8b-instruct-fast&prompt=Say%20hello
 ## Run locally
 
 ```bash
-cd experiments/cloud-ai-proxy
+cd apps/experiments/cloud-ai-proxy
 npm install
 npm run dev
 ```
@@ -64,7 +64,7 @@ Requires a Cloudflare account with Workers AI enabled.
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/cloud-ai-proxy)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cloud-ai-proxy)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

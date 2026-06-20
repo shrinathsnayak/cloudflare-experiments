@@ -1,0 +1,615 @@
+---
+title: "AI Bot Visibility Checker"
+description: "Check if a URL is configured to allow or block AI crawlers like GPTBot, ClaudeBot, and others"
+---
+
+<Callout type="warning">
+
+This is an experimental Worker. Use it as a starting point for your own projects.
+
+</Callout>
+
+The AI Bot Visibility Checker analyzes a webpage's `robots.txt` file and page-level directives to determine whether known AI crawlers (like GPTBot, ClaudeBot, PerplexityBot) are allowed or blocked. It provides per-crawler status and a summary by platform.
+
+<Callout>
+
+**Disclaimer**: This tool reports **configuration only**. It does not verify whether a URL is actually indexed or used by any AI product, as there are no public APIs for that information.
+
+</Callout>
+
+## Features
+
+- Check 14+ known AI crawler bots in one request
+- Parse `robots.txt` with user-agent specific rules
+- Detect page-level blocks (meta robots, X-Robots-Tag headers)
+- Support for generic directives (`noindex`, `noai`, `noimageai`)
+- Stateless edge execution (no bindings required)
+- Sub-second response times
+
+## API Reference
+
+### GET /check
+
+Check AI crawler visibility configuration for a URL.
+
+**`url`** `string` (required)
+
+The target URL to check. Must use `http://` or `https://` scheme.
+
+#### Response
+
+**`url`** `string`
+
+The URL that was analyzed.
+
+**`disclaimer`** `string`
+
+Reminder that this reports configuration only, not actual indexing status.
+
+**`crawlers`** `array`
+
+Array of crawler status objects.
+
+<Accordions>
+<Accordion title="Crawler Object">
+
+**`id`** `string`
+
+The crawler's User-Agent token (e.g., "GPTBot", "ClaudeBot").
+
+**`platform`** `string`
+
+Human-readable platform name (e.g., "ChatGPT", "Claude").
+
+**`status`** `string`
+
+One of: - `"allowed"` - robots.txt and page directives allow this crawler - `"blocked"` - robots.txt or page-level directive blocks this crawler - `"not_specified"` - no rule applies for this crawler
+
+</Accordion>
+</Accordions>
+**`summary`** `object`
+
+Aggregated results by status.
+
+<Accordions>
+<Accordion title="Summary Object">
+
+**`allowed`** `string[]`
+
+Array of platform names that are allowed.
+
+**`blocked`** `string[]`
+
+Array of platform names that are blocked.
+
+**`notSpecified`** `string[]`
+
+Array of platform names with no specific rules.
+
+</Accordion>
+</Accordions>
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/check?url=https://www.cloudflare.com"
+```
+
+#### Example Response
+
+```json
+{
+  "url": "https://www.cloudflare.com",
+  "disclaimer": "Configuration only; we cannot verify actual index inclusion in any AI product.",
+  "crawlers": [
+    {
+      "id": "GPTBot",
+      "platform": "ChatGPT",
+      "status": "allowed"
+    },
+    {
+      "id": "ChatGPT-User",
+      "platform": "ChatGPT",
+      "status": "allowed"
+    },
+    {
+      "id": "ClaudeBot",
+      "platform": "Claude",
+      "status": "not_specified"
+    },
+    {
+      "id": "PerplexityBot",
+      "platform": "Perplexity",
+      "status": "blocked"
+    },
+    {
+      "id": "Google-Extended",
+      "platform": "Google (Gemini/Bard)",
+      "status": "not_specified"
+    }
+    // ... 9 more crawlers
+  ],
+  "summary": {
+    "allowed": ["ChatGPT"],
+    "blocked": ["Perplexity"],
+    "notSpecified": [
+      "Claude",
+      "ChatGPT Search",
+      "Google (Gemini/Bard)",
+      "Google Vertex AI",
+      "Common Crawl",
+      "ByteDance",
+      "Meta AI",
+      "Meta",
+      "Apple",
+      "Amazon",
+      "DuckDuckGo"
+    ]
+  }
+}
+```
+
+#### Error Responses
+
+**`error`** `string`
+
+Human-readable error message.
+
+**`code`** `string`
+
+Machine-readable error code.
+
+**400 Bad Request** - Missing or invalid URL:
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+**502 Bad Gateway** - Failed to fetch the URL:
+
+```json
+{
+  "error": "Failed to fetch URL",
+  "code": "FETCH_ERROR"
+}
+```
+
+## Monitored AI Crawlers
+
+The worker checks the following AI crawlers:
+
+| Crawler ID              | Platform             | Description                 |
+| ----------------------- | -------------------- | --------------------------- |
+| `GPTBot`                | ChatGPT              | OpenAI's web crawler        |
+| `ChatGPT-User`          | ChatGPT              | ChatGPT user-facing bot     |
+| `OAI-SearchBot`         | ChatGPT Search       | OpenAI's search crawler     |
+| `ClaudeBot`             | Claude               | Anthropic's web crawler     |
+| `PerplexityBot`         | Perplexity           | Perplexity AI's crawler     |
+| `Google-Extended`       | Google (Gemini/Bard) | Google's Gemini crawler     |
+| `Google-CloudVertexBot` | Google Vertex AI     | Google Vertex AI crawler    |
+| `CCBot`                 | Common Crawl         | Common Crawl corpus builder |
+| `Bytespider`            | ByteDance            | ByteDance's crawler         |
+| `Meta-ExternalAgent`    | Meta AI              | Meta's AI crawler           |
+| `FacebookBot`           | Meta                 | Facebook's web crawler      |
+| `Applebot`              | Apple                | Apple's web crawler         |
+| `Amazonbot`             | Amazon               | Amazon's web crawler        |
+| `DuckAssistBot`         | DuckDuckGo           | DuckDuckGo AI assistant     |
+
+<Callout>
+
+This list is defined in `src/constants/crawlers.ts` and can be customized for your needs.
+
+</Callout>
+
+## Implementation Details
+
+### Detection Logic
+
+The worker uses a multi-layered approach to determine crawler visibility:
+
+<Steps>
+  <Step>
+
+### Fetch robots.txt and page content
+
+    Both requests are made in parallel:
+    ```typescript
+    const [pageResult, robotsBody] = await Promise.all([
+      fetchPage(url),
+      fetchRobotsTxt(origin),
+    ]);
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Parse robots.txt rules
+
+    Extract per-user-agent Allow/Disallow directives:
+    ```typescript
+    const rules = robotsBody ? parseRobotsTxt(robotsBody) : new Map();
+    ```
+
+    The parser handles:
+    - User-agent specific rules
+    - Wildcard user-agents (`*`)
+    - Path-specific allow/disallow patterns
+
+  </Step>
+  
+  <Step>
+
+### Extract page-level signals
+
+    Check HTML meta tags and HTTP headers:
+    ```typescript
+    // Detects:
+    // <meta name="robots" content="noindex, noai">
+    // <meta name="GPTBot" content="noindex">
+    // X-Robots-Tag: noindex, nofollow
+    const signals = getPageRobotSignals(html, headers);
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Compute per-crawler status
+
+    Apply precedence rules for each crawler:
+    ```typescript
+    // 1. Page-level block -> blocked
+    // 2. robots.txt disallow -> blocked
+    // 3. robots.txt allow -> allowed
+    // 4. No rule -> not_specified
+    const status = computeStatus(rules, signals, crawlerId, path);
+    ```
+
+  </Step>
+</Steps>
+
+### Core Implementation
+
+Here's the main route handler from `src/routes/check.ts`:
+
+```typescript
+app.get("/check", async (c) => {
+  const url = validateUrl(c.req.query("url"));
+  if (!url) return jsonError(c, "Missing or invalid query parameter: url", "INVALID_URL");
+
+  try {
+    const parsed = new URL(url);
+    const origin = parsed.origin;
+    const path = parsed.pathname || "/";
+
+    const [pageResult, robotsBody] = await Promise.all([fetchPage(url), fetchRobotsTxt(origin)]);
+
+    const rules = robotsBody ? parseRobotsTxt(robotsBody) : new Map();
+    const response = buildVisibilityResponse(url, path, rules, pageResult.html, pageResult.headers);
+    return jsonSuccess(c, response);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Failed to fetch URL";
+    return jsonError(c, message, "FETCH_ERROR", 502);
+  }
+});
+```
+
+### Status Precedence
+
+The visibility logic follows this precedence (from `src/lib/visibility.ts`):
+
+```typescript
+function computeStatus(
+  rules: RobotsRules,
+  signals: PageRobotSignals,
+  crawlerId: string,
+  path: string
+): CrawlerStatus {
+  // Page-level block takes highest precedence
+  if (isCrawlerBlockedByPage(signals, crawlerId)) return "blocked";
+
+  // Then check robots.txt
+  const robotsAllow = isAllowedByRobots(rules, crawlerId, path);
+  if (robotsAllow === false) return "blocked";
+  if (robotsAllow === true) return "allowed";
+
+  // No rule specified
+  return "not_specified";
+}
+```
+
+### Page-Level Directives
+
+The worker detects these meta tags and headers:
+
+```html
+<!-- Generic blocks (apply to all crawlers) -->
+<meta name="robots" content="noindex" />
+<meta name="robots" content="noai" />
+<meta name="robots" content="noimageai" />
+
+<!-- Crawler-specific blocks -->
+<meta name="GPTBot" content="noindex" />
+<meta name="ClaudeBot" content="nofollow, noindex" />
+
+<!-- HTTP header equivalent -->
+X-Robots-Tag: noindex, noai
+```
+
+### robots.txt Parsing
+
+Example `robots.txt` rules:
+
+```txt
+# Block specific crawlers
+User-agent: GPTBot
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /private/
+
+# Allow all others
+User-agent: *
+Allow: /
+```
+
+The parser extracts per-user-agent rules and applies path matching with longest-prefix-wins logic.
+
+## Setup & Deployment
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) v18 or later
+- A [Cloudflare account](https://dash.cloudflare.com/sign-up)
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed
+
+### Local Development
+
+<Steps>
+  <Step>
+
+### Clone and install dependencies
+
+    ```bash
+    git clone https://github.com/shrinathsnayak/cloudflare-experiments
+    cd cloudflare-experiments/apps/experiments/ai-bot-visibility
+    npm install
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Start the development server
+
+    ```bash
+    npm run dev
+    ```
+
+    This starts Wrangler in dev mode. No bindings required.
+
+  </Step>
+  
+  <Step>
+
+### Test the endpoint
+
+    ```bash
+    curl "http://localhost:8787/check?url=https://www.cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+### Deploy to Production
+
+<Steps>
+  <Step>
+
+### Authenticate with Cloudflare
+
+    ```bash
+    wrangler login
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Deploy the Worker
+
+    ```bash
+    npm run deploy
+    ```
+
+    This publishes your Worker to `*.workers.dev` or your custom domain.
+
+  </Step>
+  
+  <Step>
+
+### Test the production endpoint
+
+    ```bash
+    curl "https://ai-bot-visibility.YOUR_SUBDOMAIN.workers.dev/check?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+### One-Click Deploy
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-bot-visibility)
+
+Click the button above to deploy this Worker directly to your Cloudflare account. You can fork the repository and update the URL to deploy from your own fork.
+
+## Configuration
+
+No bindings or environment variables are required. The `wrangler.toml` is minimal:
+
+```toml
+name = "ai-bot-visibility"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+```
+
+## Dependencies
+
+```json
+{
+  "dependencies": {
+    "hono": "^4.6.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^4"
+  }
+}
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for fetching pages and robots.txt
+- **Edge Networking** - Low-latency requests from global edge locations
+
+## Use Cases
+
+- **SEO Tools** - Add AI crawler visibility checks to SEO audit dashboards
+- **CMS Plugins** - Integrate into WordPress/Drupal to show AI bot status
+- **Privacy Compliance** - Monitor which AI platforms can access your content
+- **Analytics Dashboards** - Track AI crawler access policies across sites
+- **Browser Extensions** - Show AI visibility status for the current page
+- **Web Scraping Tools** - Check if your scraper is allowed before crawling
+
+## Limitations
+
+- **Configuration only**: Does not verify actual indexing by AI platforms (no public APIs exist)
+- **Static analysis**: Does not execute JavaScript; only analyzes HTML and headers
+- **No authentication**: Cannot check auth-protected pages
+- **robots.txt compliance**: Assumes crawlers respect robots.txt (not legally enforced)
+- **Limited crawlers**: Only checks 14 known AI crawlers (list can be extended)
+- **No sitemap parsing**: Only checks individual URLs, not entire sitemaps
+
+## Advanced Usage
+
+### Adding Custom Crawlers
+
+Extend the crawler list in `src/constants/crawlers.ts`:
+
+```typescript
+export const AI_CRAWLERS: Array<{ id: string; platform: string }> = [
+  { id: "GPTBot", platform: "ChatGPT" },
+  { id: "ClaudeBot", platform: "Claude" },
+  // Add your custom crawlers
+  { id: "MyCustomBot", platform: "My AI Platform" },
+  // ...
+];
+```
+
+### Batch Checking Multiple URLs
+
+Create a new endpoint to check multiple URLs:
+
+```typescript
+app.post("/batch-check", async (c) => {
+  const { urls } = await c.req.json();
+  const results = await Promise.all(urls.map((url) => checkVisibility(url)));
+  return c.json({ results });
+});
+```
+
+### Adding Site-Wide Analysis
+
+Fetch and parse the sitemap to check all pages:
+
+```typescript
+import { parseSitemap } from "./lib/sitemap";
+
+app.get("/site-check", async (c) => {
+  const sitemapUrl = c.req.query("sitemap");
+  const urls = await parseSitemap(sitemapUrl);
+  // Check each URL...
+});
+```
+
+## Related Resources
+
+<Cards>
+  <Card
+    title="robots.txt Specification"
+    href="https://developers.google.com/search/docs/crawling-indexing/robots/intro"
+  >
+    Learn about robots.txt syntax and best practices
+  </Card>
+  <Card
+    title="Meta Robots Tag"
+    href="https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag"
+  >
+    Documentation for meta robots directives
+  </Card>
+  <Card
+    title="AI Crawl Control"
+    href="https://blog.cloudflare.com/declaring-your-aindependence-block-ai-bots-scrapers-and-crawlers-with-a-single-click"
+  >
+    Cloudflare's AI crawler blocking feature
+  </Card>
+  <Card
+    title="GitHub Repository"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-bot-visibility"
+  >
+    View the complete source code
+  </Card>
+</Cards>
+
+## FAQ
+
+<Accordions>
+  <Accordion title="Why does it say 'not_specified' for most crawlers?">
+    If a site doesn't explicitly allow or block a crawler in robots.txt or meta tags, the status is
+    `not_specified`. This means the crawler could access the page by default, but there's no
+    explicit rule.
+  </Accordion>
+
+  <Accordion title="Does 'allowed' mean the page is definitely in ChatGPT/Claude?">
+    No. `allowed` means the page configuration doesn't block the crawler. Actual indexing depends on
+    many factors: crawler behavior, content quality, update frequency, and internal platform
+    decisions.
+  </Accordion>
+
+  <Accordion title="Can I check private/authenticated pages?">
+    Not with the default implementation. You'd need to add authentication headers to the fetch
+    requests and handle cookies/sessions.
+  </Accordion>
+
+  <Accordion title="How accurate is the robots.txt parsing?">
+    The parser handles standard robots.txt directives (User-agent, Allow, Disallow) with path prefix
+    matching. It doesn't support regex patterns or advanced extensions.
+  </Accordion>
+
+  <Accordion title="What if a crawler ignores robots.txt?">
+    This tool reports configuration only. If a crawler doesn't respect robots.txt (which is
+    voluntary), you'd need to block it at the network level (firewall, CDN rules, etc.).
+  </Accordion>
+</Accordions>
+
+## Next Steps
+
+<Cards>
+  <Card title="More Experiments" href="/docs/introduction">
+    Explore other Cloudflare experiments
+  </Card>
+  <Card title="Workers Documentation" href="https://developers.cloudflare.com/workers/">
+    Learn more about Cloudflare Workers
+  </Card>
+  <Card title="Hono Framework" href="https://hono.dev">
+    Explore the Hono web framework
+  </Card>
+  <Card title="Contribute" href="https://github.com/shrinathsnayak/cloudflare-experiments">
+    Contribute to the experiments repository
+  </Card>
+</Cards>

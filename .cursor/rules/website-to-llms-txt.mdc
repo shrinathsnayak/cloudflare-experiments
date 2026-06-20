@@ -1,6 +1,6 @@
 ---
 description: Contract for website-to-llms-txt (route, params, response, bindings)
-globs: experiments/website-to-llms-txt/**/*.ts
+globs: apps/experiments/website-to-llms-txt/**/*.ts
 alwaysApply: false
 ---
 

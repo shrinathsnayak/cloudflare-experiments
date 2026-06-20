@@ -38,7 +38,7 @@ Locally, `cf` may be empty or minimal; full data appears when deployed to Cloudf
 ## Run locally
 
 ```bash
-cd experiments/whereami
+cd apps/experiments/whereami
 npm install
 npm run dev
 ```
@@ -47,7 +47,7 @@ Then open: `http://localhost:8787/whereami` (or `http://localhost:8787/` for nam
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/whereami)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/whereami)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

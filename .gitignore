@@ -2,7 +2,12 @@
 node_modules/
 package-lock.json
 
-# Wrangler / Cloudflare
+# Turborepo
+.turbo/
+
+# Next.js (docs app)
+.next/
+.source/
 .dev.vars
 .wrangler/
 dist/

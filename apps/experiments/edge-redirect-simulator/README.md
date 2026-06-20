@@ -38,7 +38,7 @@ If the chain hits a redirect with no `Location` or exceeds the hop limit, the re
 ## Run locally
 
 ```bash
-cd experiments/edge-redirect-simulator
+cd apps/experiments/edge-redirect-simulator
 npm install
 npm run dev
 ```
@@ -47,7 +47,7 @@ Then open: `http://localhost:8787/redirect-chain?url=https://cloudflare.com`
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/edge-redirect-simulator)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/edge-redirect-simulator)
 
 ## Tests
 

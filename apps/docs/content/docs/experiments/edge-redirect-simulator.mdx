@@ -1,0 +1,149 @@
+---
+title: "Edge Redirect Simulator"
+description: "Show redirect chains for any URL from Cloudflare's edge—each hop and status code"
+---
+
+Show redirect chains for any URL from Cloudflare's edge. The Worker follows HTTP redirects (301, 302, 303, 307, 308) and returns each hop with its status code, so you can see exactly how a URL resolves.
+
+## API Endpoint
+
+### GET /redirect-chain
+
+Follow redirects for a URL and return the chain of hops.
+
+**`url`** `string` (required)
+
+The URL to trace. Use a full URL (`https://cloudflare.com`) or hostname (`example.com`). Only `http` and `https` are allowed.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/redirect-chain?url=https://example.com"
+```
+
+#### Success Response
+
+**`chain`** `array`
+
+Array of objects, one per hop in the redirect chain.
+
+**`url`** `string`
+
+The URL at this hop (after redirect, if any).
+
+**`status`** `number`
+
+HTTP status code at this hop (e.g. 301, 302, 200).
+
+**`error`** `string` (optional)
+
+Present if the chain was truncated—e.g. missing `Location` header, redirect loop, or max redirects exceeded. Response is still 200 with the chain collected so far.
+
+#### Example Response
+
+```json
+{
+  "chain": [
+    { "url": "https://example.com/", "status": 301 },
+    { "url": "https://www.example.com/", "status": 302 },
+    { "url": "https://final.example.com/", "status": 200 }
+  ]
+}
+```
+
+Display form: `example.com → 301` → `www.example.com → 302` → `final.example.com → 200`.
+
+#### Error Responses
+
+**400 Bad Request** — Missing or invalid `url` (wrong scheme or malformed):
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+**500 Internal Server Error** — Uncaught error (e.g. fetch failure):
+
+```json
+{
+  "error": "Internal error message",
+  "code": "INTERNAL_ERROR"
+}
+```
+
+If the chain hits a redirect with no `Location` or exceeds the hop limit, the response is still **200** with the `chain` collected so far and an `error` message in the body.
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/edge-redirect-simulator)
+
+  </Step>
+  
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard to deploy the Worker to your Cloudflare account. No additional configuration or bindings required.
+
+  </Step>
+  
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/redirect-chain?url=https://cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/edge-redirect-simulator
+npm install
+npm run dev
+```
+
+Then open: `http://localhost:8787/redirect-chain?url=https://cloudflare.com`
+
+## Use Cases
+
+- **Debug redirects** — See the full chain from short URL or vanity domain to final destination
+- **SEO and canonicalization** — Verify 301/302 chains and final URLs
+- **Security and compliance** — Audit where redirects lead before clicking
+- **Integration testing** — Confirm redirect behavior from the edge
+
+## Cloudflare Features Used
+
+- **Workers** — Edge compute runtime
+- **Fetch API** — HTTP requests with `redirect: "manual"` to capture each hop
+- **Edge Networking** — Redirect chain observed from Cloudflare's global network
+
+## Next Steps
+
+<Cards>
+  <Card title="Is It Down?" href="/docs/experiments/is-it-down">
+    Check if a website is reachable from the edge
+  </Card>
+  <Card title="URL DNS Lookup" href="/docs/experiments/url-dns-lookup">
+    Get DNS records for any URL's hostname
+  </Card>
+  <Card
+    title="GitHub Repository"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/edge-redirect-simulator"
+  >
+    View the complete source code
+  </Card>
+  <Card title="More Experiments" href="/docs/introduction">
+    Explore other Cloudflare experiments
+  </Card>
+</Cards>

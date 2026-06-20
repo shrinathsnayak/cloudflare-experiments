@@ -1,0 +1,195 @@
+---
+title: Contributing Guide
+description: Learn how to contribute to Cloudflare Experiments - from bug fixes to new experiments
+---
+
+Thank you for your interest in contributing to Cloudflare Experiments. This guide explains how to propose changes, add new experiments, and follow the project's standards.
+
+## How to Contribute
+
+There are several ways to contribute to this project:
+
+- **Bug fixes and improvements**: Open an issue first (optional but helpful), then submit a pull request
+- **New experiments**: Open an issue with the Experiment idea template to discuss before implementing
+- **Documentation**: Fixes and improvements to README or CONTRIBUTING are always welcome via PR
+
+<Callout>
+
+By participating in this project, you agree to abide by our [Code of Conduct](https://github.com/shrinathsnayak/cloudflare-experiments/blob/main/CODE_OF_CONDUCT.md).
+
+</Callout>
+
+## Development Setup
+
+Each experiment is fully independent with its own dependencies. Follow these steps to set up your development environment:
+
+<Steps>
+  <Step>
+
+### Fork and clone the repository
+
+    Fork the [cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments) repository and clone it to your local machine.
+
+  </Step>
+
+  <Step>
+
+### Install dependencies
+
+    Navigate to the specific experiment you want to work on:
+    ```bash
+    cd apps/experiments/<experiment-name>
+    npm install
+    ```
+
+  </Step>
+
+  <Step>
+
+### Run locally
+
+    Start the development server:
+    ```bash
+    npm run dev
+    # or: npx wrangler dev
+    ```
+
+  </Step>
+
+  <Step>
+
+### Lint and type-check
+
+    If the experiment has these scripts configured:
+    ```bash
+    npm run lint
+    npm run build
+    ```
+
+  </Step>
+</Steps>
+
+## Pull Request Process
+
+Follow these steps when submitting a pull request:
+
+<Steps>
+  <Step>
+
+### Create a branch
+
+    Create a branch from `main` with a descriptive name:
+    - `fix/whereami-typo` for bug fixes
+    - `feat/new-experiment-name` for new experiments
+
+  </Step>
+
+  <Step>
+
+### Make focused changes
+
+    Make your changes in **one experiment only** per PR when possible. Keep PRs focused and easy to review.
+
+  </Step>
+
+  <Step>
+
+### Test deployment
+
+    Ensure the experiment still runs and deploys:
+    ```bash
+    npx wrangler deploy
+    ```
+    Run this from the experiment's directory.
+
+  </Step>
+
+  <Step>
+
+### Update documentation
+
+    Update the experiment's **README.md** if you changed behavior or added options.
+
+  </Step>
+
+  <Step>
+
+### Add new experiments to the table
+
+    If adding a **new experiment**, add a row to the experiments table in the **root README.md** and ensure the experiment follows the [repository structure](/code-standards#experiment-structure).
+
+  </Step>
+
+  <Step>
+
+### Open a pull request
+
+    Open a pull request against `main` with a clear title and description. Fill in the PR template.
+
+  </Step>
+
+  <Step>
+
+### Address feedback
+
+    Address review feedback. Once approved, a maintainer will merge.
+
+  </Step>
+</Steps>
+
+## Community Guidelines
+
+### Our Pledge
+
+We pledge to make participation in our community a harassment-free experience for everyone, regardless of age, body size, visible or invisible disability, ethnicity, sex characteristics, gender identity and expression, level of experience, education, socio-economic status, nationality, personal appearance, race, caste, color, religion, or sexual identity and orientation.
+
+### Our Standards
+
+Examples of behavior that contributes to a positive environment:
+
+- Using welcoming and inclusive language
+- Being respectful of differing viewpoints and experiences
+- Gracefully accepting constructive criticism
+- Focusing on what is best for the community
+- Showing empathy towards other community members
+
+Examples of unacceptable behavior:
+
+- The use of sexualized language or imagery, and sexual attention or advances of any kind
+- Trolling, insulting or derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information without explicit permission
+- Other conduct which could reasonably be considered inappropriate in a professional setting
+
+### Enforcement
+
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project maintainers. All complaints will be reviewed and investigated promptly and fairly.
+
+## Getting Help
+
+<Accordions>
+<Accordion title="Where can I ask questions?">
+  Open a [Discussion](https://github.com/shrinathsnayak/cloudflare-experiments/discussions) for questions or ideas about the project.
+</Accordion>
+
+<Accordion title="How do I report bugs?">
+  Use [Issues](https://github.com/shrinathsnayak/cloudflare-experiments/issues) for bugs or feature
+  requests. Provide as much detail as possible.
+</Accordion>
+
+<Accordion title="Can I contribute without writing code?">
+  Yes! Documentation improvements, bug reports, feature suggestions, and helping others in
+  Discussions are all valuable contributions.
+</Accordion>
+
+<Accordion title="What if my PR isn't accepted?">
+  Don't be discouraged! We appreciate all contributions. If a PR isn't accepted, maintainers will explain why and may suggest alternatives.
+</Accordion>
+</Accordions>
+## Next Steps
+
+- Review the [Code Standards](/docs/code-standards) to understand the project structure
+- Learn [how to add new experiments](/docs/adding-experiments)
+- Check out existing experiments in the [repository](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments)
+
+Thanks for contributing to Cloudflare Experiments!

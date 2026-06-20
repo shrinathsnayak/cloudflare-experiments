@@ -1,6 +1,6 @@
 ---
 description: Contract for ai-bot-visibility (route, params, response, bindings)
-globs: experiments/ai-bot-visibility/**/*.ts
+globs: apps/experiments/ai-bot-visibility/**/*.ts
 alwaysApply: false
 ---
 

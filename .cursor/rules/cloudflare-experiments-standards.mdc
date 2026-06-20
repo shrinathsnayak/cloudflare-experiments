@@ -12,14 +12,28 @@ alwaysApply: true
 - **Under 60 seconds**: Each request path should complete within ~60 seconds.
 - **Single responsibility**: Each experiment demonstrates one specific Cloudflare capability.
 
+## Monorepo layout
+
+This repo is a **Turborepo** monorepo under `apps/`:
+
+- `apps/docs/` — Fumadocs documentation site (Next.js)
+- `apps/experiments/<name>/` — Cloudflare Worker experiments
+
+Run from the repo root:
+
+- `npm install` — install all workspace dependencies
+- `npm run build` — build all packages via Turborepo
+- `npm run test` — run tests in all experiments
+- `npm run dev -- --filter=<name>` — dev a single experiment or `--filter=docs` for the docs site
+
 ## Folder Structure
 
-Every experiment lives under `experiments/<name>/`. Use this layout only; do not add extra top-level dirs (e.g. no `app/`, `server/`).
+Every Worker experiment lives under `apps/experiments/<name>/`. Use this layout only; do not add extra top-level dirs (e.g. no `app/`, `server/`).
 
 ### Required layout
 
 ```
-experiments/<name>/
+apps/experiments/<name>/
 ├── src/
 │   ├── index.ts          # Entry: Hono app, mount routes, export default { fetch: app.fetch }
 │   ├── routes/           # Route handlers only (one file per route or logical group)

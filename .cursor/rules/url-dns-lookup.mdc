@@ -1,6 +1,6 @@
 ---
 description: Contract for url-dns-lookup (route, params, response, bindings)
-globs: experiments/url-dns-lookup/**/*.ts
+globs: apps/experiments/url-dns-lookup/**/*.ts
 alwaysApply: false
 ---
 

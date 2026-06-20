@@ -1,0 +1,146 @@
+---
+title: "Cloud AI Proxy"
+description: "Call Workers AI with any model and prompt from a single public endpoint"
+---
+
+<Callout type="warning">
+
+This is an experimental Worker. Use it as a starting point for your own projects.
+
+</Callout>
+
+The Cloud AI Proxy experiment exposes [Workers AI](https://developers.cloudflare.com/workers-ai/) through a single public endpoint. You pass a model ID and prompt (or chat messages) and receive AI-generated text. Use it to try different models or integrate Workers AI from external tools without managing Wrangler or bindings yourself.
+
+<Callout>
+
+The endpoint is public by design. For production use, add rate limiting or API key authentication.
+
+</Callout>
+
+## Features
+
+- Call any Workers AI text-generation model via one endpoint
+- Support for single prompt or chat-style messages
+- Optional `max_tokens` control
+- POST (JSON) and GET (query params) interfaces
+- No external API keys; uses your Cloudflare account’s Workers AI
+
+## API Reference
+
+### POST /chat
+
+Send a JSON body with model and prompt or messages.
+
+| Field        | Required | Description                                                       |
+| ------------ | -------- | ----------------------------------------------------------------- |
+| `model`      | Yes      | Workers AI model ID (e.g. `@cf/meta/llama-3.1-8b-instruct-fast`)  |
+| `prompt`     | No\*     | Single prompt string                                              |
+| `messages`   | No\*     | Array of `{ role: string, content: string }` for chat-style input |
+| `max_tokens` | No       | Max tokens to generate (1–4096)                                   |
+
+\*At least one of `prompt` or `messages` is required.
+
+**`response`** `string`
+
+The AI-generated text.
+
+#### Example Request
+
+```bash
+curl -X POST https://your-worker.workers.dev/chat \
+  -H "Content-Type: application/json" \
+  -d '{"model":"@cf/meta/llama-3.1-8b-instruct-fast","prompt":"Say hello in one sentence."}'
+```
+
+#### Example Response
+
+```json
+{
+  "response": "Hello! How can I help you today?"
+}
+```
+
+### GET /chat
+
+Query params: `model` (required), `prompt` (required), optional `max_tokens`.
+
+**`model`** `string` (required)
+
+Workers AI model ID (e.g. `@cf/meta/llama-3.1-8b-instruct-fast`).
+
+**`prompt`** `string` (required)
+
+The prompt text. URL-encoded.
+
+**`max_tokens`** `number`
+
+Max tokens to generate (1–4096). Optional.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/chat?model=@cf/meta/llama-3.1-8b-instruct-fast&prompt=Say%20hello"
+```
+
+#### Error Responses
+
+- **400 Bad Request** — `INVALID_BODY`, `MISSING_MODEL`, `MISSING_PROMPT`, or `INVALID_MAX_TOKENS`
+- **502 Bad Gateway** — `AI_ERROR` (model run failed)
+
+## Run locally
+
+<Steps>
+  <Step>
+
+### Clone and enter the experiment
+
+    ```bash
+    git clone https://github.com/shrinathsnayak/cloudflare-experiments
+    cd cloudflare-experiments/apps/experiments/cloud-ai-proxy
+    ```
+
+  </Step>
+  <Step>
+
+### Install and start the dev server
+
+    ```bash
+    npm install
+    npm run dev
+    ```
+
+  </Step>
+  <Step>
+
+### Call the endpoint
+
+    Use `http://localhost:8787/chat` with POST (JSON body) or GET (query params).
+
+  </Step>
+</Steps>
+
+Requires a Cloudflare account with Workers AI enabled. See [Workers AI](https://developers.cloudflare.com/workers-ai/) for setup.
+
+## Deploy
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cloud-ai-proxy)
+
+Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments). To use your own fork, change the owner in the deploy URL.
+
+## Cloudflare features used
+
+- **Workers** — Edge runtime
+- **Workers AI** — `AI` binding for text generation
+
+## Related resources
+
+<Cards>
+  <Card
+    title="Workers AI models"
+    href="https://developers.cloudflare.com/workers-ai/models/"
+  ></Card>
+  <Card
+    title="GitHub repository"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cloud-ai-proxy"
+  ></Card>
+</Cards>

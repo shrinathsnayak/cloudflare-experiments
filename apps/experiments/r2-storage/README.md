@@ -24,7 +24,7 @@ Use Cloudflare R2 from a Worker with configurable list/get/put/delete and **publ
 4. **Run locally** (use real R2 for public URL to work):
 
 ```bash
-cd experiments/r2-storage
+cd apps/experiments/r2-storage
 npm install
 npm run dev -- --remote
 ```
@@ -167,7 +167,7 @@ Response for public uploads includes `url` when `PUBLIC_BUCKET_URL` is set.
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/r2-storage)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-storage)
 
 1. Create the two R2 buckets and enable public access on the public one.
 2. In **Workers & Pages** → your Worker → **Settings** → **Variables**, add `PUBLIC_BUCKET_URL` = your public bucket URL (e.g. `https://pub-xxxxx.r2.dev`).

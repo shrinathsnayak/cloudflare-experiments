@@ -1,6 +1,6 @@
 ---
 description: Contract for cloud-ai-proxy (routes, params, response, AI binding)
-globs: experiments/cloud-ai-proxy/**/*.ts
+globs: apps/experiments/cloud-ai-proxy/**/*.ts
 alwaysApply: false
 ---
 

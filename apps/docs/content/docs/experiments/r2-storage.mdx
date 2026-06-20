@@ -1,0 +1,573 @@
+---
+title: R2 Storage API
+description: Upload and serve files with Cloudflare R2 storage - private and public buckets with list, get, put, and delete operations
+---
+
+<Callout type="idea">
+
+Upload images and files to R2 with configurable private and public access. Objects in the private bucket are only accessible through the Worker, while public bucket objects get a direct URL.
+
+</Callout>
+
+## Features
+
+- **Private bucket**: Objects only accessible via Worker API (`GET /object?key=...`)
+- **Public bucket**: Objects get a public URL (e.g. `https://pub-xxx.r2.dev/key`) when uploaded with `public=true`
+- **List operations** with pagination, prefix filtering, and directory-style delimiters
+- **Custom metadata** support via `X-Custom-Metadata-*` headers
+- **Content-Type** handling for serving images and other media
+
+## Setup
+
+<Steps>
+  <Step>
+
+### Create R2 buckets
+
+    In the [Cloudflare dashboard](https://dash.cloudflare.com/) → **R2** → **Create bucket**:
+
+    1. Create `r2-storage-bucket` (private - default settings)
+    2. Create `r2-storage-public` (for public files)
+
+  </Step>
+
+  <Step>
+
+### Enable public access
+
+    For the **public bucket only**:
+
+    1. Go to **R2** → select `r2-storage-public` → **Settings**
+    2. Under **Public Development URL**, click **Enable**
+    3. Type `allow` when prompted and confirm
+    4. Copy the public bucket URL (looks like `https://pub-xxxxx.r2.dev`)
+
+    <Callout>
+
+You can also use a custom domain instead of the `r2.dev` URL
+
+</Callout>
+  </Step>
+
+  <Step>
+
+### Configure wrangler.json
+
+    Update your `wrangler.json` with the bucket bindings:
+
+    ```json
+    {
+      "r2_buckets": [
+        {
+          "binding": "BUCKET",
+          "bucket_name": "r2-storage-bucket"
+        },
+        {
+          "binding": "PUBLIC_BUCKET",
+          "bucket_name": "r2-storage-public"
+        }
+      ],
+      "vars": {
+        "PUBLIC_BUCKET_URL": "https://pub-xxxxx.r2.dev"
+      }
+    }
+    ```
+
+    Replace `https://pub-xxxxx.r2.dev` with your actual public bucket URL.
+
+  </Step>
+
+  <Step>
+
+### Run locally
+
+    ```bash
+    cd apps/experiments/r2-storage
+    npm install
+    npm run dev -- --remote
+    ```
+
+    <Callout>
+
+Use `--remote` to connect to real R2 buckets. The public URL won't work with local buckets.
+
+</Callout>
+  </Step>
+</Steps>
+
+## API Reference
+
+### List objects
+
+<Card title="GET /list">List objects from a bucket with optional filtering and pagination.</Card>
+
+#### Query Parameters
+
+**`public`** `boolean`
+
+Set to `true` or `1` to list from the public bucket. Omit for private bucket.
+
+**`prefix`** `string`
+
+Filter objects by key prefix (e.g., `images/` to list only keys starting with "images/")
+
+**`limit`** `number`
+
+Maximum number of keys to return (1-1000)
+
+**`cursor`** `string`
+
+Pagination cursor from a previous response (when `truncated: true`)
+
+**`delimiter`** `string`
+
+Delimiter for directory-style listing (e.g., `/` to group by directory)
+
+#### Response
+
+**`objects`** `array`
+
+Array of object metadata
+
+<Accordions>
+<Accordion title="object properties">
+
+**`key`** `string`
+
+Object key
+
+**`size`** `number`
+
+Size in bytes
+
+**`etag`** `string`
+
+Entity tag for versioning
+
+**`uploaded`** `string`
+
+ISO 8601 timestamp
+
+**`customMetadata`** `object`
+
+Custom metadata if present
+
+</Accordion>
+</Accordions>
+**`truncated`** `boolean`
+
+Whether there are more results available
+
+**`cursor`** `string`
+
+Cursor for next page (only present when `truncated: true`)
+
+#### Example
+
+```bash
+# List all objects from private bucket
+curl "https://your-worker.workers.dev/list"
+
+# List public objects with prefix
+curl "https://your-worker.workers.dev/list?public=true&prefix=images/"
+
+# Paginated listing
+curl "https://your-worker.workers.dev/list?limit=10&cursor=eyJrZXkiOi4uLn0"
+```
+
+<Tabs items={['Response']}>
+<Tab value="Response">
+
+```json
+{
+  "objects": [
+    {
+      "key": "images/photo.png",
+      "size": 102400,
+      "etag": "abc123def456",
+      "uploaded": "2025-03-10T12:34:56.789Z"
+    }
+  ],
+  "truncated": false
+}
+```
+
+</Tab>
+</Tabs>
+
+---
+
+### Get object
+
+<Card title="GET /object">
+  Download an object from R2. Returns the raw file with appropriate Content-Type.
+</Card>
+
+#### Query Parameters
+
+**`key`** `string` (required)
+
+Object key to retrieve
+
+**`public`** `boolean`
+
+Set to `true` or `1` to get from the public bucket
+
+#### Headers
+
+**`param`** `string`
+
+Optional byte range for partial content (e.g., `bytes=0-1023`)
+
+#### Response
+
+Returns the raw object body with headers:
+
+- `Content-Type`: From object's HTTP metadata
+- `ETag`: Object version identifier
+- `Content-Length`: Size in bytes
+
+#### Example
+
+```bash
+# Download private object
+curl "https://your-worker.workers.dev/object?key=private/document.pdf" -o document.pdf
+
+# Download public object
+curl "https://your-worker.workers.dev/object?key=images/photo.png&public=true" -o photo.png
+
+# Get partial content
+curl -H "Range: bytes=0-1023" "https://your-worker.workers.dev/object?key=video.mp4"
+```
+
+---
+
+### Get object metadata
+
+<Card title="HEAD /object">Get object metadata without downloading the body.</Card>
+
+#### Query Parameters
+
+**`key`** `string` (required)
+
+Object key to check
+
+**`public`** `boolean`
+
+Set to `true` or `1` to check the public bucket
+
+#### Response
+
+**`key`** `string`
+
+Object key
+
+**`size`** `number`
+
+Size in bytes
+
+**`etag`** `string`
+
+Entity tag
+
+**`uploaded`** `string`
+
+ISO 8601 timestamp
+
+**`customMetadata`** `object`
+
+Custom metadata if present
+
+**`httpMetadata`** `object`
+
+HTTP metadata including contentType
+
+#### Example
+
+```bash
+curl -X HEAD "https://your-worker.workers.dev/object?key=photo.png&public=true"
+```
+
+<Tabs items={['Response']}>
+<Tab value="Response">
+
+```json
+{
+  "key": "photo.png",
+  "size": 102400,
+  "etag": "abc123def456",
+  "uploaded": "2025-03-10T12:34:56.789Z",
+  "httpMetadata": {
+    "contentType": "image/png"
+  }
+}
+```
+
+</Tab>
+</Tabs>
+
+---
+
+### Upload object
+
+<Card title="PUT /object">Upload an object to R2. Send raw bytes in the request body.</Card>
+
+#### Query Parameters
+
+**`key`** `string` (required)
+
+Object key (path) for the upload
+
+**`public`** `boolean`
+
+Set to `true` or `1` to upload to the public bucket and get a public URL
+
+#### Headers
+
+**`param`** `string`
+
+MIME type of the file (e.g., `image/png`, `application/pdf`)
+
+**`param`** `string`
+
+Custom metadata headers (e.g., `X-Custom-Metadata-Author: John`)
+
+#### Request Body
+
+Raw bytes of the file to upload.
+
+#### Response
+
+**`key`** `string`
+
+Object key that was uploaded
+
+**`uploaded`** `boolean`
+
+Always `true` on success
+
+**`url`** `string`
+
+Public URL (only present for public bucket uploads when `PUBLIC_BUCKET_URL` is configured)
+
+#### Example
+
+```bash
+# Upload to private bucket
+curl -X PUT "https://your-worker.workers.dev/object?key=documents/report.pdf" \
+  -H "Content-Type: application/pdf" \
+  --data-binary @report.pdf
+
+# Upload image to public bucket
+curl -X PUT "https://your-worker.workers.dev/object?key=images/photo.png&public=true" \
+  -H "Content-Type: image/png" \
+  --data-binary @photo.png
+
+# Upload with custom metadata
+curl -X PUT "https://your-worker.workers.dev/object?key=files/data.json&public=true" \
+  -H "Content-Type: application/json" \
+  -H "X-Custom-Metadata-Author: Alice" \
+  -H "X-Custom-Metadata-Version: 1.0" \
+  --data-binary @data.json
+```
+
+```json Private upload response
+{
+  "key": "documents/report.pdf",
+  "uploaded": true
+}
+```
+
+```json Public upload response
+{
+  "key": "images/photo.png",
+  "uploaded": true,
+  "url": "https://pub-xxxxx.r2.dev/images/photo.png"
+}
+```
+
+<Callout type="idea">
+
+The `url` in the response is a direct public link. You can share it or use it in `<img>` tags without going through the Worker.
+
+</Callout>
+
+---
+
+### Delete object
+
+<Card title="DELETE /object">Delete an object from R2.</Card>
+
+#### Query Parameters
+
+**`key`** `string` (required)
+
+Object key to delete
+
+**`public`** `boolean`
+
+Set to `true` or `1` to delete from the public bucket
+
+#### Response
+
+**`key`** `string`
+
+Object key that was deleted
+
+**`deleted`** `boolean`
+
+Always `true` on success
+
+#### Example
+
+```bash
+# Delete from private bucket
+curl -X DELETE "https://your-worker.workers.dev/object?key=temp/old-file.txt"
+
+# Delete from public bucket
+curl -X DELETE "https://your-worker.workers.dev/object?key=images/old-photo.png&public=true"
+```
+
+<Tabs items={['Response']}>
+<Tab value="Response">
+
+```json
+{
+  "key": "temp/old-file.txt",
+  "deleted": true
+}
+```
+
+</Tab>
+</Tabs>
+
+## Use Cases
+
+### Image hosting
+
+Upload images to the public bucket and use the returned URL in your app:
+
+```bash
+# Upload
+curl -X PUT "https://your-worker.workers.dev/object?key=avatars/user123.jpg&public=true" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary @avatar.jpg
+
+# Response: { "url": "https://pub-xxxxx.r2.dev/avatars/user123.jpg", ... }
+# Use URL directly: <img src="https://pub-xxxxx.r2.dev/avatars/user123.jpg" />
+```
+
+### Private file storage
+
+Store documents that should only be accessible through your Worker:
+
+```bash
+# Upload
+curl -X PUT "https://your-worker.workers.dev/object?key=user-data/123/invoice.pdf" \
+  -H "Content-Type: application/pdf" \
+  --data-binary @invoice.pdf
+
+# Download (with auth check in your Worker)
+curl "https://your-worker.workers.dev/object?key=user-data/123/invoice.pdf" \
+  -H "Authorization: Bearer token"
+```
+
+### Organized file structure
+
+Use prefixes and delimiters for directory-like organization:
+
+```bash
+# List all images
+curl "https://your-worker.workers.dev/list?prefix=images/&public=true"
+
+# List top-level "directories" only
+curl "https://your-worker.workers.dev/list?delimiter=/&public=true"
+```
+
+## Environment Variables
+
+**`param`** `string`
+
+Base URL for the public R2 bucket (e.g., `https://pub-xxxxx.r2.dev`). Required to return public URLs in upload responses. Set in `wrangler.json` under `vars` or in the dashboard under **Workers & Pages** → **Settings** → **Variables**.
+
+## Bindings
+
+**`param`** `R2Bucket`
+
+Private R2 bucket binding (name: `r2-storage-bucket`)
+
+**`param`** `R2Bucket`
+
+Public R2 bucket binding (name: `r2-storage-public`)
+
+## Deploy
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-storage)
+
+<Steps>
+  <Step>
+
+### Create buckets
+
+    Create both R2 buckets and enable public access on the public one (see Setup above)
+
+  </Step>
+
+  <Step>
+
+### Deploy Worker
+
+    Click the deploy button or run:
+    ```bash
+    npm run deploy
+    ```
+
+  </Step>
+
+  <Step>
+
+### Configure variables
+
+    In **Workers & Pages** → your Worker → **Settings** → **Variables**:
+    - Add `PUBLIC_BUCKET_URL` = your public bucket URL (e.g., `https://pub-xxxxx.r2.dev`)
+
+  </Step>
+
+  <Step>
+
+### Update wrangler.json
+
+    Ensure `bucket_name` values match your actual bucket names in the dashboard
+
+  </Step>
+</Steps>
+
+## Error Responses
+
+All errors return JSON with this structure:
+
+```json
+{
+  "error": "Error message",
+  "code": "ERROR_CODE"
+}
+```
+
+**`error`** `string`
+
+Human-readable error message
+
+**`code`** `string`
+
+Error code: `INVALID_QUERY`, `NOT_FOUND`, `MISSING_PARAM`, `INTERNAL_ERROR`
+
+## Source Code
+
+View the complete source code on GitHub: [r2-storage](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-storage)
+
+## Cloudflare Features
+
+- **Workers**: Serverless compute at the edge
+- **R2**: Object storage with zero egress fees
+- **Public buckets**: Direct public access to objects
+- **Hono**: Lightweight web framework

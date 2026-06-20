@@ -1,0 +1,163 @@
+---
+title: "AI Website Tag Generator"
+description: "Generate topic tags for any website using Workers AI on the edge"
+---
+
+<Callout type="warning">
+
+This is an experimental Worker. Use it as a starting point for your own projects.
+
+</Callout>
+
+The AI Website Tag Generator experiment fetches any webpage, extracts its content, and uses [Workers AI](https://developers.cloudflare.com/workers-ai/) to generate topic tags. Built with Hono and TypeScript, it runs on Cloudflare's edge network—no external API keys required.
+
+## Features
+
+- Fetch and parse any public webpage
+- Extract title and body text from HTML
+- Generate topic tags using Workers AI (e.g. Llama 3.1)
+- Sub-second responses on the edge
+- Accepts full URLs or hostnames (e.g. `https://cloudflare.com` or `example.com`)
+
+## API Reference
+
+### GET /tags
+
+Generate topic tags for any webpage.
+
+**`url`** `string` (required)
+
+The webpage URL or hostname to tag. Use `http://` or `https://` for full URLs, or a bare hostname like `example.com`.
+
+#### Response
+
+**`tags`** `string[]`
+
+An array of topic tags generated from the page content.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/tags?url=https://www.cloudflare.com"
+```
+
+#### Example Response
+
+```json
+{
+  "tags": ["technology", "CDN", "security", "edge computing", "DDoS protection"]
+}
+```
+
+#### Error Responses
+
+**`error`** `string`
+
+Human-readable error message.
+
+**`code`** `string`
+
+Machine-readable error code.
+
+**400 Bad Request** — Missing or invalid URL:
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+**502 Bad Gateway** — Failed to fetch webpage or AI error:
+
+```json
+{
+  "error": "Failed to fetch or generate tags",
+  "code": "FETCH_OR_AI_ERROR"
+}
+```
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Clone and install dependencies
+
+    ```bash
+    git clone https://github.com/shrinathsnayak/cloudflare-experiments
+    cd cloudflare-experiments/apps/experiments/ai-website-tag-generator
+    npm install
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Test locally
+
+    ```bash
+    npm run dev
+    ```
+
+    Then open: `http://localhost:8787/tags?url=https://cloudflare.com`
+
+  </Step>
+  
+  <Step>
+
+### Deploy to Cloudflare Workers
+
+    ```bash
+    npm run deploy
+    ```
+
+    Requires a Cloudflare account with Workers AI enabled.
+
+  </Step>
+</Steps>
+
+### One-Click Deploy
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-tag-generator)
+
+Click the button above to deploy this Worker directly to your Cloudflare account. Fork the repository and update the URL to deploy from your own fork.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Serverless execution environment
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** — Run LLMs on the edge with the `AI` binding
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** — HTTP client for fetching webpages
+
+## Use Cases
+
+- **Content tagging** — Auto-tag articles or bookmarks by topic
+- **SEO and discovery** — Suggest categories or related topics from page content
+- **Link previews** — Enrich shared links with topic tags
+- **Research and curation** — Quickly label pages by theme
+
+## Limitations
+
+- **JavaScript-heavy sites** — Only static HTML is fetched; client-rendered content is not executed
+- **Workers AI limits** — Subject to [Workers AI usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
+- **Fetch and size limits** — Same constraints as other URL-based experiments (timeout, HTML size cap)
+
+## Next Steps
+
+<Cards>
+  <Card title="Workers AI Models" href="https://developers.cloudflare.com/workers-ai/models/">
+    Explore other models available in Workers AI
+  </Card>
+  <Card title="AI Website Summary" href="/docs/experiments/ai-website-summary">
+    Summarize webpages with Workers AI
+  </Card>
+  <Card
+    title="GitHub Repository"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-tag-generator"
+  >
+    View the complete source code
+  </Card>
+  <Card title="More Experiments" href="/docs/introduction">
+    Explore other Cloudflare experiments
+  </Card>
+</Cards>

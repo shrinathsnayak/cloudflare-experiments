@@ -1,0 +1,118 @@
+---
+title: "Screenshot API"
+description: "Capture screenshots of any website from the edge using Cloudflare Browser Rendering"
+---
+
+Capture screenshots of any website from Cloudflare's edge network using Browser Rendering and Puppeteer.
+
+## API Endpoint
+
+### GET /screenshot
+
+Captures a PNG screenshot of the specified URL.
+
+**`url`** `string` (required)
+
+The website URL to screenshot (must be http or https)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/screenshot?url=https://www.cloudflare.com" \
+  --output screenshot.png
+```
+
+#### Success Response
+
+Returns a PNG image with the following headers:
+
+```http
+Content-Type: image/png
+Cache-Control: public, max-age=60
+```
+
+#### Error Response
+
+**`error`** `string`
+
+Human-readable error message
+
+**`code`** `string`
+
+Error code indicating the failure type
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+#### Error Codes
+
+- `400` — Missing or invalid `url` parameter (not http/https)
+- `502` — Screenshot operation failed (navigation timeout, unreachable site, rendering error)
+
+## Implementation Details
+
+The API uses the following configuration:
+
+- **Viewport**: 1280x800 pixels
+- **Wait condition**: `networkidle0` (waits until network is idle)
+- **Navigation timeout**: 20 seconds
+- **Image format**: PNG
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/screenshot-api)
+
+  </Step>
+  
+  <Step>
+
+### Enable Browser Rendering
+
+    This experiment requires Cloudflare Browser Rendering to be enabled on your account. Visit the [Browser Rendering docs](https://developers.cloudflare.com/browser-rendering/) for setup instructions.
+
+  </Step>
+  
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard to deploy the Worker to your Cloudflare account.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/screenshot-api
+npm install
+npx wrangler dev --remote
+```
+
+<Callout>
+
+Use `--remote` flag to access a real browser instance. Local development without this flag will not work as Browser Rendering requires Cloudflare infrastructure.
+
+</Callout>
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/screenshot?url=https://www.cloudflare.com" \
+  --output test.png
+```
+
+## Cloudflare Features Used
+
+- **Workers** — Edge compute runtime
+- **Browser Rendering** — Headless Chromium via Puppeteer
+- **Fetch API** — Network requests within the browser

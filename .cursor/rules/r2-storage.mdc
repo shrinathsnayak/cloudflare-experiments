@@ -1,6 +1,6 @@
 ---
 description: Contract for r2-storage (list/object routes, R2 bindings, public/private buckets)
-globs: experiments/r2-storage/**/*.ts
+globs: apps/experiments/r2-storage/**/*.ts
 alwaysApply: false
 ---
 

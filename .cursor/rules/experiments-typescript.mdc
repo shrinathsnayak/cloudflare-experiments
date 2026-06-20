@@ -1,6 +1,6 @@
 ---
 description: TypeScript details when editing experiment source (complements coding-standards and folder structure)
-globs: experiments/**/*.ts
+globs: apps/experiments/**/*.ts
 alwaysApply: false
 ---
 

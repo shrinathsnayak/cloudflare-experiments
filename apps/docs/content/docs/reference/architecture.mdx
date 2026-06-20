@@ -1,0 +1,684 @@
+---
+title: Architecture & Design Patterns
+description: Common architecture patterns, tech stack, and design decisions across experiments
+---
+
+All experiments follow consistent architectural patterns and design principles. This guide explains the shared architecture, tech stack, and best practices used throughout the repository.
+
+## Tech Stack
+
+Every experiment uses a consistent, modern tech stack optimized for edge computing:
+
+### Core Technologies
+
+<Cards>
+  <Card title="TypeScript">
+    **Strictly typed** codebase with full type safety.
+    
+    All experiments use TypeScript with:
+    - Strict mode enabled
+    - No `any` types
+    - Full type coverage
+    - `tsconfig.json` per experiment
+    
+    Environment bindings are typed in `src/types/env.d.ts`.
+  </Card>
+
+<Card title="Hono">
+  **Fast, lightweight** web framework for Cloudflare Workers. Benefits: - Ultra-small bundle size
+  (~12KB) - Type-safe routing - Middleware support - Web standard APIs - Built for edge runtime Used
+  for routing in all experiments.
+</Card>
+
+<Card title="Cloudflare Workers">
+  **Serverless runtime** at the edge. Features: - V8 isolate-based execution - Standard Web APIs -
+  Sub-millisecond cold starts - Global deployment - Zero configuration scaling
+</Card>
+
+  <Card title="Wrangler">
+    **CLI tool** for Workers development and deployment.
+    
+    Used for:
+    - Local development (`wrangler dev`)
+    - Deployment (`wrangler deploy`)
+    - Resource management (D1, KV, R2)
+    - Secret management
+  </Card>
+</Cards>
+
+## Project Structure
+
+Every experiment follows an identical directory structure for consistency:
+
+```
+apps/experiments/<name>/
+├── src/
+│   ├── index.ts          # Entry point - Hono app, route mounting, error handler
+│   ├── routes/           # Route handlers (one file per route or logical group)
+│   ├── lib/              # Business logic (fetch, parsing, validation)
+│   ├── utils/            # Shared utilities (response helpers, formatters)
+│   ├── constants/        # Configuration and constants
+│   └── types/            # TypeScript types and interfaces
+│       └── env.d.ts      # Worker environment bindings
+├── migrations/           # Database migrations (D1 experiments only)
+├── package.json          # Dependencies and scripts
+├── wrangler.json         # Worker configuration and bindings
+├── tsconfig.json         # TypeScript configuration
+└── README.md             # Experiment documentation
+```
+
+### Key Principles
+
+1. **Single Responsibility**: One experiment demonstrates one Cloudflare feature
+2. **No Shared Code**: Each experiment is completely independent
+3. **Consistent Structure**: Same directory layout across all experiments
+4. **Type Safety**: Full TypeScript coverage with strict mode
+
+## Common Patterns
+
+Experiments implement several recurring architectural patterns:
+
+### 1. Fetch + Parse Pattern
+
+Fetch external content and extract structured data.
+
+**Used in**: Dependency Analyzer, Website Metadata Extractor, Website DevTools Inspector
+
+```typescript
+// src/routes/analyze.ts
+import { Hono } from "hono";
+import { validateUrl } from "../lib/url";
+import { fetchHtml } from "../lib/fetch";
+import { parseDependencies } from "../lib/parse";
+import { jsonError, jsonSuccess } from "../utils/response";
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.get("/analyze", async (c) => {
+  // 1. Validate input
+  const url = validateUrl(c.req.query("url"));
+  if (!url) return jsonError(c, "Missing or invalid url", "INVALID_URL");
+
+  try {
+    // 2. Fetch content
+    const html = await fetchHtml(url);
+
+    // 3. Parse and extract
+    const data = parseDependencies(html, url);
+
+    // 4. Return structured response
+    return jsonSuccess(c, data);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Failed to fetch";
+    return jsonError(c, message, "FETCH_ERROR", 502);
+  }
+});
+```
+
+**Pattern Flow:**
+
+1. Validate user input (URL)
+2. Fetch external content
+3. Parse/extract data with regex or HTMLRewriter
+4. Return JSON response
+5. Handle errors consistently
+
+### 2. AI Integration Pattern
+
+Fetch content, extract text, and process with Workers AI.
+
+**Used in**: AI Website Summary, GitHub Repo Explainer
+
+```typescript
+// src/routes/summary.ts
+import { Hono } from "hono";
+import { validateUrl } from "../lib/url";
+import { fetchHtml } from "../lib/fetch";
+import { getTitle, getBodyText } from "../lib/html";
+import { summarizeWithAi } from "../lib/ai";
+import { jsonSuccess, jsonError } from "../utils/response";
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.get("/summary", async (c) => {
+  const url = validateUrl(c.req.query("url"));
+  if (!url) return jsonError(c, "Missing or invalid url", "INVALID_URL");
+
+  try {
+    // 1. Fetch HTML
+    const html = await fetchHtml(url);
+
+    // 2. Extract text content
+    const title = getTitle(html);
+    const bodyText = getBodyText(html, 6000);
+
+    if (!bodyText.trim()) {
+      return jsonSuccess(c, { title, summary: "No content." });
+    }
+
+    // 3. Summarize with AI
+    const summary = await summarizeWithAi(c.env, bodyText, title);
+
+    // 4. Return result
+    return jsonSuccess(c, { title, summary });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Failed";
+    return jsonError(c, message, "FETCH_OR_AI_ERROR", 502);
+  }
+});
+```
+
+**AI Helper Example:**
+
+```typescript
+// src/lib/ai.ts
+import type { Env } from "../types/env";
+
+export async function summarizeWithAi(
+  env: Env,
+  text: string,
+  title: string | null
+): Promise<string> {
+  const prompt = `Summarize the following webpage content.\n\nTitle: ${title || "N/A"}\n\nContent:\n${text}`;
+
+  const response = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
+    messages: [
+      { role: "system", content: "You are a helpful assistant." },
+      { role: "user", content: prompt },
+    ],
+  });
+
+  return response.response || "Unable to generate summary.";
+}
+```
+
+**Pattern Flow:**
+
+1. Fetch external content
+2. Extract relevant text (limit to model context)
+3. Send to Workers AI with structured prompt
+4. Return AI response
+
+### 3. Browser Automation Pattern
+
+Use headless browser to interact with pages.
+
+**Used in**: Screenshot API
+
+```typescript
+// src/routes/screenshot.ts
+import { Hono } from "hono";
+import puppeteer from "@cloudflare/puppeteer";
+import { validateUrl } from "../lib/url";
+import { jsonError } from "../utils/response";
+import { DEFAULT_VIEWPORT, NAVIGATION_TIMEOUT_MS } from "../constants/defaults";
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.get("/screenshot", async (c) => {
+  const url = validateUrl(c.req.query("url"));
+  if (!url) return jsonError(c, "Missing or invalid url", "INVALID_URL");
+
+  let browser = null;
+  try {
+    // 1. Launch browser
+    browser = await puppeteer.launch(c.env.BROWSER);
+
+    // 2. Create page and configure
+    const page = await browser.newPage();
+    await page.setViewport(DEFAULT_VIEWPORT);
+
+    // 3. Navigate and wait
+    await page.goto(url, {
+      waitUntil: "networkidle0",
+      timeout: NAVIGATION_TIMEOUT_MS,
+    });
+
+    // 4. Capture screenshot
+    const png = await page.screenshot({ type: "png" });
+
+    // 5. Clean up
+    await browser.close();
+    browser = null;
+
+    // 6. Return image
+    return new Response(png, {
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=60",
+      },
+    });
+  } catch (e) {
+    if (browser)
+      try {
+        await browser.close();
+      } catch {
+        /* ignore */
+      }
+    const message = e instanceof Error ? e.message : "Screenshot failed";
+    return jsonError(c, message, "SCREENSHOT_ERROR", 502);
+  }
+});
+```
+
+**Pattern Flow:**
+
+1. Launch browser session
+2. Configure viewport and navigation options
+3. Navigate to URL and wait for load
+4. Perform action (screenshot, scraping, etc.)
+5. Always close browser (cleanup)
+6. Return binary or JSON response
+
+### 4. Storage Pattern (D1 + KV)
+
+Combine D1 (primary) with KV (cache) for optimal performance.
+
+**Used in**: Link Shortener
+
+```typescript
+// src/routes/redirect.ts
+import { Hono } from "hono";
+import type { Env } from "../types/env";
+import { jsonError } from "../utils/response";
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.get("/:code", async (c) => {
+  const code = c.req.param("code");
+
+  // 1. Try KV cache first (fast read)
+  let url = await c.env.LINKS_CACHE.get(code);
+
+  if (!url) {
+    // 2. Cache miss - read from D1 (source of truth)
+    const row = await c.env.DB.prepare("SELECT url FROM links WHERE code = ?")
+      .bind(code)
+      .first<{ url: string }>();
+
+    if (!row) {
+      return jsonError(c, "Link not found", "NOT_FOUND", 404);
+    }
+
+    url = row.url;
+
+    // 3. Populate cache for future requests
+    await c.env.LINKS_CACHE.put(code, url);
+  }
+
+  // 4. Redirect
+  return c.redirect(url, 302);
+});
+```
+
+**Storage Strategy:**
+
+- **D1**: Source of truth, handles writes and cache misses
+- **KV**: Read-through cache, optimized for redirects
+- **Pattern**: Read from KV → Miss → Read D1 → Cache in KV → Return
+
+### 5. Object Storage Pattern
+
+Public and private R2 buckets with direct access.
+
+**Used in**: R2 Storage
+
+```typescript
+// src/routes/object.ts
+import { Hono } from "hono";
+import type { Env } from "../types/env";
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.put("/object", async (c) => {
+  const key = c.req.query("key");
+  const isPublic = c.req.query("public") === "true";
+
+  if (!key) return c.json({ error: "Missing key" }, 400);
+
+  // Choose bucket based on public flag
+  const bucket = isPublic ? c.env.PUBLIC_BUCKET : c.env.BUCKET;
+
+  // Upload object
+  await bucket.put(key, c.req.raw.body, {
+    httpMetadata: {
+      contentType: c.req.header("Content-Type") || "application/octet-stream",
+    },
+  });
+
+  // Generate public URL if applicable
+  const response: any = { key, uploaded: true };
+  if (isPublic && c.env.PUBLIC_BUCKET_URL) {
+    response.url = `${c.env.PUBLIC_BUCKET_URL}/${key}`;
+  }
+
+  return c.json(response);
+});
+```
+
+**Storage Strategy:**
+
+- **Private bucket**: Objects only accessible via Worker
+- **Public bucket**: Direct URLs for CDN delivery
+- **Pattern**: Choose bucket → Upload → Return URL (public) or key (private)
+
+## Error Handling
+
+Consistent error handling across all experiments:
+
+### Response Utilities
+
+```typescript
+// src/utils/response.ts
+import type { Context } from "hono";
+
+export function jsonSuccess<T>(c: Context, data: T) {
+  return c.json(data);
+}
+
+export function jsonError(c: Context, message: string, code: string, status: number = 400) {
+  return c.json({ error: message, code }, status);
+}
+```
+
+### Global Error Handler
+
+Every experiment registers a global error handler:
+
+```typescript
+// src/index.ts
+import { Hono } from "hono";
+import type { Env } from "./types/env";
+import routes from "./routes/...";
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.route("/", routes);
+
+app.get("/", (c) => {
+  return c.json({
+    name: "experiment-name",
+    description: "What this experiment does",
+    usage: "GET /endpoint?param=value",
+  });
+});
+
+// Global error handler for uncaught errors
+app.onError((err, c) => {
+  return c.json({ error: err.message, code: "INTERNAL_ERROR" }, 500);
+});
+
+export default { fetch: app.fetch };
+```
+
+### Error Codes
+
+Standardized error codes used across experiments:
+
+| Code               | Status | Description                         |
+| ------------------ | ------ | ----------------------------------- |
+| `INVALID_URL`      | 400    | Missing or malformed URL parameter  |
+| `INVALID_INPUT`    | 400    | Invalid request body or parameters  |
+| `NOT_FOUND`        | 404    | Resource not found (links, objects) |
+| `FETCH_ERROR`      | 502    | Failed to fetch external resource   |
+| `PARSE_ERROR`      | 502    | Failed to parse HTML or response    |
+| `AI_ERROR`         | 502    | Workers AI inference failed         |
+| `SCREENSHOT_ERROR` | 502    | Browser Rendering failed            |
+| `DATABASE_ERROR`   | 500    | D1 query failed                     |
+| `STORAGE_ERROR`    | 500    | KV or R2 operation failed           |
+| `INTERNAL_ERROR`   | 500    | Uncaught/unexpected error           |
+
+## Validation
+
+Input validation is critical for security and reliability:
+
+### URL Validation
+
+```typescript
+// src/lib/url.ts
+export function validateUrl(input: string | undefined): string | null {
+  if (!input) return null;
+
+  try {
+    const url = new URL(input);
+    // Only allow HTTP and HTTPS
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return null;
+    }
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+export function resolveUrl(base: string, href: string): string {
+  try {
+    return new URL(href, base).toString();
+  } catch {
+    return href;
+  }
+}
+```
+
+### Request Body Validation
+
+```typescript
+// src/routes/shorten.ts
+app.post("/shorten", async (c) => {
+  let body: any;
+
+  try {
+    body = await c.req.json();
+  } catch {
+    return jsonError(c, "Invalid JSON", "INVALID_INPUT");
+  }
+
+  const url = validateUrl(body?.url);
+  if (!url) {
+    return jsonError(c, "Missing or invalid url in body", "INVALID_URL");
+  }
+
+  // Proceed with validated input
+});
+```
+
+## HTML Parsing
+
+Experiments use regex-based parsing for lightweight HTML extraction:
+
+```typescript
+// src/lib/parse.ts
+function extractScripts(html: string): string[] {
+  const urls: string[] = [];
+  const re = /<script[^>]+src=["']([^"']+)["']/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html)) !== null) {
+    urls.push(m[1].trim());
+  }
+  return urls;
+}
+
+function getTitle(html: string): string | null {
+  const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  return m ? m[1].replace(/<[^>]+>/g, "").trim() || null : null;
+}
+
+function getMeta(html: string, name: string): string | null {
+  const re = new RegExp(`<meta[^>]+name=["']${name}["'][^>]+content=["']([^"']*)["']`, "i");
+  const m = html.match(re);
+  return m ? m[1].trim() || null : null;
+}
+```
+
+**Why Regex Instead of DOM Parser?**
+
+- Lower memory overhead
+- Faster for simple extraction
+- No need for full DOM representation
+- Works well at the edge with streaming
+
+## Configuration
+
+Configuration is managed via `wrangler.json` and environment variables:
+
+### wrangler.json Structure
+
+```json
+{
+  "name": "experiment-name",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-01-01",
+  "node_compat": true,
+
+  "vars": {
+    "PUBLIC_URL": "https://example.com"
+  },
+
+  "ai": {
+    "binding": "AI"
+  },
+
+  "browser": {
+    "binding": "BROWSER"
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "my-database",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "my-bucket"
+    }
+  ]
+}
+```
+
+### Environment Bindings
+
+Type bindings in `src/types/env.d.ts`:
+
+```typescript
+export interface Env {
+  // AI binding
+  AI?: Ai;
+
+  // Browser binding
+  BROWSER?: Fetcher;
+
+  // D1 database
+  DB?: D1Database;
+
+  // KV namespace
+  CACHE?: KVNamespace;
+
+  // R2 bucket
+  BUCKET?: R2Bucket;
+  PUBLIC_BUCKET?: R2Bucket;
+
+  // Environment variables
+  PUBLIC_BUCKET_URL?: string;
+}
+```
+
+## Performance Optimization
+
+Experiments follow edge-optimized performance patterns:
+
+### 1. Minimize Latency
+
+- Use edge-native APIs (fetch, KV)
+- Stream responses when possible
+- Avoid buffering large payloads
+
+### 2. Optimize Cold Starts
+
+- Keep bundle size small (Hono ~12KB)
+- Minimal dependencies
+- Tree-shaking via esbuild
+
+### 3. Cache Effectively
+
+- Use KV for read-heavy data
+- Set appropriate Cache-Control headers
+- Leverage Cloudflare's CDN
+
+### 4. Handle Timeouts
+
+- Set reasonable fetch timeouts
+- Browser navigation timeouts
+- Graceful degradation
+
+## Security Best Practices
+
+<Cards>
+  <Card title="Input Validation">
+    Always validate user input:
+    - URL format and protocol
+    - JSON structure
+    - Parameter types and ranges
+  </Card>
+
+<Card title="Error Messages">
+  Never expose internal details: - Generic error messages for users - Specific errors logged
+  internally - No stack traces in responses
+</Card>
+
+<Card title="Rate Limiting">
+  Protect against abuse: - Cloudflare Rate Limiting rules - Per-IP limits - Per-endpoint limits
+</Card>
+
+  <Card title="Secret Management">
+    Store secrets securely:
+    - Use Wrangler secrets (encrypted)
+    - Never commit secrets to git
+    - Rotate keys regularly
+  </Card>
+</Cards>
+
+## Testing Strategy
+
+Test experiments locally before deployment:
+
+```bash
+# Type checking
+npm run build
+# or: tsc --noEmit
+
+# Local development
+npm run dev
+
+# Remote testing (for AI, Browser, R2)
+npm run dev -- --remote
+
+# Manual endpoint testing
+curl http://localhost:8787/endpoint?param=value
+```
+
+## Next Steps
+
+<Cards>
+  <Card title="Cloudflare Features" href="/docs/reference/cloudflare-features">
+    Learn about platform features used in experiments
+  </Card>
+
+<Card title="Deployment Guide" href="/docs/reference/deployment">
+  Deploy experiments to production
+</Card>
+
+  <Card title="Contributing" href="https://github.com/shrinathsnayak/cloudflare-experiments/blob/main/CONTRIBUTING.md">
+    Add your own experiment to the repository
+  </Card>
+</Cards>

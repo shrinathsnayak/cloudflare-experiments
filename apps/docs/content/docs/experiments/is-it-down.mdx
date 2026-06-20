@@ -1,0 +1,141 @@
+---
+title: "Is It Down?"
+description: "Check if a website is reachable from Cloudflare's edge network"
+---
+
+Check whether any website is reachable from Cloudflare's edge, with response time, status code, and edge location information.
+
+## API Endpoint
+
+### GET /check
+
+Checks if the specified URL is reachable and returns timing and status information.
+
+**`url`** `string` (required)
+
+The target URL to check (must be http or https)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/check?url=https://www.cloudflare.com"
+```
+
+#### Success Response (Reachable)
+
+**`status`** `string`
+
+Reachability status: `"reachable"` or `"unreachable"`
+
+**`responseTime`** `number`
+
+Round-trip response time in milliseconds
+
+**`statusCode`** `number`
+
+HTTP status code returned by the target server
+
+**`colo`** `string`
+
+Cloudflare edge data center (IATA code) that served this check (only available when deployed)
+
+```json
+{
+  "status": "reachable",
+  "responseTime": 87,
+  "statusCode": 200,
+  "colo": "LHR"
+}
+```
+
+#### Success Response (Unreachable)
+
+**`error`** `string`
+
+Error message explaining why the site is unreachable (only present when status is `"unreachable"`)
+
+```json
+{
+  "status": "unreachable",
+  "responseTime": 5000,
+  "statusCode": 0,
+  "colo": "SFO",
+  "error": "The operation was aborted."
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+#### Error Codes
+
+- `400` — Missing or invalid `url` parameter (not http/https)
+
+## Use Cases
+
+- Monitor website availability from the edge
+- Measure response times from different geographic locations
+- Build uptime monitoring tools
+- Check if a site is down globally or just from your location
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/is-it-down)
+
+  </Step>
+  
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard to deploy the Worker to your Cloudflare account. No additional configuration required.
+
+  </Step>
+  
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/check?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/is-it-down
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/check?url=https://www.cloudflare.com"
+```
+
+<Callout>
+
+The `colo` field will not be populated during local development. It only appears when deployed to Cloudflare Workers.
+
+</Callout>
+
+## Cloudflare Features Used
+
+- **Workers** — Edge compute runtime
+- **Fetch API** — HTTP requests with timing
+- **Edge Networking** — Request metadata including data center location

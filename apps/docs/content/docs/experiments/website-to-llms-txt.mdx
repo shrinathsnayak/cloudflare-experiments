@@ -1,0 +1,173 @@
+---
+title: Website to llms.txt
+description: Convert any webpage into llms.txt format for LLM consumption
+---
+
+Convert any webpage into the llms.txt format, a structured markdown format optimized for Large Language Model consumption. Extracts title, description, key links, and contact information in a standardized format that LLMs can easily parse.
+
+## API Endpoint
+
+### GET /llms.txt
+
+Convert a webpage to llms.txt format by providing its URL.
+
+**`url`** `string` (required)
+
+The URL of the webpage to convert. Must be a valid HTTP or HTTPS URL.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/llms.txt?url=https://www.cloudflare.com"
+```
+
+#### Response Format
+
+The endpoint returns plain text in llms.txt format with `Content-Type: text/plain; charset=utf-8`.
+
+#### Example Response
+
+```markdown
+# Cloudflare - The Web Performance & Security Company
+
+> Here at Cloudflare, we make the Internet work the way it should. Offering CDN, DNS, DDoS protection and security, find out how we can help your site.
+
+## Key Information
+
+- [Products](https://www.cloudflare.com/products/)
+- [Solutions](https://www.cloudflare.com/solutions/)
+- [Pricing](https://www.cloudflare.com/plans/)
+- [Developers](https://developers.cloudflare.com/)
+- [Learning Center](https://www.cloudflare.com/learning/)
+- [Community](https://community.cloudflare.com/)
+- [Support](https://www.cloudflare.com/support/)
+
+## Contact
+
+- [Contact Sales](mailto:sales@cloudflare.com)
+- [Support Team](mailto:support@cloudflare.com)
+```
+
+## Format Specification
+
+The llms.txt format follows this structure:
+
+1. **Title (H1)**: The page title or site name
+2. **Description (Blockquote)**: Meta description or og:description
+3. **Key Information (H2)**: Up to 100 important links from the page with anchor text
+4. **Contact (H2)**: Contact information (mailto links or fallback to website URL)
+
+## Error Responses
+
+### Invalid URL
+
+```json
+{
+  "success": false,
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+### Fetch Error
+
+```json
+{
+  "success": false,
+  "error": "HTTP 404",
+  "code": "FETCH_ERROR"
+}
+```
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Clone the repository
+
+    ```bash
+    git clone https://github.com/your-org/cloudflare-experiments
+    cd cloudflare-experiments/apps/experiments/website-to-llms-txt
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Install dependencies
+
+    ```bash
+    npm install
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Test locally
+
+    ```bash
+    npm run dev
+    ```
+
+    The API will be available at `http://localhost:8787`
+
+  </Step>
+  
+  <Step>
+
+### Deploy to Cloudflare Workers
+
+    ```bash
+    npm run deploy
+    ```
+
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **LLM Context**: Provide structured website information to language models
+- **AI Assistants**: Enable AI to understand website structure and navigation
+- **Documentation Parsing**: Convert documentation sites into LLM-friendly format
+- **Content Summarization**: Extract key information for AI-powered summaries
+- **Chatbot Training**: Generate training data from website content
+- **RAG Systems**: Prepare website data for retrieval-augmented generation
+
+## Technical Details
+
+- Built with [Hono](https://hono.dev/) framework
+- Runs on Cloudflare Workers
+- Implements llms.txt specification v1.1.1
+- Extracts up to 100 key links from the page
+- Prioritizes metadata over HTML content for descriptions
+- Returns plain text with UTF-8 encoding
+
+## Extraction Logic
+
+### Title
+
+1. Extracts from `<title>` tag
+2. Falls back to hostname if no title found
+
+### Description
+
+1. Checks `<meta name="description">` tag
+2. Falls back to `<meta property="og:description">` tag
+3. Falls back to generic description with the URL
+
+### Key Links
+
+- Extracts links from `<a>` tags throughout the page
+- Includes anchor text with each link
+- Limits to 100 links maximum
+- Excludes anchor links (#), javascript:, and mailto: links
+- Deduplicates by URL
+- Resolves relative URLs to absolute URLs
+- Truncates long anchor text to 200 characters
+
+### Contact Information
+
+- Extracts mailto: links if available
+- Falls back to website URL if no contact links found

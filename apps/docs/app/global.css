@@ -1,0 +1,43 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+:root {
+  --color-fd-primary: #f38020;
+  --color-fd-primary-foreground: #ffffff;
+}
+
+@theme inline {
+  --font-sans: var(--font-ui), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+
+/* Article body — monospace for technical docs */
+.prose {
+  font-family: var(--font-mono);
+}
+
+/* Headings stay sans for clear hierarchy against prose */
+.prose :where(h1, h2, h3, h4, h5, h6, th) {
+  font-family: var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
+/* Code blocks inherit mono from .prose; keep explicit for Shiki outside prose */
+.prose :where(code):not(:where(pre *)),
+.prose :where(pre),
+.prose :where(kbd),
+.prose :where(samp),
+.shiki,
+.shiki code {
+  font-family: var(--font-mono);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}

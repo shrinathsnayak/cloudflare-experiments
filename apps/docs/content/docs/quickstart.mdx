@@ -1,0 +1,211 @@
+---
+title: Quickstart
+description: Deploy your first Cloudflare experiment in under 60 seconds
+---
+
+Get started with Cloudflare Experiments by deploying a simple worker to the edge. Each experiment is designed to run in under 60 seconds and demonstrates real-world capabilities of the Cloudflare platform.
+
+## Deploy an Experiment
+
+The fastest way to get started is using the one-click deploy button. We'll use the **Where Am I** experiment as an example.
+
+<Steps>
+  <Step>
+
+### Choose an experiment
+
+    Browse the [available experiments](/docs/experiments) and pick one to deploy. For this guide, we'll deploy [Where Am I](/docs/experiments/whereami), which returns geolocation data from Cloudflare's edge.
+
+  </Step>
+
+  <Step>
+
+### Click the deploy button
+
+    Click the Deploy to Cloudflare Workers button from any experiment page or the main repository.
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/whereami)
+
+  </Step>
+
+  <Step>
+
+### Authenticate with Cloudflare
+
+    If you haven't already, you'll be prompted to sign in to your Cloudflare account. The deployment process will automatically:
+    - Create a new Worker
+    - Configure the necessary bindings
+    - Deploy to Cloudflare's global edge network
+
+  </Step>
+
+  <Step>
+
+### Access your deployed worker
+
+    Once deployed, you'll receive a `*.workers.dev` URL where your experiment is live.
+
+  </Step>
+</Steps>
+
+<Callout>
+
+Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments). To deploy from your own fork, change the owner in the deploy URL.
+
+</Callout>
+
+## Test Your Deployment
+
+Once deployed, test your worker using curl or your browser.
+
+### Where Am I Example
+
+```bash
+curl https://your-worker.workers.dev/whereami
+```
+
+**Response:**
+
+```json
+{
+  "country": "US",
+  "city": "San Francisco",
+  "region": "California",
+  "timezone": "America/Los_Angeles",
+  "colo": "SFO",
+  "asn": 13335
+}
+```
+
+### Is It Down Example
+
+Check if a website is reachable from Cloudflare's edge:
+
+```bash
+curl "https://your-worker.workers.dev/check?url=https://www.cloudflare.com"
+```
+
+**Response:**
+
+```json
+{
+  "status": "reachable",
+  "responseTime": 87,
+  "statusCode": 200,
+  "colo": "LHR"
+}
+```
+
+<Callout type="idea">
+
+The `colo` field shows the edge data center (IATA code) that served your request. Cloudflare has over 300 locations worldwide.
+
+</Callout>
+
+## Local Development
+
+To modify an experiment or develop locally, clone the repository and run the worker on your machine.
+
+### Install Dependencies
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tab value="npm">
+
+```bash
+cd apps/experiments/whereami
+npm install
+```
+
+</Tab>
+<Tab value="pnpm">
+
+```bash
+cd apps/experiments/whereami
+pnpm install
+```
+
+</Tab>
+<Tab value="yarn">
+
+```bash
+cd apps/experiments/whereami
+yarn install
+```
+
+</Tab>
+</Tabs>
+
+### Start Development Server
+
+<Tabs items={['npm', 'pnpm', 'yarn']}>
+<Tab value="npm">
+
+```bash
+npm run dev
+```
+
+</Tab>
+<Tab value="pnpm">
+
+```bash
+pnpm dev
+```
+
+</Tab>
+<Tab value="yarn">
+
+```bash
+yarn dev
+```
+
+</Tab>
+</Tabs>
+
+The worker will be available at `http://localhost:8787`.
+
+### Test Locally
+
+```bash
+curl http://localhost:8787/whereami
+```
+
+<Callout>
+
+When running locally, the `cf` object may be empty or minimal. Full geolocation data appears when deployed to Cloudflare's edge network.
+
+</Callout>
+
+## What You Can Build
+
+Each experiment in this collection demonstrates **practical capabilities** of the Cloudflare platform:
+
+- **Workers** — Edge compute without backend servers
+- **Workers AI** — Run AI models at the edge
+- **Browser Rendering** — Capture screenshots and manipulate web pages
+- **HTMLRewriter** — Transform HTML on the fly
+- **Edge Networking** — Global request/response handling
+- **D1** — Serverless SQL database
+- **R2** — Object storage
+
+<Callout type="idea">
+
+All experiments are **stateless first** and use edge compute, fetch, and HTML parsing without requiring persistent storage. Learn more about the design [philosophy](/docs/philosophy).
+
+</Callout>
+
+## Next Steps
+
+<Cards>
+  <Card title="Explore Experiments" href="/docs/experiments">
+    Browse all available experiments
+  </Card>
+  <Card title="Philosophy" href="/docs/philosophy">
+    Learn the design principles
+  </Card>
+  <Card title="Contributing" href="/docs/contributing">
+    Add your own experiment
+  </Card>
+  <Card title="GitHub Repository" href="https://github.com/shrinathsnayak/cloudflare-experiments">
+    View source code
+  </Card>
+</Cards>

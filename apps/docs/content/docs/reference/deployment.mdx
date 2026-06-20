@@ -1,0 +1,509 @@
+---
+title: Deployment Guide
+description: Deploy experiments to Cloudflare Workers using click-to-deploy or manual methods
+---
+
+Every experiment in this repository can be deployed independently to Cloudflare Workers. This guide covers all deployment methods and configuration steps.
+
+## Quick Deploy (Click-to-Deploy)
+
+The fastest way to deploy any experiment is using Cloudflare's one-click deployment:
+
+<Steps>
+  <Step>
+
+### Choose an experiment
+
+    Navigate to any experiment page and click the "Deploy to Cloudflare Workers" button.
+
+    Each experiment README includes a deploy button linking to its source code.
+
+  </Step>
+
+  <Step>
+
+### Authenticate with Cloudflare
+
+    Sign in to your Cloudflare account or create one if you don't have an account.
+
+    The deployment system will request permissions to deploy Workers on your behalf.
+
+  </Step>
+
+  <Step>
+
+### Configure resources
+
+    Some experiments require additional resources:
+
+    - **D1 databases**: Created automatically during deployment
+    - **KV namespaces**: Created automatically
+    - **R2 buckets**: Created automatically
+    - **Browser Rendering**: Enabled automatically (requires plan upgrade)
+    - **Workers AI**: Enabled automatically (requires plan upgrade)
+
+    The deployment wizard guides you through any required setup.
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Click the final deploy button. Your Worker will be deployed to a `*.workers.dev` subdomain.
+
+    The deployment typically completes in 10-30 seconds.
+
+  </Step>
+</Steps>
+
+### Deployment URL Format
+
+Click-to-deploy URLs follow this pattern:
+
+```
+https://deploy.workers.cloudflare.com/?url=https://github.com/{owner}/{repo}/tree/{branch}/apps/experiments/{experiment-name}
+```
+
+**Example:**
+
+```
+https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-summary
+```
+
+<Callout>
+
+To deploy from your own fork, replace `shrinathsnayak` with your GitHub username in the deployment URL.
+
+</Callout>
+
+## Manual Deployment
+
+For more control or local development, deploy manually using Wrangler CLI.
+
+<Tabs items={['Prerequisites', 'Basic Experiments', 'Workers AI', 'Browser Rendering', 'D1 + KV', 'R2 Storage']}>
+<Tab value="Prerequisites">
+
+Install the required tools:
+
+    ```bash
+    # Install Node.js 18+ (via nvm recommended)
+    nvm install 18
+    nvm use 18
+
+    # Install Wrangler CLI globally
+    npm install -g wrangler
+
+    # Authenticate with Cloudflare
+    wrangler login
+    ```
+
+    Clone the repository:
+
+    ```bash
+    git clone https://github.com/shrinathsnayak/cloudflare-experiments.git
+    cd cloudflare-experiments
+    ```
+
+</Tab>
+<Tab value="Basic Experiments">
+
+Deploy experiments with no external dependencies (most experiments):
+
+    ```bash
+    # Navigate to experiment directory
+    cd apps/experiments/is-it-down
+
+    # Install dependencies
+    npm install
+
+    # Test locally
+    npm run dev
+    # Visit http://localhost:8787
+
+    # Deploy to production
+    npm run deploy
+    # or: wrangler deploy
+    ```
+
+    Your Worker will be deployed to `https://{experiment-name}.{your-subdomain}.workers.dev`.
+
+    <Callout>
+
+Basic experiments include: Is It Down, Where Am I, Website Metadata Extractor, Dependency Analyzer, Website to API, URL DNS Lookup, Website DevTools Inspector, AI Bot Visibility, Website to llms.txt
+
+</Callout>
+
+</Tab>
+<Tab value="Workers AI">
+
+Experiments using Workers AI require additional setup:
+
+    ```bash
+    cd apps/experiments/ai-website-summary
+    npm install
+
+    # Workers AI is automatically bound in wrangler.json
+    # No additional configuration needed
+
+    # Test with remote AI (local dev doesn't support AI)
+    npm run dev -- --remote
+
+    # Deploy
+    npm run deploy
+    ```
+
+    <Callout type="warning">
+
+Workers AI requires the Workers Paid plan ($5/month). The first 10,000 AI requests per day are included.
+
+</Callout>
+
+    Experiments using Workers AI:
+    - [AI Website Summary](/docs/experiments/ai-website-summary)
+    - [GitHub Repo Explainer](/docs/experiments/github-repo-explainer)
+    - [Cloud AI Proxy](/docs/experiments/cloud-ai-proxy)
+
+</Tab>
+<Tab value="Browser Rendering">
+
+Deploy experiments that capture screenshots:
+
+    ```bash
+    cd apps/experiments/screenshot-api
+    npm install
+
+    # Browser Rendering requires remote mode for local testing
+    npm run dev -- --remote
+
+    # Deploy
+    npm run deploy
+    ```
+
+    <Callout type="warning">
+
+Browser Rendering requires the Workers Paid plan. Pricing is per browser session.
+
+</Callout>
+
+    The Browser binding is automatically configured in `wrangler.json`:
+
+    ```json
+    {
+      "browser": {
+        "binding": "BROWSER"
+      }
+    }
+    ```
+
+</Tab>
+<Tab value="D1 + KV">
+
+Deploy experiments with database storage:
+
+    ```bash
+    cd apps/experiments/link-shortener
+    npm install
+
+    # 1. Create D1 database
+    wrangler d1 create link-shortener-db
+    # Copy the returned database_id
+
+    # 2. Update wrangler.json with the database_id
+    # Replace 00000000-0000-0000-0000-000000000000 with your database_id
+
+    # 3. Create KV namespace
+    wrangler kv namespace create LINKS_CACHE
+    # Copy the returned id
+
+    # 4. Update wrangler.json with the KV namespace id
+
+    # 5. Run migrations locally
+    npm run db:migrate:local
+
+    # 6. Test locally
+    npm run dev
+
+    # 7. Run migrations on production
+    npm run db:migrate
+
+    # 8. Deploy
+    npm run deploy
+    ```
+
+    **wrangler.json structure:**
+
+    ```json
+    {
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "link-shortener-db",
+          "database_id": "your-database-id-here"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "LINKS_CACHE",
+          "id": "your-kv-namespace-id-here"
+        }
+      ]
+    }
+    ```
+
+    <Callout>
+
+D1 and KV are included in the Workers Free plan with usage limits. Paid plan removes limits.
+
+</Callout>
+
+</Tab>
+<Tab value="R2 Storage">
+
+Deploy experiments with object storage:
+
+    ```bash
+    cd apps/experiments/r2-storage
+    npm install
+
+    # 1. Create R2 buckets in Cloudflare Dashboard
+    # - r2-storage-bucket (private)
+    # - r2-storage-public (public)
+
+    # 2. Enable public access on r2-storage-public:
+    # Dashboard → R2 → r2-storage-public → Settings → Enable Public Access
+    # Copy the public URL (e.g., https://pub-xxxxx.r2.dev)
+
+    # 3. Update wrangler.json with bucket names
+    # Set PUBLIC_BUCKET_URL in vars section
+
+    # 4. Test with remote R2 (local mode doesn't support public URLs)
+    npm run dev -- --remote
+
+    # 5. Deploy
+    npm run deploy
+    ```
+
+    **wrangler.json structure:**
+
+    ```json
+    {
+      "r2_buckets": [
+        {
+          "binding": "BUCKET",
+          "bucket_name": "r2-storage-bucket"
+        },
+        {
+          "binding": "PUBLIC_BUCKET",
+          "bucket_name": "r2-storage-public"
+        }
+      ],
+      "vars": {
+        "PUBLIC_BUCKET_URL": "https://pub-xxxxx.r2.dev"
+      }
+    }
+    ```
+
+    <Callout type="warning">
+
+R2 requires the Workers Paid plan. Storage is charged per GB-month, with no egress fees.
+
+</Callout>
+
+</Tab>
+</Tabs>
+
+## Custom Domains
+
+Add a custom domain to any deployed Worker:
+
+<Steps>
+  <Step>
+
+### Add domain to Cloudflare
+
+    Ensure your domain is already added to Cloudflare and using Cloudflare nameservers.
+
+  </Step>
+
+  <Step>
+
+### Navigate to Workers & Pages
+
+    In the Cloudflare dashboard:
+    1. Go to **Workers & Pages**
+    2. Select your deployed Worker
+    3. Click the **Triggers** tab
+
+  </Step>
+
+  <Step>
+
+### Add custom domain
+
+    1. Click **Add Custom Domain**
+    2. Enter your subdomain (e.g., `api.example.com`)
+    3. Click **Add Custom Domain**
+
+    Cloudflare automatically creates DNS records and provisions SSL certificates.
+
+  </Step>
+</Steps>
+
+## Environment Variables
+
+Some experiments require environment variables. Set them in the dashboard or via Wrangler:
+
+<Tabs items={['Dashboard', 'Wrangler CLI']}>
+<Tab value="Dashboard">
+
+1. Go to **Workers & Pages** 2. Select your Worker 3. Go to **Settings** → **Variables** 4. Add variables (Plain text or Secret) 5. Click **Save**
+
+</Tab>
+<Tab value="Wrangler CLI">
+
+Set secrets via Wrangler:
+
+    ```bash
+    # Set a secret (encrypted)
+    wrangler secret put API_KEY
+    # Enter the value when prompted
+
+    # Set a plain text variable (in wrangler.json)
+    {
+      "vars": {
+        "PUBLIC_URL": "https://example.com"
+      }
+    }
+    ```
+
+</Tab>
+</Tabs>
+
+## Deployment Checklist
+
+<Steps>
+  <Step>
+
+### Verify local functionality
+
+    ```bash
+    npm run dev
+    # Test all endpoints
+    ```
+
+  </Step>
+
+  <Step>
+
+### Check TypeScript
+
+    ```bash
+    npm run build
+    # or: tsc --noEmit
+    ```
+
+  </Step>
+
+  <Step>
+
+### Create required resources
+
+    - D1 databases
+    - KV namespaces
+    - R2 buckets
+    - Set environment variables
+
+  </Step>
+
+  <Step>
+
+### Run migrations (if applicable)
+
+    ```bash
+    npm run db:migrate
+    ```
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    ```bash
+    npm run deploy
+    ```
+
+  </Step>
+
+  <Step>
+
+### Test production
+
+    ```bash
+    curl https://your-worker.workers.dev
+    ```
+
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+### Deployment Fails
+
+- **Authentication error**: Run `wrangler login` to re-authenticate
+- **Missing binding**: Check `wrangler.json` for correct binding configuration
+- **TypeScript errors**: Run `npm run build` to identify issues
+
+### Runtime Errors
+
+- **AI binding not found**: Ensure Workers AI is enabled on your account
+- **Browser binding not found**: Enable Browser Rendering in your account
+- **Database not found**: Check D1 database_id in `wrangler.json`
+- **KV not found**: Check KV namespace id in `wrangler.json`
+- **R2 not found**: Verify bucket names in `wrangler.json`
+
+### Local Development Issues
+
+- **AI doesn't work locally**: Use `npm run dev -- --remote` for Workers AI
+- **Browser doesn't work locally**: Use `npm run dev -- --remote` for Browser Rendering
+- **R2 public URLs don't work**: Use `npm run dev -- --remote` to test with real R2
+
+## Production Best Practices
+
+<Cards>
+  <Card title="Use Environment Variables">
+    Store sensitive values as secrets, not in code:
+    
+    ```bash
+    wrangler secret put API_KEY
+    ```
+  </Card>
+
+<Card title="Set Rate Limits">
+  Use Cloudflare's Rate Limiting to prevent abuse: Configure in the Cloudflare dashboard under
+  Security.
+</Card>
+
+<Card title="Monitor Usage">
+  Track Worker invocations and errors: Workers & Pages → Your Worker → Metrics
+</Card>
+
+  <Card title="Enable Analytics">
+    Use Workers Analytics for detailed insights:
+    
+    Available on Workers Paid plan
+  </Card>
+</Cards>
+
+## Next Steps
+
+<Cards>
+  <Card title="Explore Experiments" href="/docs/introduction">
+    Browse all available experiments
+  </Card>
+
+  <Card title="Architecture Patterns" href="/docs/reference/architecture">
+    Learn common patterns used across experiments
+  </Card>
+</Cards>

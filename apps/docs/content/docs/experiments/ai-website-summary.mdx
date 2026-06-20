@@ -1,0 +1,351 @@
+---
+title: "AI Website Summary"
+description: "Summarize any webpage using Workers AI on the edge"
+---
+
+<Callout type="warning">
+
+This is an experimental Worker. Use it as a starting point for your own projects.
+
+</Callout>
+
+The AI Website Summary experiment demonstrates how to fetch any webpage, extract its content, and generate a concise summary using [Workers AI](https://developers.cloudflare.com/workers-ai/). Built with Hono and TypeScript, it runs entirely on Cloudflare's edge network.
+
+## Features
+
+- Fetch and parse any public webpage
+- Extract title and body text from HTML
+- Generate 2-4 sentence summaries using Llama 3.1
+- Sub-second response times on the edge
+- No external API keys required
+
+## API Reference
+
+### GET /summary
+
+Generate an AI summary of any webpage.
+
+**`url`** `string` (required)
+
+The webpage URL to summarize. Must use `http://` or `https://` scheme.
+
+#### Response
+
+**`title`** `string | null`
+
+The extracted page title from the HTML `<title>` tag.
+
+**`summary`** `string`
+
+A 2-4 sentence AI-generated summary of the page content.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/summary?url=https://www.cloudflare.com"
+```
+
+#### Example Response
+
+```json
+{
+  "title": "Cloudflare - The Web Performance & Security Company",
+  "summary": "Cloudflare provides a content delivery network and DDoS protection services. The platform offers security, performance, and reliability solutions for websites and applications. It includes features like CDN, DNS, and web application firewall to protect and accelerate online properties."
+}
+```
+
+#### Error Responses
+
+**`error`** `string`
+
+Human-readable error message.
+
+**`code`** `string`
+
+Machine-readable error code.
+
+**400 Bad Request** - Missing or invalid URL parameter:
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+**502 Bad Gateway** - Failed to fetch webpage or AI processing error:
+
+```json
+{
+  "error": "Failed to fetch or summarize",
+  "code": "FETCH_OR_AI_ERROR"
+}
+```
+
+## Implementation Details
+
+### AI Model Configuration
+
+The worker uses Workers AI with the following configuration:
+
+```typescript
+// From src/constants/defaults.ts
+export const AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
+export const MAX_SUMMARY_TOKENS = 4096;
+export const MAX_HTML_BYTES = 128 * 1024; // 128KB limit
+export const FETCH_TIMEOUT_MS = 15_000; // 15 second timeout
+```
+
+### Request Flow
+
+The summarization process follows these steps:
+
+<Steps>
+  <Step>
+
+### Validate URL
+
+    Ensures the URL uses http/https scheme and is properly formatted:
+    ```typescript
+    const url = validateUrl(c.req.query("url"));
+    if (!url) return jsonError(c, "Missing or invalid query parameter: url", "INVALID_URL");
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Fetch HTML
+
+    Retrieves the webpage with a 15-second timeout and 128KB size limit:
+    ```typescript
+    const html = await fetchHtml(url);
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Extract Content
+
+    Parses the HTML to extract title and body text:
+    ```typescript
+    const title = getTitle(html);
+    const bodyText = getBodyText(html, 6000); // Up to 6000 chars
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Generate Summary
+
+    Sends content to Workers AI for summarization:
+    ```typescript
+    const summary = await summarizeWithAi(c.env, bodyText, title);
+    ```
+
+    The AI prompt instructs the model to:
+    - Generate exactly 2-4 concise sentences
+    - Return only the summary (no preamble or labels)
+    - Focus on key information from the page
+
+  </Step>
+  
+  <Step>
+
+### Clean Response
+
+    Removes any boilerplate phrases the model may add:
+    ```typescript
+    // Strips patterns like "Here is a summary:" or "Let me know if..."
+    return extractSummaryOnly(response);
+    ```
+
+  </Step>
+</Steps>
+
+### Core Implementation
+
+Here's the main route handler from `src/routes/summary.ts`:
+
+```typescript
+app.get("/summary", async (c) => {
+  const url = validateUrl(c.req.query("url"));
+  if (!url) return jsonError(c, "Missing or invalid query parameter: url", "INVALID_URL");
+
+  try {
+    const html = await fetchHtml(url);
+    const title = getTitle(html);
+    const bodyText = getBodyText(html, 6000);
+    if (!bodyText.trim()) {
+      return jsonSuccess<SummaryResponse>(c, { title, summary: "No extractable text content." });
+    }
+    const summary = await summarizeWithAi(c.env, bodyText, title);
+    const response: SummaryResponse = { title, summary };
+    return jsonSuccess(c, response);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Failed to fetch or summarize";
+    return jsonError(c, message, "FETCH_OR_AI_ERROR", 502);
+  }
+});
+```
+
+## Setup & Deployment
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) v18 or later
+- A [Cloudflare account](https://dash.cloudflare.com/sign-up)
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) installed
+
+### Local Development
+
+<Steps>
+  <Step>
+
+### Clone and install dependencies
+
+    ```bash
+    git clone https://github.com/shrinathsnayak/cloudflare-experiments
+    cd cloudflare-experiments/apps/experiments/ai-website-summary
+    npm install
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Start the development server
+
+    ```bash
+    npm run dev
+    ```
+
+    This starts Wrangler in dev mode with Workers AI bindings.
+
+  </Step>
+  
+  <Step>
+
+### Test the endpoint
+
+    ```bash
+    curl "http://localhost:8787/summary?url=https://www.cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+### Deploy to Production
+
+<Steps>
+  <Step>
+
+### Authenticate with Cloudflare
+
+    ```bash
+    wrangler login
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Deploy the Worker
+
+    ```bash
+    npm run deploy
+    ```
+
+    This publishes your Worker to `*.workers.dev` or your custom domain.
+
+  </Step>
+  
+  <Step>
+
+### Test the production endpoint
+
+    ```bash
+    curl "https://ai-website-summary.YOUR_SUBDOMAIN.workers.dev/summary?url=https://blog.cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+### One-Click Deploy
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-summary)
+
+Click the button above to deploy this Worker directly to your Cloudflare account. You can fork the repository and update the URL to deploy from your own fork.
+
+## Configuration
+
+The Worker automatically binds to Workers AI. The `wrangler.toml` configuration includes:
+
+```toml
+name = "ai-website-summary"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[ai]
+binding = "AI"
+```
+
+No additional environment variables or secrets are required.
+
+## Dependencies
+
+```json
+{
+  "dependencies": {
+    "hono": "^4.6.12"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.7.2",
+    "wrangler": "^4"
+  }
+}
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Run LLMs on the edge with the `AI` binding
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for fetching webpages
+
+## Use Cases
+
+- **Content Curation** - Automatically generate summaries for bookmarking tools
+- **Research Assistants** - Quickly preview webpage content before visiting
+- **News Aggregators** - Create summaries for article feeds
+- **Browser Extensions** - Add "summarize this page" functionality
+- **Slack/Discord Bots** - Share link summaries in team chats
+
+## Limitations
+
+- **JavaScript-heavy sites**: Only static HTML is fetched; JavaScript-rendered content is not executed
+- **Rate limits**: Workers AI has [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) based on your plan
+- **Fetch timeout**: Requests that take longer than 15 seconds will fail
+- **Size limit**: HTML content is capped at 128KB; body text is truncated to 6000 characters
+
+## Next Steps
+
+<Cards>
+  <Card title="Workers AI Models" href="https://developers.cloudflare.com/workers-ai/models/">
+    Explore other models available in Workers AI
+  </Card>
+  <Card title="Hono Framework" href="https://hono.dev">
+    Learn more about the Hono web framework
+  </Card>
+  <Card
+    title="GitHub Repository"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-summary"
+  >
+    View the complete source code
+  </Card>
+  <Card title="More Experiments" href="/docs/introduction">
+    Explore other Cloudflare experiments
+  </Card>
+</Cards>

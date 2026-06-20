@@ -46,7 +46,7 @@ Redirects to the stored URL. Returns `404` with `{ error, code: "NOT_FOUND" }` i
 1. Create a D1 database and get its id:
 
    ```bash
-   cd experiments/link-shortener
+   cd apps/experiments/link-shortener
    npm install
    npx wrangler d1 create link-shortener-db
    ```
@@ -81,7 +81,7 @@ curl -I http://localhost:8787/<code>
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/link-shortener)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)
 
 1. Deploy the Worker (use the button or `npm run deploy`).
 2. Create the D1 database in the dashboard if not already created, then run `npm run db:migrate` to apply migrations.

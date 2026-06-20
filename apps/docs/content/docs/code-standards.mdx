@@ -1,0 +1,375 @@
+---
+title: Code and Structure Standards
+description: Coding standards and repository structure for Cloudflare Experiments
+---
+
+Contributions should follow the project's coding and structure rules to keep the repository consistent and maintainable.
+
+## Experiment Structure
+
+Every experiment lives under `apps/experiments/<name>/` with this standardized layout:
+
+```
+apps/experiments/<name>/
+├── src/
+│   ├── index.ts          # Hono app, mount routes, export default { fetch: app.fetch }
+│   ├── routes/           # Route handlers only (one file per route or logical group)
+│   ├── lib/              # Domain logic (fetch, URL validation, parsing)
+│   ├── utils/            # Shared helpers (jsonError, jsonSuccess, etc.)
+│   ├── constants/        # Optional config/literals
+│   └── types/            # All types; env in env.d.ts
+├── package.json
+├── wrangler.toml         # or wrangler.json; bindings here
+├── tsconfig.json
+└── README.md
+```
+
+### Directory Breakdown
+
+<Accordions>
+<Accordion title="src/index.ts">
+  The main entry point for the Worker. This file:
+  - Creates a new Hono app instance
+  - Mounts route handlers
+  - Registers global error handling
+  - Exports `{ fetch: app.fetch }`
+
+**Example:**
+
+```typescript
+import { Hono } from "hono";
+import type { Env } from "./types/env";
+import checkRoutes from "./routes/check";
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.route("/", checkRoutes);
+
+app.get("/", (c) => {
+  return c.json({
+    name: "is-it-down",
+    description: "Check if a website is reachable from Cloudflare's edge",
+    usage: "GET /check?url=https://www.cloudflare.com",
+  });
+});
+
+app.onError((err, c) => {
+  return c.json({ error: err.message, code: "INTERNAL_ERROR" }, 500);
+});
+
+export default {
+  fetch: app.fetch,
+};
+```
+
+</Accordion>
+
+<Accordion title="src/routes/">
+  Contains route handlers only. Each file exports a Hono app with one or more related routes.
+
+**Example from `src/routes/check.ts`:**
+
+```typescript
+import { Hono } from "hono";
+import type { Env } from "../types/env";
+import { validateUrl } from "../lib/url";
+import { fetchWithTiming } from "../lib/fetch";
+import { jsonError, jsonSuccess } from "../utils/response";
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.get("/check", async (c) => {
+  const urlParam = c.req.query("url");
+  const url = validateUrl(urlParam);
+  if (!url) {
+    return jsonError(c, "Missing or invalid query parameter: url", "INVALID_URL");
+  }
+
+  const result = await fetchWithTiming(url);
+  return jsonSuccess(c, result);
+});
+
+export default app;
+```
+
+</Accordion>
+
+<Accordion title="src/lib/">
+  Domain logic and business functionality. This includes:
+  - URL validation
+  - Fetch operations
+  - Data parsing
+  - External API interactions
+
+**Example from `src/lib/url.ts`:**
+
+```typescript
+import { ALLOWED_SCHEMES } from "../constants/defaults";
+
+/**
+ * Validates and normalizes a URL for safe fetching.
+ * Returns the URL string or null if invalid/not allowed.
+ */
+export function validateUrl(input: string | undefined): string | null {
+  if (!input || typeof input !== "string") return null;
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+  try {
+    const url = new URL(trimmed);
+    if (!ALLOWED_SCHEMES.includes(url.protocol as (typeof ALLOWED_SCHEMES)[number])) {
+      return null;
+    }
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="src/utils/">
+  Shared helper functions used across the experiment.
+
+**Example from `src/utils/response.ts`:**
+
+```typescript
+import type { Context } from "hono";
+
+export function jsonError(
+  c: Context,
+  message: string,
+  code: string,
+  status: 400 | 404 | 502 = 400
+) {
+  return c.json({ error: message, code }, { status });
+}
+
+export function jsonSuccess<T>(c: Context, data: T, status: 200 = 200) {
+  return c.json(data, { status });
+}
+```
+
+</Accordion>
+
+<Accordion title="src/constants/">
+  Optional directory for configuration values and literals.
+
+**Example from `src/constants/defaults.ts`:**
+
+```typescript
+/** Max time (ms) to wait for the target URL to respond. */
+export const FETCH_TIMEOUT_MS = 15_000;
+
+/** Allowed URL schemes for security. */
+export const ALLOWED_SCHEMES = ["http:", "https:"] as const;
+```
+
+</Accordion>
+
+<Accordion title="src/types/">
+  All TypeScript type definitions. Worker environment bindings go in `env.d.ts`.
+
+**Example from `src/types/env.d.ts`:**
+
+```typescript
+/// <reference types="@cloudflare/workers-types" />
+
+export interface Env {
+  DB: D1Database;
+  LINKS_CACHE: KVNamespace;
+}
+```
+
+</Accordion>
+</Accordions>
+## Core Principles
+
+<Callout>
+
+**No shared code between experiments**: Each experiment is standalone with its own `package.json` and dependencies. Do not import from other experiments or the repo root.
+
+</Callout>
+
+<Callout>
+
+**Single responsibility**: One experiment = one Cloudflare capability (e.g. Workers AI, Browser Rendering, D1).
+
+</Callout>
+
+<Callout>
+
+**Edge-first, under ~60 seconds**: Prefer stateless, fast request paths that complete quickly.
+
+</Callout>
+
+## TypeScript and API Style
+
+### Strict TypeScript
+
+- Use **strict** TypeScript; avoid `any`
+- Type Worker env in `src/types/env.d.ts` and use `Hono<{ Bindings: Env }>`
+- All types should be explicitly defined
+
+### Error Handling
+
+Use a shared helper for client errors:
+
+```typescript
+jsonError(c, message, code, status);
+```
+
+**Status code guidelines:**
+
+- `400` for bad request (invalid input)
+- `404` for not found
+- `502` for server/upstream errors (don't expose internals)
+
+**Example:**
+
+```typescript
+if (!url) {
+  return jsonError(c, "Missing or invalid query parameter: url", "INVALID_URL");
+}
+```
+
+### Success Responses
+
+Use `jsonSuccess(c, data)` for JSON success responses:
+
+```typescript
+return jsonSuccess(c, { status: "reachable", responseTime: 87 });
+```
+
+### Global Error Handler
+
+In `src/index.ts`, register `app.onError(...)` so uncaught errors return consistent JSON:
+
+```typescript
+app.onError((err, c) => {
+  return c.json({ error: err.message, code: "INTERNAL_ERROR" }, 500);
+});
+```
+
+### URL Parameter Validation
+
+For any endpoint that takes a `url` query param:
+
+- Validate with a shared `validateUrl(input)` in `src/lib/url.ts`
+- Allow only `http://` and `https://`
+- Return `jsonError` with a clear message and code (e.g. `INVALID_URL`) when invalid
+
+**Example:**
+
+```typescript
+const url = validateUrl(urlParam);
+if (!url) {
+  return jsonError(c, "Missing or invalid query parameter: url", "INVALID_URL");
+}
+```
+
+### Naming Conventions
+
+- **Error codes**: Descriptive uppercase with underscores (e.g. `INVALID_URL`, `FETCH_ERROR`, `INTERNAL_ERROR`)
+- **Routes**: Files in `src/routes/` with kebab-case filenames matching the path (e.g. `check.ts` for `/check`)
+- **Functions**: camelCase for functions and variables
+- **Types**: PascalCase for interfaces and types
+
+## Real-World Examples
+
+### Error Handling Pattern
+
+From `src/lib/fetch.ts` in the `is-it-down` experiment:
+
+```typescript
+export async function fetchWithTiming(url: string): Promise<FetchResult> {
+  const start = Date.now();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(url, {
+      method: "GET",
+      signal: controller.signal,
+      headers: { "User-Agent": "Cloudflare-Experiments-IsItDown/1.0" },
+    });
+    const responseTimeMs = Date.now() - start;
+    clearTimeout(timeoutId);
+    return {
+      ok: res.ok,
+      statusCode: res.status,
+      responseTimeMs,
+    };
+  } catch (e) {
+    clearTimeout(timeoutId);
+    const responseTimeMs = Date.now() - start;
+    const message = e instanceof Error ? e.message : "Unknown error";
+    return {
+      ok: false,
+      statusCode: 0,
+      responseTimeMs,
+      error: message,
+    };
+  }
+}
+```
+
+### Database Operations with Error Handling
+
+From `src/routes/shorten.ts` in the `link-shortener` experiment:
+
+```typescript
+let code = generateCode();
+const maxAttempts = 5;
+for (let attempt = 0; attempt < maxAttempts; attempt++) {
+  try {
+    await db.prepare("INSERT INTO links (code, url) VALUES (?, ?)").bind(code, url).run();
+    await setCachedLink(c.env, code, url);
+    return c.json({ code, url } satisfies ShortenResponse, 201);
+  } catch (e) {
+    const err = e as { message?: string };
+    if (err.message?.includes("UNIQUE constraint")) {
+      code = generateCode();
+      continue;
+    }
+    throw e;
+  }
+}
+return jsonError(c, "Could not generate unique code", "INTERNAL_ERROR", 502);
+```
+
+## Configuration Files
+
+### wrangler.toml/wrangler.json
+
+Declare all Cloudflare bindings (D1, KV, R2, AI, etc.) in this file. These bindings must also be typed in `src/types/env.d.ts`.
+
+### package.json
+
+Each experiment has its own dependencies. Common dependencies:
+
+- `hono` - Web framework
+- `@cloudflare/workers-types` - TypeScript types for Workers
+
+### tsconfig.json
+
+Enable strict mode and configure paths appropriately for the experiment.
+
+## Quality Checklist
+
+Before submitting a PR, ensure:
+
+- [ ] TypeScript strict mode is enabled with no `any` types
+- [ ] All errors use `jsonError` with descriptive codes
+- [ ] Global error handler is registered in `index.ts`
+- [ ] URL parameters are validated with `validateUrl`
+- [ ] Environment bindings are declared in both `wrangler.toml` and `src/types/env.d.ts`
+- [ ] Routes are in `src/routes/`, logic in `src/lib/`, helpers in `src/utils/`
+- [ ] The experiment can be deployed with `npx wrangler deploy`
+- [ ] README.md documents the API and usage
+
+## Next Steps
+
+- Learn [how to add new experiments](/docs/adding-experiments)
+- Review the [Contributing Guide](/docs/contributing)
+- Explore existing experiments in the [repository](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments)

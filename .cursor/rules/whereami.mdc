@@ -1,6 +1,6 @@
 ---
 description: Contract for whereami (route, response, request.cf)
-globs: experiments/whereami/**/*.ts
+globs: apps/experiments/whereami/**/*.ts
 alwaysApply: false
 ---
 

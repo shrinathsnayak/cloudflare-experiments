@@ -1,0 +1,190 @@
+---
+title: Website to API
+description: Turn any webpage into structured JSON with title, headings, links, and images
+---
+
+Convert any webpage into clean, structured JSON data. Extract the title, all headings with their hierarchy, internal and external links, and images. Perfect for web scraping, content analysis, or building custom search indices.
+
+## API Endpoint
+
+### GET /api
+
+Transform a webpage into structured JSON by providing its URL.
+
+**`url`** `string` (required)
+
+The URL of the webpage to convert. Must be a valid HTTP or HTTPS URL.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/api?url=https://www.cloudflare.com"
+```
+
+#### Response Structure
+
+**`success`** `boolean`
+
+Indicates if the request was successful
+
+**`data`** `object`
+
+The structured data extracted from the webpage
+
+**`data.title`** `string | null`
+
+The page title extracted from the `<title>` tag
+
+**`data.headings`** `array`
+
+Array of all headings (h1-h6) found on the page
+
+**`data.headings[].level`** `number`
+
+The heading level (1-6 corresponding to h1-h6)
+
+**`data.headings[].text`** `string`
+
+The text content of the heading (HTML tags stripped)
+
+**`data.links`** `string[]`
+
+Array of unique absolute URLs extracted from `<a>` tags. Excludes anchor links (#) and javascript: links. All relative URLs are resolved to absolute URLs.
+
+**`data.images`** `string[]`
+
+Array of unique absolute image URLs extracted from `<img>` tags. All relative URLs are resolved to absolute URLs.
+
+#### Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "title": "Cloudflare - The Web Performance & Security Company",
+    "headings": [
+      {
+        "level": 1,
+        "text": "Welcome to Cloudflare"
+      },
+      {
+        "level": 2,
+        "text": "Performance"
+      },
+      {
+        "level": 2,
+        "text": "Security"
+      },
+      {
+        "level": 3,
+        "text": "DDoS Protection"
+      }
+    ],
+    "links": [
+      "https://www.cloudflare.com/products/",
+      "https://www.cloudflare.com/plans/",
+      "https://www.cloudflare.com/learning/",
+      "https://developers.cloudflare.com/"
+    ],
+    "images": [
+      "https://www.cloudflare.com/img/logo-web-badges/cf-logo-on-white-bg.svg",
+      "https://www.cloudflare.com/img/products/workers.png"
+    ]
+  }
+}
+```
+
+## Error Responses
+
+### Invalid URL
+
+```json
+{
+  "success": false,
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+### Fetch Error
+
+```json
+{
+  "success": false,
+  "error": "HTTP 404",
+  "code": "FETCH_ERROR"
+}
+```
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Clone the repository
+
+    ```bash
+    git clone https://github.com/your-org/cloudflare-experiments
+    cd cloudflare-experiments/apps/experiments/website-to-api
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Install dependencies
+
+    ```bash
+    npm install
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Test locally
+
+    ```bash
+    npm run dev
+    ```
+
+    The API will be available at `http://localhost:8787`
+
+  </Step>
+  
+  <Step>
+
+### Deploy to Cloudflare Workers
+
+    ```bash
+    npm run deploy
+    ```
+
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **Web Scraping**: Extract structured data from websites without parsing HTML
+- **Content Analysis**: Analyze page structure and heading hierarchy
+- **Link Extraction**: Build sitemaps or discover related content
+- **Search Indexing**: Extract text and structure for custom search engines
+- **Content Migration**: Extract content when migrating between platforms
+- **SEO Audits**: Analyze heading structure and internal linking
+
+## Technical Details
+
+- Built with [Hono](https://hono.dev/) framework
+- Runs on Cloudflare Workers
+- Regex-based HTML parsing for fast extraction
+- Automatically resolves relative URLs to absolute URLs
+- Deduplicates links and images
+- Returns clean, structured JSON ready for further processing
+
+## Processing Notes
+
+- All HTML tags within headings are stripped, returning clean text
+- Anchor links (starting with #) are excluded from the links array
+- JavaScript URLs (javascript:) are excluded from the links array
+- Duplicate links and images are automatically removed
+- Relative URLs are resolved based on the requested page URL

@@ -1,0 +1,426 @@
+---
+title: "Philosophy"
+description: "Design principles and goals behind Cloudflare Experiments"
+---
+
+Cloudflare Experiments is built on the principle that **developers learn best by building real, useful tools** — not toy examples.
+
+## The Problem
+
+Most Cloudflare tutorials show very simple examples:
+
+- "Hello World" workers
+- Basic KV counters
+- Simple fetch proxies
+
+While these are great for getting started, they don't showcase the **real power** of the Cloudflare platform. Developers are left wondering:
+
+<Callout>
+
+"Okay, I can return 'Hello World' from the edge... but what can I actually _build_ with this?"
+
+</Callout>
+
+## The Solution
+
+Cloudflare Experiments bridges this gap by providing a curated collection of **real-world developer tools** that run entirely on the Cloudflare edge.
+
+Every experiment in this repository is:
+
+### Small and Focused
+
+Each experiment demonstrates **one specific capability** of the Cloudflare platform:
+
+- **Workers AI** → AI Website Summary, GitHub Repo Explainer
+- **Browser Rendering** → Screenshot API
+- **HTMLRewriter** → Website to API, Dependency Analyzer
+- **Edge Networking** → Is It Down, URL DNS Lookup
+- **D1 + KV** → Link Shortener, R2 Storage
+- **Request Metadata** → Where Am I, AI Bot Visibility
+
+<Callout type="idea">
+
+**Single responsibility principle**: One experiment, one capability. This makes the code easy to understand and the concept easy to grasp.
+
+</Callout>
+
+### Independently Deployable
+
+Every experiment is **completely independent**:
+
+```
+experiments/
+├── ai-website-summary/     # Independent
+│   ├── package.json
+│   ├── wrangler.json
+│   ├── src/
+│   └── README.md
+├── screenshot-api/         # Independent
+│   ├── package.json
+│   ├── wrangler.json
+│   ├── src/
+│   └── README.md
+└── is-it-down/            # Independent
+    ├── package.json
+    ├── wrangler.json
+    ├── src/
+    └── README.md
+```
+
+**No shared code between experiments.** Each has its own:
+
+- Dependencies (`package.json`)
+- Configuration (`wrangler.json`)
+- Types and utilities
+- Deploy button
+
+You can:
+
+- Clone just one experiment
+- Deploy just one experiment
+- Fork just one experiment
+- Modify one without touching others
+
+<Callout type="warning">
+
+This is intentional. While shared code might reduce duplication, it creates coupling that makes experiments harder to understand and reuse independently.
+
+</Callout>
+
+### Easy to Understand
+
+Every experiment follows the **same structure**:
+
+```typescript
+// src/index.ts - Always the entry point
+import { Hono } from "hono";
+import type { Env } from "./types/env";
+import whereamiRoutes from "./routes/whereami";
+
+const app = new Hono<{ Bindings: Env }>();
+
+app.route("/", whereamiRoutes);
+
+// Always include a GET / for experiment info
+app.get("/", (c) => {
+  return c.json({
+    name: "whereami",
+    description: "Request metadata from Cloudflare's edge (request.cf)",
+    usage: "GET /whereami",
+  });
+});
+
+// Always include global error handling
+app.onError((err, c) => {
+  return c.json({ error: err.message, code: "INTERNAL_ERROR" }, 500);
+});
+
+export default {
+  fetch: app.fetch,
+};
+```
+
+**Consistent patterns**:
+
+- Use [Hono](https://hono.dev/) for routing (fast, type-safe, Workers-optimized)
+- Use TypeScript with strict typing
+- Use shared error/success helpers (`jsonError`, `jsonSuccess`)
+- Validate inputs (especially URLs) with clear error codes
+- Include comprehensive error handling
+
+### Designed to Run Fast
+
+<Callout>
+
+**Goal: Under 60 seconds** from clicking "Deploy" to having a working API.
+
+</Callout>
+
+This means:
+
+- **Stateless first**: Most experiments use edge compute and fetch—no persistent storage required
+- **No complex setup**: Works with default Cloudflare settings where possible
+- **Minimal dependencies**: Each experiment installs only what it needs
+- **Edge-optimized**: Run close to users with sub-100ms response times
+
+**Example**: The "Is It Down" experiment:
+
+1. Click Deploy button
+2. Authenticate with Cloudflare
+3. Worker is live in ~30 seconds
+4. Test: `curl "https://your-worker.workers.dev/check?url=https://example.com"`
+
+No database setup. No API keys. No configuration files.
+
+### Click-to-Deploy Ready
+
+Every experiment includes a **Deploy to Cloudflare Workers** button:
+
+```markdown
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/is-it-down)
+```
+
+This lowers the barrier to experimentation. You can:
+
+- Try before you clone
+- Deploy to production in one click
+- Fork and modify the deploy URL to use your own repo
+
+## Design Principles
+
+### 1. Real Tools, Not Demos
+
+Every experiment is something you might **actually want to use**:
+
+<Cards>
+  <Card title="Screenshot API">
+    Real use case: Social media preview images, monitoring, archiving
+  </Card>
+  <Card title="Link Shortener">Real use case: URL shortening service with D1 persistence</Card>
+  <Card title="Is It Down">Real use case: Website monitoring, uptime checks</Card>
+  <Card title="AI Website Summary">
+    Real use case: Content analysis, research tools, browser extensions
+  </Card>
+</Cards>
+
+These aren't toy examples—they're **production-ready patterns** you can build on.
+
+### 2. Edge-First Architecture
+
+Cloudflare's edge network spans 300+ cities. Experiments demonstrate **how to leverage this**:
+
+**Example: Is It Down**
+
+Instead of checking from a single server location:
+
+```javascript
+// Traditional approach (single server)
+const response = await fetch(url);
+return response.ok ? "up" : "down";
+```
+
+Check from the edge closest to the user:
+
+```javascript
+// Edge approach (Cloudflare)
+const cf = c.req.raw.cf;
+const result = await fetchWithTiming(url);
+return {
+  status: result.ok ? "reachable" : "unreachable",
+  responseTime: result.responseTimeMs,
+  colo: cf?.colo, // Which edge location served this
+};
+```
+
+The user in London gets results from LHR (London Heathrow), the user in Tokyo gets results from NRT (Narita). **Global performance by default.**
+
+### 3. Platform Capabilities Over Abstractions
+
+Experiments showcase **native Cloudflare features**:
+
+**Workers AI** (not external AI APIs):
+
+```typescript
+// experiments/ai-website-summary/src/lib/ai.ts
+const ai = c.env.AI;
+const response = await ai.run("@cf/meta/llama-2-7b-chat-int8", {
+  messages: [
+    {
+      role: "user",
+      content: `Summarize this webpage: ${text}`,
+    },
+  ],
+});
+```
+
+**Browser Rendering** (not external screenshot services):
+
+```typescript
+// experiments/screenshot-api/src/lib/screenshot.ts
+const browser = await puppeteer.launch(c.env.BROWSER);
+const page = await browser.newPage();
+await page.goto(url);
+const screenshot = await page.screenshot();
+```
+
+**HTMLRewriter** (not external parsing services):
+
+```typescript
+// experiments/website-to-api/src/lib/parser.ts
+new HTMLRewriter()
+  .on("h1", {
+    element(element) {
+      headings.push(element.getAttribute("textContent"));
+    },
+  })
+  .transform(response);
+```
+
+<Callout type="idea">
+
+Every experiment teaches you **what Cloudflare can do natively** without external dependencies.
+
+</Callout>
+
+### 4. Consistent Code Standards
+
+All experiments follow the same conventions:
+
+**Error Handling**:
+
+```typescript
+// src/utils/response.ts (duplicated in each experiment)
+export function jsonError(c: Context, message: string, code: string, status = 400) {
+  return c.json({ error: message, code }, status);
+}
+
+export function jsonSuccess(c: Context, data: unknown) {
+  return c.json(data);
+}
+```
+
+**URL Validation**:
+
+```typescript
+// src/lib/url.ts (duplicated in each experiment)
+export function validateUrl(input: string | undefined): string | null {
+  if (!input) return null;
+  try {
+    const url = new URL(input);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      return null;
+    }
+    return url.href;
+  } catch {
+    return null;
+  }
+}
+```
+
+**Error Codes**:
+
+- `INVALID_URL` - Bad or missing URL parameter
+- `FETCH_ERROR` - Failed to fetch external resource
+- `INTERNAL_ERROR` - Uncaught exception
+- `NOT_FOUND` - Resource doesn't exist
+
+Consistent patterns make the codebase **predictable and easy to navigate**.
+
+### 5. TypeScript All the Way
+
+Every experiment uses **strict TypeScript**:
+
+```typescript
+// src/types/env.d.ts
+export interface Env {
+  AI?: Ai; // Workers AI binding
+  BROWSER?: Fetcher; // Browser Rendering binding
+  DB?: D1Database; // D1 binding
+  LINKS_CACHE?: KVNamespace; // KV binding
+}
+```
+
+```typescript
+// src/types/check.ts
+export type CheckResponse =
+  | {
+      status: "reachable";
+      responseTime: number;
+      statusCode: number;
+      colo?: string;
+    }
+  | {
+      status: "unreachable";
+      responseTime: number;
+      statusCode?: number;
+      colo?: string;
+      error?: string;
+    };
+```
+
+Full type safety from request to response.
+
+## What This Means for You
+
+### As a Learner
+
+You can:
+
+- **Learn by example**: See real implementations of Cloudflare features
+- **Copy and modify**: Each experiment is a starting point for your own projects
+- **Understand the platform**: See what's possible with Workers, AI, D1, KV, etc.
+
+### As a Builder
+
+You can:
+
+- **Deploy immediately**: Click-to-deploy to production
+- **Fork and customize**: Each experiment is MIT licensed
+- **Build on top**: Use experiments as building blocks for larger applications
+
+### As a Contributor
+
+You can:
+
+- **Add new experiments**: Showcase other Cloudflare capabilities (Durable Objects, Queues, Vectorize)
+- **Improve existing ones**: Better error handling, new features, performance optimizations
+- **Fix bugs**: Help make the examples more robust
+
+See [CONTRIBUTING.md](https://github.com/shrinathsnayak/cloudflare-experiments/blob/main/CONTRIBUTING.md) for guidelines.
+
+## Future Directions
+
+The collection will continue to grow with experiments demonstrating:
+
+- **Durable Objects** - Stateful coordination at the edge
+- **Queues** - Asynchronous message processing
+- **Images API** - On-the-fly image transformation
+- **Email Workers** - Process incoming email
+- **Vectorize** - Vector search at the edge
+- **Hyperdrive** - Accelerate database queries
+
+<Callout>
+
+Each new experiment will follow the same principles: **real tools**, **independently deployable**, **easy to understand**, and **edge-first**.
+
+</Callout>
+
+## Why It Matters
+
+Cloudflare's edge platform is **incredibly powerful**, but the learning curve can be steep. Cloudflare Experiments makes it tangible:
+
+- See **concrete examples** of what you can build
+- Deploy **real tools** in under 60 seconds
+- Learn **platform capabilities** through working code
+- Build **production patterns** from day one
+
+The goal is simple: **help developers discover what's possible** on the Cloudflare edge by showing them real, useful tools they can deploy today.
+
+<Callout type="idea">
+
+The best way to learn is to deploy an experiment, look at the code, and modify it. Start with something simple like [Where Am I](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/whereami), then move to more complex experiments like [Link Shortener](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener).
+
+</Callout>
+
+## Get Involved
+
+<Cards>
+  <Card title="GitHub" href="https://github.com/shrinathsnayak/cloudflare-experiments">
+    Star the repo and explore the code
+  </Card>
+  <Card
+    title="Contributing"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/blob/main/CONTRIBUTING.md"
+  >
+    Learn how to contribute your own experiments
+  </Card>
+  <Card title="Quick Start" href="/docs/quickstart">
+    Deploy your first experiment now
+  </Card>
+  <Card
+    title="Discussions"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/discussions"
+  >
+    Ask questions and share ideas
+  </Card>
+</Cards>

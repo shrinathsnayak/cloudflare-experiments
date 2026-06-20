@@ -32,7 +32,7 @@ GET /tags?url=example.com
 ## Run locally
 
 ```bash
-cd experiments/ai-website-tag-generator
+cd apps/experiments/ai-website-tag-generator
 npm install
 npm run dev
 ```
@@ -43,7 +43,7 @@ Requires a Cloudflare account with Workers AI enabled.
 
 ## Deploy
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/experiments/ai-website-tag-generator)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-tag-generator)
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

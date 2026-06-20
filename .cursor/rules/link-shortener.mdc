@@ -1,6 +1,6 @@
 ---
 description: Contract for link-shortener (routes, params, response, D1/KV bindings)
-globs: experiments/link-shortener/**/*.ts
+globs: apps/experiments/link-shortener/**/*.ts
 alwaysApply: false
 ---
 

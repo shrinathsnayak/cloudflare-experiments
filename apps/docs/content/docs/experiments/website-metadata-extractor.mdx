@@ -1,0 +1,178 @@
+---
+title: Website Metadata Extractor
+description: Extract metadata from any webpage including title, description, Open Graph tags, and canonical URL
+---
+
+Extract comprehensive metadata from any webpage including title, description, Open Graph properties, and canonical URL. Perfect for building link previews, SEO analysis tools, or content aggregators.
+
+## API Endpoint
+
+### GET /metadata
+
+Extract metadata from a webpage by providing its URL.
+
+**`url`** `string` (required)
+
+The URL of the webpage to extract metadata from. Must be a valid HTTP or HTTPS URL.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/metadata?url=https://www.cloudflare.com"
+```
+
+#### Response Structure
+
+**`success`** `boolean`
+
+Indicates if the request was successful
+
+**`data`** `object`
+
+The extracted metadata from the webpage
+
+**`data.title`** `string | null`
+
+The page title extracted from the `<title>` tag
+
+**`data.description`** `string | null`
+
+The page description from meta tags or Open Graph description
+
+**`data.canonical`** `string | null`
+
+The canonical URL if specified in the page
+
+**`data.og`** `object`
+
+Open Graph metadata properties
+
+**`data.og.title`** `string` (optional)
+
+Open Graph title (og:title)
+
+**`data.og.description`** `string` (optional)
+
+Open Graph description (og:description)
+
+**`data.og.image`** `string` (optional)
+
+Open Graph image URL (og:image)
+
+**`data.og.type`** `string` (optional)
+
+Open Graph content type (og:type)
+
+**`data.og.url`** `string` (optional)
+
+Open Graph canonical URL (og:url)
+
+**`data.og.siteName`** `string` (optional)
+
+Open Graph site name (og:site_name)
+
+#### Example Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "title": "Cloudflare - The Web Performance & Security Company",
+    "description": "Here at Cloudflare, we make the Internet work the way it should.",
+    "canonical": "https://www.cloudflare.com/",
+    "og": {
+      "title": "Cloudflare",
+      "description": "Here at Cloudflare, we make the Internet work the way it should.",
+      "image": "https://www.cloudflare.com/img/cf-facebook-card.png",
+      "type": "website",
+      "url": "https://www.cloudflare.com/",
+      "siteName": "Cloudflare"
+    }
+  }
+}
+```
+
+## Error Responses
+
+### Invalid URL
+
+```json
+{
+  "success": false,
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+### Fetch Error
+
+```json
+{
+  "success": false,
+  "error": "HTTP 404",
+  "code": "FETCH_ERROR"
+}
+```
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Clone the repository
+
+    ```bash
+    git clone https://github.com/your-org/cloudflare-experiments
+    cd cloudflare-experiments/apps/experiments/website-metadata-extractor
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Install dependencies
+
+    ```bash
+    npm install
+    ```
+
+  </Step>
+  
+  <Step>
+
+### Test locally
+
+    ```bash
+    npm run dev
+    ```
+
+    The API will be available at `http://localhost:8787`
+
+  </Step>
+  
+  <Step>
+
+### Deploy to Cloudflare Workers
+
+    ```bash
+    npm run deploy
+    ```
+
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **Link Previews**: Generate rich previews for shared links in chat applications
+- **SEO Analysis**: Audit metadata across multiple pages
+- **Content Aggregation**: Collect and display metadata from external sources
+- **Social Media Tools**: Extract Open Graph data for social sharing optimization
+- **Bookmark Managers**: Automatically fetch metadata when saving URLs
+
+## Technical Details
+
+- Built with [Hono](https://hono.dev/) framework
+- Runs on Cloudflare Workers
+- HTML parsing with regex-based extraction
+- Fetches and processes pages up to the configured size limit
+- Returns structured JSON with comprehensive metadata
