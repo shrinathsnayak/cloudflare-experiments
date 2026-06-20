@@ -73,7 +73,16 @@ cloudflare-experiments/
 │       ├── task-queue/
 │       ├── edge-cache/
 │       ├── crypto-hash/
-│       └── websocket-echo/
+│       ├── websocket-echo/
+│       ├── html-rewriter/
+│       ├── text-translator/
+│       ├── sentiment-analyzer/
+│       ├── text-similarity/
+│       ├── image-resizer/
+│       ├── vectorize-search/
+│       ├── ai-image-generator/
+│       ├── analytics-engine/
+│       └── turnstile-verify/
 ├── turbo.json
 ├── .cursor/
 │   ├── rules/
@@ -119,6 +128,15 @@ This is a **Turborepo** monorepo. Worker experiments live in `apps/experiments/`
 | [Edge Cache](apps/experiments/edge-cache/)                                 | Fetch URLs with the Workers Cache API; report HIT/MISS/BYPASS                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/edge-cache)                 |
 | [Crypto Hash](apps/experiments/crypto-hash/)                               | Compute SHA-256/384/512 digests with the Web Crypto API at the edge                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/crypto-hash)                |
 | [WebSocket Echo](apps/experiments/websocket-echo/)                         | WebSocket echo server using WebSocketPair on Workers                                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/websocket-echo)             |
+| [HTML Rewriter](apps/experiments/html-rewriter/)                           | Extract HTML stats and transform pages with HTMLRewriter at the edge                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/html-rewriter)              |
+| [Text Translator](apps/experiments/text-translator/)                       | Translate text between languages using Workers AI                                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/text-translator)            |
+| [Sentiment Analyzer](apps/experiments/sentiment-analyzer/)                 | Analyze text sentiment (positive/negative) with Workers AI                                | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/sentiment-analyzer)         |
+| [Text Similarity](apps/experiments/text-similarity/)                       | Compare semantic similarity of two texts using Workers AI embeddings                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/text-similarity)            |
+| [Image Resizer](apps/experiments/image-resizer/)                           | Resize remote images with Cloudflare Image Resizing via `cf.image`                        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/image-resizer)              |
+| [Vectorize Search](apps/experiments/vectorize-search/)                     | Semantic search with Workers AI embeddings and Vectorize                                  | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/vectorize-search)           |
+| [AI Image Generator](apps/experiments/ai-image-generator/)                 | Generate images from text prompts using Workers AI (FLUX)                                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-image-generator)         |
+| [Analytics Engine](apps/experiments/analytics-engine/)                     | Write custom analytics events with Workers Analytics Engine                               | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/analytics-engine)           |
+| [Turnstile Verify](apps/experiments/turnstile-verify/)                     | Verify Cloudflare Turnstile tokens via the siteverify API                                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/turnstile-verify)           |
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 
@@ -151,11 +169,10 @@ By participating, you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 Additional platform features that may be explored:
 
-- Vectorize
-- Images API
-- Email Workers
-- Hyperdrive
-- Workers Analytics Engine
+- Email Workers (inbound routing)
+- Hyperdrive (database connection pooling)
+- D1 full-text search
+- Workers AI speech-to-text
 
 ---
 

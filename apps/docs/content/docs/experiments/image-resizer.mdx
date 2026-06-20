@@ -1,0 +1,113 @@
+---
+title: "Image Resizer"
+description: "Resize remote images with Cloudflare Image Resizing at the edge"
+---
+
+Fetch and resize remote images using Cloudflare [Image Resizing](https://developers.cloudflare.com/images/transform-images/) via the `fetch` API and `cf.image` options. Returns the resized image binary with the appropriate `Content-Type` header.
+
+## API Endpoint
+
+### GET /resize
+
+Fetches a remote image and returns a resized version.
+
+**`url`** `string` (required)
+
+Source image URL (`http://` or `https://` only)
+
+**`width`** `number` (optional)
+
+Target width in pixels (1–4096). At least one of `width` or `height` is required.
+
+**`height`** `number` (optional)
+
+Target height in pixels (1–4096). At least one of `width` or `height` is required.
+
+**`fit`** `string` (optional)
+
+Resize fit mode: `scale-down` (default), `contain`, `cover`, `crop`, or `pad`
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/resize?url=https://example.com/image.jpg&width=800&fit=scale-down" --output resized.jpg
+```
+
+#### Success Response
+
+Returns the resized image as binary data with an appropriate `Content-Type` header (e.g. `image/jpeg`, `image/png`).
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `400` - Invalid `width` value (`INVALID_WIDTH`)
+- `400` - Invalid `height` value (`INVALID_HEIGHT`)
+- `400` - Neither `width` nor `height` provided (`MISSING_DIMENSION`)
+- `400` - Invalid `fit` mode (`INVALID_FIT`)
+- `502` - Upstream fetch or resize failed (`FETCH_ERROR`)
+
+## Use Cases
+
+- Serve dynamically resized thumbnails from any remote image URL
+- Learn Cloudflare Image Resizing options via Workers `fetch`
+- Build on-the-fly image proxy endpoints at the edge
+- Reduce bandwidth by resizing images before delivery to clients
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/image-resizer)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Image Resizing must be enabled on your Cloudflare zone. On `workers.dev` URLs, resizing may not be available.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/resize?url=https://example.com/image.jpg&width=800&fit=scale-down" --output resized.jpg
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/image-resizer
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/resize?url=https://example.com/image.jpg&width=800&fit=scale-down" --output resized.jpg
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Image Resizing](https://developers.cloudflare.com/images/transform-images/)** - `fetch` with `cf.image` transform options
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote image retrieval

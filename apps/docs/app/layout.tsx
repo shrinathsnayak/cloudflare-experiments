@@ -9,7 +9,7 @@ export const metadata = createRootMetadata();
 export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={fontVariables} suppressHydrationWarning>
-      <body className={`${uiFont.className} text-sm flex flex-col min-h-screen`}>
+      <body className={`${uiFont.className} flex flex-col min-h-screen`}>
         <JsonLd data={createWebsiteJsonLd()} />
         <DocsRootProvider>{children}</DocsRootProvider>
       </body>

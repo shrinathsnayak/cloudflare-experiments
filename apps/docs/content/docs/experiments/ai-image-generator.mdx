@@ -1,0 +1,103 @@
+---
+title: "AI Image Generator"
+description: "Generate images from text prompts with Workers AI at the edge"
+---
+
+Generate PNG images from text prompts using [Workers AI](https://developers.cloudflare.com/workers-ai/) and the `@cf/black-forest-labs/flux-1-schnell` model at the edge.
+
+## API Endpoint
+
+### GET /generate
+
+Generates a PNG image from the provided text prompt.
+
+**`prompt`** `string` (required)
+
+Text prompt describing the image (max 1,000 characters)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/generate?prompt=a%20sunset%20over%20snow-capped%20mountains" \
+  --output image.png
+```
+
+#### Success Response
+
+Returns a PNG image with the following header:
+
+```http
+Content-Type: image/png
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: prompt",
+  "code": "INVALID_PROMPT"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `prompt` (`INVALID_PROMPT`)
+- `502` - Workers AI model run failed (`AI_ERROR`)
+
+## Use Cases
+
+- Prototype AI image generation without external API keys
+- Generate placeholder or marketing visuals from text at the edge
+- Learn Workers AI image models in a stateless Worker
+- Build creative tools that return binary image responses directly
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-image-generator)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Enable the **Workers AI** binding (`AI`) in your Worker settings. The deploy button configures this automatically via `wrangler.json`. Requires a Cloudflare account with Workers AI enabled.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/generate?prompt=a%20sunset%20over%20snow-capped%20mountains" \
+      --output image.png
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/ai-image-generator
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/generate?prompt=a%20cyberpunk%20cityscape" \
+  --output image.png
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - `@cf/black-forest-labs/flux-1-schnell` image generation model

@@ -1,0 +1,192 @@
+---
+title: "Vectorize Search"
+description: "Semantic search with Workers AI embeddings and Vectorize at the edge"
+---
+
+Upsert text documents as vectors and search them by natural language using [Workers AI](https://developers.cloudflare.com/workers-ai/) embeddings and [Vectorize](https://developers.cloudflare.com/vectorize/) at the edge.
+
+## API Endpoints
+
+### POST /upsert
+
+Embeds text with Workers AI and upserts the vector into Vectorize with metadata.
+
+**`id`** `string` (required)
+
+Unique document identifier (non-empty string)
+
+**`text`** `string` (required)
+
+Text to embed and store (max 10,000 characters)
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/upsert" \
+  -H "Content-Type: application/json" \
+  -d '{"id":"doc-1","text":"Cloudflare Workers run at the edge"}'
+```
+
+#### Success Response
+
+**`id`** `string`
+
+The document id that was upserted
+
+```json
+{
+  "id": "doc-1"
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid field: text",
+  "code": "INVALID_TEXT"
+}
+```
+
+#### Error Codes
+
+- `400` - Invalid JSON body (`INVALID_BODY`)
+- `400` - Missing or invalid `id` (`INVALID_ID`)
+- `400` - Missing or invalid `text` (`INVALID_TEXT`)
+- `502` - Embedding or Vectorize operation failed (`VECTORIZE_ERROR`)
+
+### GET /search
+
+Embeds the query with Workers AI and returns the nearest Vectorize matches.
+
+**`q`** `string` (required)
+
+Search query (max 10,000 characters)
+
+**`topK`** `number` (optional)
+
+Number of results to return (1–20, default 5)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/search?q=edge%20computing&topK=5"
+```
+
+#### Success Response
+
+**`query`** `string`
+
+The search query that was embedded
+
+**`results`** `array`
+
+Matching documents, each with `id`, `score`, and `text`
+
+```json
+{
+  "query": "edge computing",
+  "results": [
+    {
+      "id": "doc-1",
+      "score": 0.87,
+      "text": "Cloudflare Workers run at the edge"
+    }
+  ]
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: q",
+  "code": "INVALID_QUERY"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `q` (`INVALID_QUERY`)
+- `400` - Invalid `topK` (must be 1–20) (`INVALID_TOP_K`)
+- `502` - Embedding or Vectorize operation failed (`VECTORIZE_ERROR`)
+
+## Use Cases
+
+- Build semantic search over product docs or support articles at the edge
+- Prototype RAG pipelines with Vectorize as the vector store
+- Learn Workers AI embeddings with `@cf/baai/bge-base-en-v1.5`
+- Compare cosine similarity search without running a separate vector database
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/vectorize-search)
+
+  </Step>
+
+  <Step>
+
+### Create the Vectorize index
+
+    Before deploying, create the index (768 dimensions, cosine metric for the embedding model):
+
+    ```bash
+    wrangler vectorize create experiment-search --dimensions=768 --metric=cosine
+    ```
+
+    The index name must match `experiment-search` in `wrangler.json`.
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Enable the **Workers AI** binding (`AI`) and **Vectorize** binding (`VECTORIZE`). The deploy button configures these via `wrangler.json`. Requires a Cloudflare account with Workers AI and Vectorize enabled.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/upsert" \
+      -H "Content-Type: application/json" \
+      -d '{"id":"doc-1","text":"Cloudflare Workers run at the edge"}'
+
+    curl "https://your-worker.workers.dev/search?q=edge%20computing&topK=5"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/vectorize-search
+npm install
+wrangler vectorize create experiment-search --dimensions=768 --metric=cosine
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl -X POST "http://localhost:8787/upsert" \
+  -H "Content-Type: application/json" \
+  -d '{"id":"doc-1","text":"Cloudflare Workers run at the edge"}'
+
+curl "http://localhost:8787/search?q=edge%20computing&topK=5"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - `@cf/baai/bge-base-en-v1.5` text embeddings
+- **[Vectorize](https://developers.cloudflare.com/vectorize/)** - `experiment-search` index (768 dims, cosine)

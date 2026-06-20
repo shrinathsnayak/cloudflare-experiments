@@ -1,0 +1,11 @@
+{
+  "name": "image-resizer",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-11-01",
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

@@ -1,0 +1,128 @@
+---
+title: "Analytics Engine"
+description: "Write custom events to Workers Analytics Engine at the edge"
+---
+
+Record custom analytics events from a Worker using [Workers Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/). The `experiment_events` dataset is auto-created on first write - no manual dashboard setup required.
+
+## API Endpoint
+
+### POST /track
+
+Writes a named event with an optional numeric value and tag to the Analytics Engine dataset.
+
+**`event`** `string` (required)
+
+Event name (non-empty string, max 100 characters)
+
+**`value`** `number` (optional)
+
+Numeric value to record (defaults to `1`)
+
+**`tag`** `string` (optional)
+
+Optional string tag stored as a blob alongside the event
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/track" \
+  -H "Content-Type: application/json" \
+  -d '{"event":"page_view","value":1,"tag":"homepage"}'
+```
+
+#### Success Response
+
+**`ok`** `boolean`
+
+Always `true` on success
+
+**`event`** `string`
+
+The event name that was recorded
+
+**`value`** `number`
+
+The numeric value that was written
+
+```json
+{
+  "ok": true,
+  "event": "page_view",
+  "value": 1
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid field: event (required non-empty string, max 100 characters)",
+  "code": "INVALID_EVENT"
+}
+```
+
+#### Error Codes
+
+- `400` - Invalid JSON body (`INVALID_BODY`)
+- `400` - Missing or invalid `event` (`INVALID_EVENT`)
+
+## Use Cases
+
+- Emit custom metrics from edge Workers without a third-party analytics SDK
+- Track feature usage, clicks, or conversions with named events and tags
+- Learn Analytics Engine `writeDataPoint` in a minimal stateless API
+- Prototype observability pipelines before wiring dashboards and SQL queries
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/analytics-engine)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    The **Analytics Engine** binding (`ANALYTICS`) is configured in `wrangler.json` with dataset `experiment_events`. The dataset is created automatically when the first event is written - you do not need to create it in the dashboard first.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/track" \
+      -H "Content-Type: application/json" \
+      -d '{"event":"page_view","value":1,"tag":"homepage"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/analytics-engine
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl -X POST "http://localhost:8787/track" \
+  -H "Content-Type: application/json" \
+  -d '{"event":"demo_click","value":1,"tag":"local"}'
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/)** - `experiment_events` dataset via `ANALYTICS` binding

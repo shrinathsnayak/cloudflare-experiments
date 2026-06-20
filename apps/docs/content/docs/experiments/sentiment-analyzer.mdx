@@ -1,0 +1,114 @@
+---
+title: "Sentiment Analyzer"
+description: "Analyze text sentiment with Workers AI at the edge"
+---
+
+Classify text sentiment as positive or negative using [Workers AI](https://developers.cloudflare.com/workers-ai/) and DistilBERT. Returns a label and confidence score for any short text input.
+
+## API Endpoint
+
+### GET /sentiment
+
+Analyzes the sentiment of the provided text.
+
+**`text`** `string` (required)
+
+Text to classify (max 10,000 characters)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/sentiment?text=This%20pizza%20is%20great!"
+```
+
+#### Success Response
+
+**`text`** `string`
+
+The original input text
+
+**`label`** `string`
+
+Sentiment label (e.g. `POSITIVE` or `NEGATIVE`)
+
+**`score`** `number`
+
+Confidence score for the predicted label (0–1)
+
+```json
+{
+  "text": "This pizza is great!",
+  "label": "POSITIVE",
+  "score": 0.9998
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: text",
+  "code": "INVALID_TEXT"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `text` (`INVALID_TEXT`)
+- `502` - Workers AI model run failed (`AI_ERROR`)
+
+## Use Cases
+
+- Score customer feedback and reviews at the edge
+- Filter or route messages by sentiment in real time
+- Learn Workers AI classification models in a stateless Worker
+- Build moderation or analytics pipelines without external ML APIs
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/sentiment-analyzer)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Enable the **Workers AI** binding (`AI`) in your Worker settings. The deploy button configures this automatically via `wrangler.json`. Requires a Cloudflare account with Workers AI enabled.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/sentiment?text=This%20pizza%20is%20great!"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/sentiment-analyzer
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/sentiment?text=This%20pizza%20is%20great!"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - `@cf/huggingface/distilbert-sst-2-int8` sentiment classification model

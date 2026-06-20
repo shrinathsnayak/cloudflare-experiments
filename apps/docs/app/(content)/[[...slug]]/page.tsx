@@ -27,9 +27,9 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
     <>
       <JsonLd data={createDocsPageJsonLd(page)} />
       <DocsPage toc={page.data.toc} full={page.data.full}>
-        <DocsTitle className="text-2xl leading-tight">{page.data.title}</DocsTitle>
-        <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
-        <div className="flex flex-row gap-2 items-center border-b pb-6">
+        <DocsTitle>{page.data.title}</DocsTitle>
+        <DocsDescription>{page.data.description}</DocsDescription>
+        <div className="flex flex-row flex-wrap items-center gap-2 not-prose">
           <MarkdownCopyButton markdownUrl={markdownUrl} />
           <ViewOptionsPopover
             markdownUrl={markdownUrl}

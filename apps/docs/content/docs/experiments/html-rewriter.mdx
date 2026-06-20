@@ -1,0 +1,180 @@
+---
+title: "HTML Rewriter"
+description: "Extract HTML stats and transform pages with HTMLRewriter at the edge"
+---
+
+Fetch remote HTML pages and analyze or transform them using the [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) API. Stream-parse documents at the edge to count elements or inject content without loading a full DOM parser.
+
+## API Endpoint
+
+### GET /stats
+
+Fetches a page and returns HTML statistics collected via HTMLRewriter handlers.
+
+**`url`** `string` (required)
+
+Page URL to analyze (`http://` or `https://` only)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/stats?url=https://example.com"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+The requested page URL
+
+**`title`** `string | null`
+
+Text content of the `<title>` element, if present
+
+**`linkCount`** `number`
+
+Number of `<a>` elements on the page
+
+**`imageCount`** `number`
+
+Number of `<img>` elements on the page
+
+**`headingCounts`** `object`
+
+Count of each heading tag (e.g. `h1`, `h2`) found on the page
+
+```json
+{
+  "url": "https://example.com",
+  "title": "Example Domain",
+  "linkCount": 1,
+  "imageCount": 0,
+  "headingCounts": { "h1": 1 }
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `502` - Failed to fetch or analyze the page (`FETCH_ERROR`)
+
+### GET /transform
+
+Fetches a page and injects a banner `<div>` at the top of `<body>` using HTMLRewriter.
+
+**`url`** `string` (required)
+
+Page URL to transform (`http://` or `https://` only)
+
+**`banner`** `string` (optional)
+
+Banner text to inject (default: `Transformed by Cloudflare HTMLRewriter at the edge`)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/transform?url=https://example.com&banner=Hello%20from%20the%20edge"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+The requested page URL
+
+**`banner`** `string`
+
+The banner text that was injected
+
+**`html`** `string`
+
+The transformed HTML document
+
+```json
+{
+  "url": "https://example.com",
+  "banner": "Transformed by Cloudflare HTMLRewriter at the edge",
+  "html": "<html>...</html>"
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid query parameter: url",
+  "code": "INVALID_URL"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `502` - Failed to fetch or transform the page (`FETCH_ERROR`)
+
+## Use Cases
+
+- Audit page structure (links, images, headings) without a headless browser
+- Inject edge banners or notices into proxied HTML responses
+- Learn streaming HTML transformation with HTMLRewriter handlers
+- Build lightweight HTML analysis tools at the edge
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/html-rewriter)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    No additional configuration required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/stats?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/html-rewriter
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/stats?url=https://example.com"
+curl "http://localhost:8787/transform?url=https://example.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/)** - Streaming HTML parsing and transformation
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote HTML retrieval

@@ -1,0 +1,143 @@
+---
+title: "Turnstile Verify"
+description: "Verify Cloudflare Turnstile tokens via the siteverify API"
+---
+
+Verify [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) tokens server-side by calling the siteverify API from a Worker. This experiment uses the `TURNSTILE_SECRET_KEY` environment secret - there is no Turnstile Worker binding.
+
+## API Endpoint
+
+### POST /verify
+
+Validates a client Turnstile token against the Cloudflare siteverify endpoint and returns the verification result.
+
+**`token`** `string` (required)
+
+Turnstile response token from the client widget
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/verify" \
+  -H "Content-Type: application/json" \
+  -d '{"token":"0.abc123..."}'
+```
+
+#### Success Response
+
+**`success`** `boolean`
+
+Whether Turnstile accepted the token
+
+**`hostname`** `string` (optional)
+
+Hostname associated with the token, when provided by siteverify
+
+**`action`** `string` (optional)
+
+Custom action name from the widget, when provided by siteverify
+
+**`errorCodes`** `string[]` (optional)
+
+Present when `success` is `false`; Turnstile error codes from siteverify
+
+```json
+{
+  "success": true,
+  "hostname": "example.com",
+  "action": "login"
+}
+```
+
+When verification fails:
+
+```json
+{
+  "success": false,
+  "errorCodes": ["invalid-input-response"]
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Missing or invalid field: token",
+  "code": "INVALID_TOKEN"
+}
+```
+
+#### Error Codes
+
+- `400` - Invalid JSON body (`INVALID_BODY`)
+- `400` - Missing or invalid `token` (`INVALID_TOKEN`)
+- `502` - Turnstile secret key is not configured (`MISSING_SECRET`)
+- `502` - Siteverify request failed (`VERIFY_ERROR`)
+
+## Use Cases
+
+- Validate Turnstile tokens on form submission before processing requests
+- Protect login, signup, or contact endpoints from bots at the edge
+- Learn server-side Turnstile verification without a backend framework
+- Return structured siteverify results to your frontend or API gateway
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/turnstile-verify)
+
+  </Step>
+
+  <Step>
+
+### Set the Turnstile secret
+
+    After deploy, set your Turnstile **secret key** as a Worker secret:
+
+    ```bash
+    cd apps/experiments/turnstile-verify
+    npx wrangler secret put TURNSTILE_SECRET_KEY
+    ```
+
+    Use the secret key from your Turnstile widget configuration in the Cloudflare dashboard.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/verify" \
+      -H "Content-Type: application/json" \
+      -d '{"token":"YOUR_TURNSTILE_TOKEN"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/turnstile-verify
+npm install
+npx wrangler secret put TURNSTILE_SECRET_KEY
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl -X POST "http://localhost:8787/verify" \
+  -H "Content-Type: application/json" \
+  -d '{"token":"YOUR_TURNSTILE_TOKEN"}'
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/)** - siteverify API for token validation

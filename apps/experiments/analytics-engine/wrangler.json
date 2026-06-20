@@ -1,0 +1,17 @@
+{
+  "name": "analytics-engine",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "analytics_engine_datasets": [
+    {
+      "binding": "ANALYTICS",
+      "dataset": "experiment_events"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}
