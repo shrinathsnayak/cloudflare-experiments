@@ -7,7 +7,7 @@ import { notFound } from "next/navigation";
 
 export const revalidate = false;
 
-export async function GET(_req: Request, { params }: RouteContext<"/og/docs/[...slug]">) {
+export async function GET(_req: Request, { params }: RouteContext<"/og/[...slug]">) {
   const { slug } = await params;
   const page = source.getPage(slug.slice(0, -1));
   if (!page) notFound();
@@ -18,7 +18,7 @@ export async function GET(_req: Request, { params }: RouteContext<"/og/docs/[...
 
   return new ImageResponse(
     <OgImage title={title} description={description} site={appName} logoSrc={logoSrc} />,
-    await getOgImageOptions(title, description, appName),
+    await getOgImageOptions(title, description, appName)
   );
 }
 

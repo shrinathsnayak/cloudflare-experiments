@@ -15,7 +15,7 @@ npm run dev -- --filter=docs
 npm run dev
 ```
 
-Open [http://localhost:3000/docs](http://localhost:3000/docs).
+Open [http://localhost:3000](http://localhost:3000) for the introduction page.
 
 ## Build
 
@@ -36,4 +36,4 @@ node scripts/migrate-mintlify.mjs /path/to/mintlify-docs-repo
 
 ## URL redirects
 
-Legacy Mintlify paths (`/introduction`, `/experiments/*`, etc.) redirect to `/docs/*` via `next.config.mjs`.
+Legacy `/docs/*` and `/introduction` paths redirect to the root URL structure via `next.config.mjs`.

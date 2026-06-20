@@ -33,6 +33,7 @@
     "---Reference---",
     "reference/cloudflare-features",
     "reference/deployment",
-    "reference/architecture"
+    "reference/architecture",
+    "reference/experiment-docs"
   ]
 }

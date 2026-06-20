@@ -168,7 +168,7 @@ A good experiment:
 
 ### Implement the Worker
 
-    Follow the [code standards](/docs/code-standards) to implement your Worker:
+    Follow the [code standards](/code-standards) to implement your Worker:
 
     **Create `src/types/env.d.ts`:**
     ```typescript
@@ -356,6 +356,22 @@ A good experiment:
 
   <Step>
 
+### Document on the docs site
+
+    Generate the Fumadocs page for the experiment:
+
+    ```bash
+    node apps/docs/scripts/scaffold-experiment-doc.mjs my-experiment
+    ```
+
+    Replace `TODO` sections using `src/routes/`, types, and `wrangler.json`. Add `"experiments/my-experiment"` to `apps/docs/content/docs/meta.json` under the right category.
+
+    See the [Experiment Documentation Guide](/reference/experiment-docs) for structure, MDX conventions, and the full checklist.
+
+  </Step>
+
+  <Step>
+
 ### Submit a pull request
 
     Create a PR with:
@@ -506,6 +522,7 @@ Before submitting your PR, verify:
 - [ ] TypeScript strict mode passes with no errors
 - [ ] No `any` types in the code
 - [ ] Added experiment to root README.md table
+- [ ] Added or updated docs page at `apps/docs/content/docs/experiments/<name>.mdx` and `meta.json` (see [Experiment Documentation Guide](/reference/experiment-docs))
 
 ## Getting Help
 
@@ -530,8 +547,8 @@ Before submitting your PR, verify:
 </Accordions>
 ## Next Steps
 
-- Review the [Code Standards](/docs/code-standards) for implementation details
-- Check the [Contributing Guide](/docs/contributing) for PR guidelines
+- Review the [Code Standards](/code-standards) for implementation details
+- Check the [Contributing Guide](/contributing) for PR guidelines
 - Browse [existing experiments](https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments) for inspiration
 - Open an [experiment idea issue](https://github.com/shrinathsnayak/cloudflare-experiments/issues/new) to get started
 

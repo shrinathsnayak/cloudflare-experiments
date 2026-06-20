@@ -22,14 +22,9 @@ const config = {
   },
   async redirects() {
     return [
-      { source: "/introduction", destination: "/docs", permanent: true },
-      { source: "/quickstart", destination: "/docs/quickstart", permanent: true },
-      { source: "/philosophy", destination: "/docs/philosophy", permanent: true },
-      { source: "/contributing", destination: "/docs/contributing", permanent: true },
-      { source: "/code-standards", destination: "/docs/code-standards", permanent: true },
-      { source: "/adding-experiments", destination: "/docs/adding-experiments", permanent: true },
-      { source: "/experiments/:path*", destination: "/docs/experiments/:path*", permanent: true },
-      { source: "/reference/:path*", destination: "/docs/reference/:path*", permanent: true },
+      { source: "/docs", destination: "/", permanent: true },
+      { source: "/docs/:path*", destination: "/:path*", permanent: true },
+      { source: "/introduction", destination: "/", permanent: true },
     ];
   },
 };

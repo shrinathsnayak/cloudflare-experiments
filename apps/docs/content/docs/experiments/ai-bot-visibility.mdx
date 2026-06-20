@@ -575,21 +575,21 @@ app.get("/site-check", async (c) => {
     explicit rule.
   </Accordion>
 
-  <Accordion title="Does 'allowed' mean the page is definitely in ChatGPT/Claude?">
-    No. `allowed` means the page configuration doesn't block the crawler. Actual indexing depends on
-    many factors: crawler behavior, content quality, update frequency, and internal platform
-    decisions.
-  </Accordion>
+<Accordion title="Does 'allowed' mean the page is definitely in ChatGPT/Claude?">
+  No. `allowed` means the page configuration doesn't block the crawler. Actual indexing depends on
+  many factors: crawler behavior, content quality, update frequency, and internal platform
+  decisions.
+</Accordion>
 
-  <Accordion title="Can I check private/authenticated pages?">
-    Not with the default implementation. You'd need to add authentication headers to the fetch
-    requests and handle cookies/sessions.
-  </Accordion>
+<Accordion title="Can I check private/authenticated pages?">
+  Not with the default implementation. You'd need to add authentication headers to the fetch
+  requests and handle cookies/sessions.
+</Accordion>
 
-  <Accordion title="How accurate is the robots.txt parsing?">
-    The parser handles standard robots.txt directives (User-agent, Allow, Disallow) with path prefix
-    matching. It doesn't support regex patterns or advanced extensions.
-  </Accordion>
+<Accordion title="How accurate is the robots.txt parsing?">
+  The parser handles standard robots.txt directives (User-agent, Allow, Disallow) with path prefix
+  matching. It doesn't support regex patterns or advanced extensions.
+</Accordion>
 
   <Accordion title="What if a crawler ignores robots.txt?">
     This tool reports configuration only. If a crawler doesn't respect robots.txt (which is
@@ -600,7 +600,7 @@ app.get("/site-check", async (c) => {
 ## Next Steps
 
 <Cards>
-  <Card title="More Experiments" href="/docs/introduction">
+  <Card title="More Experiments" href="/">
     Explore other Cloudflare experiments
   </Card>
   <Card title="Workers Documentation" href="https://developers.cloudflare.com/workers/">

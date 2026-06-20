@@ -1,0 +1,110 @@
+---
+title: "{{TITLE}}"
+description: "{{DESCRIPTION}}"
+---
+
+{{INTRO_PARAGRAPH}}
+
+<!-- Optional: experimental / AI warning -->
+<!-- <Callout type="warning">This is an experimental Worker.</Callout> -->
+
+## API Endpoint
+
+### {{METHOD}} {{PATH}}
+
+{{ENDPOINT_DESCRIPTION}}
+
+**`{{PARAM_NAME}}`** `{{PARAM_TYPE}}` ({{REQUIRED_OR_OPTIONAL}})
+
+{{PARAM_DESCRIPTION}}
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev{{PATH_WITH_EXAMPLE_QUERY}}"
+```
+
+#### Success Response
+
+<!-- Document each response field -->
+**`{{FIELD}}`** `{{TYPE}}`
+
+{{FIELD_DESCRIPTION}}
+
+```json
+{
+  "TODO": "replace with real example"
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Human-readable message",
+  "code": "ERROR_CODE"
+}
+```
+
+#### Error Codes
+
+- `400` — {{REASON}} (`INVALID_URL`, etc.)
+- `502` — {{REASON}} (if applicable)
+
+## Use Cases
+
+- {{USE_CASE_1}}
+- {{USE_CASE_2}}
+- {{USE_CASE_3}}
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/{{EXPERIMENT_NAME}})
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard. {{BINDING_SETUP_NOTES}}
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev{{PATH_WITH_EXAMPLE_QUERY}}"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/{{EXPERIMENT_NAME}}
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787{{PATH_WITH_EXAMPLE_QUERY}}"
+```
+
+<!-- Optional local vs deployed behavior -->
+<!-- <Callout>Some fields (e.g. `colo`) only appear when deployed.</Callout> -->
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+<!-- Add bindings: Workers AI, R2, D1, KV, Browser Rendering, etc. -->

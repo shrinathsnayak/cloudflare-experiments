@@ -10,8 +10,9 @@ const FILE_MAP = {
 
 function convertLinks(content) {
   return content
-    .replace(/href="\/(?!\/)([^"#?][^"]*)"/g, (_match, slug) => `href="/docs/${slug}"`)
-    .replace(/]\(\/(?!\/)([^)#?]+)\)/g, (_match, slug) => `](/docs/${slug})`);
+    // Internal links stay at site root (no /docs prefix).
+    .replace(/href="\/(?!\/)([^"#?][^"]*)"/g, (_match, slug) => `href="/${slug}"`)
+    .replace(/]\(\/(?!\/)([^)#?]+)\)/g, (_match, slug) => `](/${slug})`);
 }
 
 function convertCallouts(content) {

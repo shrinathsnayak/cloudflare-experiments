@@ -1,17 +1,18 @@
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Google_Sans, Google_Sans_Code } from "next/font/google";
 
-/** Navigation, sidebar, page titles, and other UI chrome. */
-export const uiFont = Inter({
+export const uiFont = Google_Sans({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-ui",
   display: "swap",
 });
 
-/** Article body, code blocks, inline code, and terminal output. */
-export const monoFont = JetBrains_Mono({
+/** Monospace companion to Google Sans — code blocks, inline code, file trees. */
+export const codeFont = Google_Sans_Code({
   subsets: ["latin"],
-  variable: "--font-jetbrains-mono",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-code",
   display: "swap",
 });
 
-export const fontVariables = `${uiFont.variable} ${monoFont.variable}`;
+export const fontVariables = `${uiFont.variable} ${codeFont.variable}`;

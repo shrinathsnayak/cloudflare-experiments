@@ -12,6 +12,6 @@ export default async function Image() {
 
   return new ImageResponse(
     <OgImage title={appName} description={appDescription} site={appName} logoSrc={logoSrc} />,
-    await getOgImageOptions(appName, appDescription),
+    await getOgImageOptions(appName, appDescription)
   );
 }

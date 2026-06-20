@@ -2,7 +2,7 @@
 
 A curated collection of experiments demonstrating what developers can build using the **Cloudflare platform**.
 
-📖 **Documentation:** [cloudflare-experiments.com](https://cloudflare-experiments.com) · source in [`apps/docs/`](apps/docs/)
+📖 **Documentation:** [cloudflare-experiments.com](https://cloudflare-experiments.com) · source in [`apps/docs/`](apps/docs/) (Fumadocs + Next.js)
 
 The goal of this repository is to showcase **real-world developer tools and utilities** that run entirely on the **Cloudflare edge**, often without requiring any backend servers or persistent storage.
 

@@ -13,13 +13,7 @@ function isExternalSrc(src: ComponentProps<"img">["src"]): src is string {
 /** Remote SVGs (e.g. deploy buttons) cannot go through next/image and return 400. */
 function MdxImage(props: ComponentProps<"img">) {
   if (isExternalSrc(props.src)) {
-    return (
-      <img
-        {...props}
-        alt={props.alt ?? ""}
-        className={cn("rounded-lg", props.className)}
-      />
-    );
+    return <img {...props} alt={props.alt ?? ""} className={cn("rounded-lg", props.className)} />;
   }
 
   const DefaultImage = defaultMdxComponents.img;

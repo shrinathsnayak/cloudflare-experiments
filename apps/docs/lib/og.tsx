@@ -4,6 +4,9 @@ import { logoDimensions } from "@/lib/logo";
 
 export const ogPrimary = "#f38020";
 
+/** Satori (next/og) cannot render Google Sans; Roboto is the closest compatible match for previews. */
+const ogSansFamily = "Roboto";
+
 interface OgImageProps {
   title: ReactNode;
   description?: ReactNode;
@@ -42,7 +45,7 @@ export function OgImage({ title, description, site, logoSrc }: OgImageProps) {
         />
         <p
           style={{
-            fontFamily: "Inter",
+            fontFamily: ogSansFamily,
             fontSize: "36px",
             fontWeight: 600,
             color: ogPrimary,
@@ -55,9 +58,9 @@ export function OgImage({ title, description, site, logoSrc }: OgImageProps) {
 
       <p
         style={{
-          fontFamily: "Inter",
+          fontFamily: ogSansFamily,
           fontSize: "72px",
-          fontWeight: 800,
+          fontWeight: 700,
           lineHeight: 1.1,
           margin: 0,
           letterSpacing: "-0.02em",
@@ -69,8 +72,9 @@ export function OgImage({ title, description, site, logoSrc }: OgImageProps) {
       {description ? (
         <p
           style={{
-            fontFamily: "JetBrains Mono",
+            fontFamily: ogSansFamily,
             fontSize: "32px",
+            fontWeight: 400,
             lineHeight: 1.4,
             color: "rgba(240,240,240,0.75)",
             margin: 0,
@@ -114,19 +118,19 @@ export async function getOgImageOptions(
 ): Promise<OgImageOptions> {
   const text = collectText(...parts);
 
-  const [interSemi, interBold, jetbrains] = await Promise.all([
-    loadGoogleFont("Inter", 600, text),
-    loadGoogleFont("Inter", 800, text),
-    loadGoogleFont("JetBrains Mono", 400, text),
+  const [ogSansRegular, ogSansSemi, ogSansBold] = await Promise.all([
+    loadGoogleFont(ogSansFamily, 400, text),
+    loadGoogleFont(ogSansFamily, 600, text),
+    loadGoogleFont(ogSansFamily, 700, text),
   ]);
 
   return {
     width: 1200,
     height: 630,
     fonts: [
-      { name: "Inter", data: interSemi, weight: 600, style: "normal" as const },
-      { name: "Inter", data: interBold, weight: 800, style: "normal" as const },
-      { name: "JetBrains Mono", data: jetbrains, weight: 400, style: "normal" as const },
+      { name: ogSansFamily, data: ogSansRegular, weight: 400, style: "normal" as const },
+      { name: ogSansFamily, data: ogSansSemi, weight: 600, style: "normal" as const },
+      { name: ogSansFamily, data: ogSansBold, weight: 700, style: "normal" as const },
     ],
   };
 }

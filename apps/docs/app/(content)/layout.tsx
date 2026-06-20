@@ -4,7 +4,7 @@ import { baseOptions } from "@/lib/layout.shared";
 import { Banner } from "fumadocs-ui/components/banner";
 import { siteBanner } from "@/lib/shared";
 
-export default function Layout({ children }: LayoutProps<"/docs">) {
+export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <>
       <Banner className="bg-[#f38020] text-white">{siteBanner.text}</Banner>
