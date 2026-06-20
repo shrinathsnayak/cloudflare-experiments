@@ -1,6 +1,6 @@
 export const appName = "Cloudflare Experiments";
 export const appDescription =
-  "Documentation and deployable Cloudflare Workers experiments — edge computing tools using Workers AI, Browser Rendering, R2, D1, and more.";
+  "Documentation and deployable Cloudflare Workers experiments - edge computing tools using Workers AI, Browser Rendering, R2, D1, and more.";
 export const siteKeywords = [
   "Cloudflare Workers",
   "edge computing",

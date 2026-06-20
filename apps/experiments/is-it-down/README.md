@@ -4,7 +4,7 @@ Check whether a website is reachable from Cloudflare's edge network.
 
 ## Features
 
-- **GET /check?url=** — Returns reachability, response time, status code, and edge colo (when deployed).
+- **GET /check?url=** - Returns reachability, response time, status code, and edge colo (when deployed).
 - No persistent storage; stateless.
 - Runs on the edge in under 60 seconds.
 
@@ -22,7 +22,7 @@ Check whether a website is reachable from Cloudflare's edge network.
 GET /check?url=https://www.cloudflare.com
 ```
 
-**Response (reachable)** — when deployed, `colo` is the edge data center (IATA code) that served the check.
+**Response (reachable)** - when deployed, `colo` is the edge data center (IATA code) that served the check.
 
 ```json
 {
@@ -47,7 +47,7 @@ GET /check?url=https://www.cloudflare.com
 
 **Errors**
 
-- `400` — Missing or invalid `url` (e.g. not http/https).
+- `400` - Missing or invalid `url` (e.g. not http/https).
 
 ## Run locally
 

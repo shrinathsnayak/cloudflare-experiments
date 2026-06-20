@@ -9,7 +9,7 @@ This is an experimental Worker. Use it as a starting point for your own projects
 
 </Callout>
 
-The AI Website Tag Generator experiment fetches any webpage, extracts its content, and uses [Workers AI](https://developers.cloudflare.com/workers-ai/) to generate topic tags. Built with Hono and TypeScript, it runs on Cloudflare's edge network—no external API keys required.
+The AI Website Tag Generator experiment fetches any webpage, extracts its content, and uses [Workers AI](https://developers.cloudflare.com/workers-ai/) to generate topic tags. Built with Hono and TypeScript, it runs on Cloudflare's edge network-no external API keys required.
 
 ## Features
 
@@ -59,7 +59,7 @@ Human-readable error message.
 
 Machine-readable error code.
 
-**400 Bad Request** — Missing or invalid URL:
+**400 Bad Request** - Missing or invalid URL:
 
 ```json
 {
@@ -68,7 +68,7 @@ Machine-readable error code.
 }
 ```
 
-**502 Bad Gateway** — Failed to fetch webpage or AI error:
+**502 Bad Gateway** - Failed to fetch webpage or AI error:
 
 ```json
 {
@@ -125,22 +125,22 @@ Click the button above to deploy this Worker directly to your Cloudflare account
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Serverless execution environment
-- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** — Run LLMs on the edge with the `AI` binding
-- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** — HTTP client for fetching webpages
+- **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Run LLMs on the edge with the `AI` binding
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP client for fetching webpages
 
 ## Use Cases
 
-- **Content tagging** — Auto-tag articles or bookmarks by topic
-- **SEO and discovery** — Suggest categories or related topics from page content
-- **Link previews** — Enrich shared links with topic tags
-- **Research and curation** — Quickly label pages by theme
+- **Content tagging** - Auto-tag articles or bookmarks by topic
+- **SEO and discovery** - Suggest categories or related topics from page content
+- **Link previews** - Enrich shared links with topic tags
+- **Research and curation** - Quickly label pages by theme
 
 ## Limitations
 
-- **JavaScript-heavy sites** — Only static HTML is fetched; client-rendered content is not executed
-- **Workers AI limits** — Subject to [Workers AI usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
-- **Fetch and size limits** — Same constraints as other URL-based experiments (timeout, HTML size cap)
+- **JavaScript-heavy sites** - Only static HTML is fetched; client-rendered content is not executed
+- **Workers AI limits** - Subject to [Workers AI usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
+- **Fetch and size limits** - Same constraints as other URL-based experiments (timeout, HTML size cap)
 
 ## Next Steps
 

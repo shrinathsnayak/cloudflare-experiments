@@ -6,7 +6,7 @@ Check whether a URL is **configured** to be visible or blocked for known AI craw
 
 ## Features
 
-- **GET /check?url=** — Returns per-crawler status (allowed, blocked, not_specified) and a summary by platform.
+- **GET /check?url=** - Returns per-crawler status (allowed, blocked, not_specified) and a summary by platform.
 - No bindings; stateless fetch of the page and `robots.txt`.
 - Runs on the edge in under 60 seconds.
 
@@ -44,14 +44,14 @@ GET /check?url=https://www.cloudflare.com
 
 **Status values**
 
-- `allowed` — robots.txt (or lack of block) and page meta allow this crawler.
-- `blocked` — robots.txt or page-level directive (noindex, noai, or crawler-specific meta) blocks this crawler.
-- `not_specified` — No rule applies for this crawler.
+- `allowed` - robots.txt (or lack of block) and page meta allow this crawler.
+- `blocked` - robots.txt or page-level directive (noindex, noai, or crawler-specific meta) blocks this crawler.
+- `not_specified` - No rule applies for this crawler.
 
 **Errors**
 
-- `400` — Missing or invalid `url` (e.g. not http/https).
-- `502` — Failed to fetch the URL (e.g. timeout, HTTP error).
+- `400` - Missing or invalid `url` (e.g. not http/https).
+- `502` - Failed to fetch the URL (e.g. timeout, HTTP error).
 
 ## Run locally
 

@@ -1,6 +1,6 @@
 ---
 title: "Edge Redirect Simulator"
-description: "Show redirect chains for any URL from Cloudflare's edge—each hop and status code"
+description: "Show redirect chains for any URL from Cloudflare's edge-each hop and status code"
 ---
 
 Show redirect chains for any URL from Cloudflare's edge. The Worker follows HTTP redirects (301, 302, 303, 307, 308) and returns each hop with its status code, so you can see exactly how a URL resolves.
@@ -37,7 +37,7 @@ HTTP status code at this hop (e.g. 301, 302, 200).
 
 **`error`** `string` (optional)
 
-Present if the chain was truncated—e.g. missing `Location` header, redirect loop, or max redirects exceeded. Response is still 200 with the chain collected so far.
+Present if the chain was truncated-e.g. missing `Location` header, redirect loop, or max redirects exceeded. Response is still 200 with the chain collected so far.
 
 #### Example Response
 
@@ -55,7 +55,7 @@ Display form: `example.com → 301` → `www.example.com → 302` → `final.exa
 
 #### Error Responses
 
-**400 Bad Request** — Missing or invalid `url` (wrong scheme or malformed):
+**400 Bad Request** - Missing or invalid `url` (wrong scheme or malformed):
 
 ```json
 {
@@ -64,7 +64,7 @@ Display form: `example.com → 301` → `www.example.com → 302` → `final.exa
 }
 ```
 
-**500 Internal Server Error** — Uncaught error (e.g. fetch failure):
+**500 Internal Server Error** - Uncaught error (e.g. fetch failure):
 
 ```json
 {
@@ -117,16 +117,16 @@ Then open: `http://localhost:8787/redirect-chain?url=https://cloudflare.com`
 
 ## Use Cases
 
-- **Debug redirects** — See the full chain from short URL or vanity domain to final destination
-- **SEO and canonicalization** — Verify 301/302 chains and final URLs
-- **Security and compliance** — Audit where redirects lead before clicking
-- **Integration testing** — Confirm redirect behavior from the edge
+- **Debug redirects** - See the full chain from short URL or vanity domain to final destination
+- **SEO and canonicalization** - Verify 301/302 chains and final URLs
+- **Security and compliance** - Audit where redirects lead before clicking
+- **Integration testing** - Confirm redirect behavior from the edge
 
 ## Cloudflare Features Used
 
-- **Workers** — Edge compute runtime
-- **Fetch API** — HTTP requests with `redirect: "manual"` to capture each hop
-- **Edge Networking** — Redirect chain observed from Cloudflare's global network
+- **Workers** - Edge compute runtime
+- **Fetch API** - HTTP requests with `redirect: "manual"` to capture each hop
+- **Edge Networking** - Redirect chain observed from Cloudflare's global network
 
 ## Next Steps
 

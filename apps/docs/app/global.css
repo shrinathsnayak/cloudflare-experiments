@@ -20,7 +20,7 @@
   letter-spacing: -0.02em;
 }
 
-/* Tighter heading scale — site is docs-first, not marketing */
+/* Tighter heading scale - site is docs-first, not marketing */
 .prose :where(h1) {
   font-size: 1.5rem;
   line-height: 2rem;

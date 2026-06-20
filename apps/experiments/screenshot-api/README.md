@@ -23,8 +23,8 @@ GET /screenshot?url=https://www.cloudflare.com
 
 **Errors**
 
-- `400` — Missing or invalid `url`.
-- `502` — Navigation or screenshot failed (timeout, unreachable, etc.).
+- `400` - Missing or invalid `url`.
+- `502` - Navigation or screenshot failed (timeout, unreachable, etc.).
 
 ## Run locally
 

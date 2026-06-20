@@ -50,8 +50,8 @@ Error code indicating the failure type
 
 #### Error Codes
 
-- `400` — Missing or invalid `url` parameter (not http/https)
-- `502` — Screenshot operation failed (navigation timeout, unreachable site, rendering error)
+- `400` - Missing or invalid `url` parameter (not http/https)
+- `502` - Screenshot operation failed (navigation timeout, unreachable site, rendering error)
 
 ## Implementation Details
 
@@ -113,6 +113,6 @@ curl "http://localhost:8787/screenshot?url=https://www.cloudflare.com" \
 
 ## Cloudflare Features Used
 
-- **Workers** — Edge compute runtime
-- **Browser Rendering** — Headless Chromium via Puppeteer
-- **Fetch API** — Network requests within the browser
+- **Workers** - Edge compute runtime
+- **Browser Rendering** - Headless Chromium via Puppeteer
+- **Fetch API** - Network requests within the browser

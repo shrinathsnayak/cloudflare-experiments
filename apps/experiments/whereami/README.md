@@ -4,8 +4,8 @@ Return request metadata from Cloudflare's edge (geolocation, colo, etc.) using t
 
 ## Features
 
-- **GET /** — Returns name, description, and usage (same as other experiments).
-- **GET /whereami** — Returns the `cf` object (country, city, colo, timezone, etc.) from the incoming request.
+- **GET /** - Returns name, description, and usage (same as other experiments).
+- **GET /whereami** - Returns the `cf` object (country, city, colo, timezone, etc.) from the incoming request.
 - No persistent storage; no external fetch.
 
 ## API

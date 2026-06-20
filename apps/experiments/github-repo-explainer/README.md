@@ -33,8 +33,8 @@ GET /repo?url=https://github.com/cloudflare/workers-sdk
 
 **Errors**
 
-- `400` — Missing or invalid `url`.
-- `502` — Failed to fetch GitHub or AI error.
+- `400` - Missing or invalid `url`.
+- `502` - Failed to fetch GitHub or AI error.
 
 ## Run locally
 

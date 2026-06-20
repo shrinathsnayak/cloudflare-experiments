@@ -124,21 +124,21 @@ The record data (IP address, hostname, etc.)
 
 #### Error Codes
 
-- `400` — Missing or invalid `url` parameter (not http/https)
-- `502` — DNS lookup failed (DoH timeout or error)
+- `400` - Missing or invalid `url` parameter (not http/https)
+- `502` - DNS lookup failed (DoH timeout or error)
 
 ## Supported Record Types
 
 The API queries for the following DNS record types:
 
-- **A** — IPv4 addresses
-- **AAAA** — IPv6 addresses
-- **CNAME** — Canonical names
-- **MX** — Mail exchange servers
-- **NS** — Name servers
-- **TXT** — Text records
-- **SOA** — Start of authority
-- **CAA** — Certificate authority authorization
+- **A** - IPv4 addresses
+- **AAAA** - IPv6 addresses
+- **CNAME** - Canonical names
+- **MX** - Mail exchange servers
+- **NS** - Name servers
+- **TXT** - Text records
+- **SOA** - Start of authority
+- **CAA** - Certificate authority authorization
 
 ## Deployment
 
@@ -188,11 +188,11 @@ curl "http://localhost:8787/dns?url=https://www.cloudflare.com"
 
 - Uses Cloudflare's public DNS over HTTPS (DoH) API
 - Queries all record types in parallel for fast responses
-- Stateless — no database or KV storage required
+- Stateless - no database or KV storage required
 - Timeout protection on DoH requests
 
 ## Cloudflare Features Used
 
-- **Workers** — Edge compute runtime
-- **Fetch API** — HTTP requests to Cloudflare DoH
-- **Edge Networking** — Low-latency DNS lookups
+- **Workers** - Edge compute runtime
+- **Fetch API** - HTTP requests to Cloudflare DoH
+- **Edge Networking** - Low-latency DNS lookups

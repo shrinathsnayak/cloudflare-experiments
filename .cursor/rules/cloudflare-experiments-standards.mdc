@@ -16,15 +16,15 @@ alwaysApply: true
 
 This repo is a **Turborepo** monorepo under `apps/`:
 
-- `apps/docs/` — Fumadocs documentation site (Next.js)
-- `apps/experiments/<name>/` — Cloudflare Worker experiments
+- `apps/docs/` - Fumadocs documentation site (Next.js)
+- `apps/experiments/<name>/` - Cloudflare Worker experiments
 
 Run from the repo root:
 
-- `npm install` — install all workspace dependencies
-- `npm run build` — build all packages via Turborepo
-- `npm run test` — run tests in all experiments
-- `npm run dev -- --filter=<name>` — dev a single experiment or `--filter=docs` for the docs site
+- `npm install` - install all workspace dependencies
+- `npm run build` - build all packages via Turborepo
+- `npm run test` - run tests in all experiments
+- `npm run dev -- --filter=<name>` - dev a single experiment or `--filter=docs` for the docs site
 
 ## Folder Structure
 
@@ -72,7 +72,7 @@ When creating or scaffolding a **new experiment**, always:
 
 - **Routes**: `kebab-case.ts` matching the path (e.g. `check.ts` for `/check`, `screenshot.ts` for `/screenshot`).
 - **Types**: `env.d.ts` for bindings; other files named by domain (e.g. `check.ts`, `api.ts`).
-- **Lib/utils**: `url.ts`, `fetch.ts`, `response.ts` — one concern per file.
+- **Lib/utils**: `url.ts`, `fetch.ts`, `response.ts` - one concern per file.
 
 ### Config and isolation
 

@@ -22,7 +22,7 @@ export async function summarizeWithAi(
   text: string,
   title: string | null
 ): Promise<string> {
-  const prompt = `Summarize the following webpage content in exactly 2-4 concise sentences. Reply with ONLY those sentences—no preamble, no labels like "Summary:" or "Here is a summary", no JSON, and no closing phrases like "Let me know if you need assistance."\n\n${title ? `Page title: ${title}\n\n` : ""}Content:\n${text}`;
+  const prompt = `Summarize the following webpage content in exactly 2-4 concise sentences. Reply with ONLY those sentences-no preamble, no labels like "Summary:" or "Here is a summary", no JSON, and no closing phrases like "Let me know if you need assistance."\n\n${title ? `Page title: ${title}\n\n` : ""}Content:\n${text}`;
   const out = await env.AI.run(AI_MODEL, {
     prompt,
     max_tokens: MAX_SUMMARY_TOKENS,

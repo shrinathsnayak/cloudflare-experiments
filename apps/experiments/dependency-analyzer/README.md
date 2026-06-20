@@ -30,8 +30,8 @@ GET /analyze?url=https://www.cloudflare.com
 
 **Errors**
 
-- `400` — Missing or invalid `url`.
-- `502` — Failed to fetch the page.
+- `400` - Missing or invalid `url`.
+- `502` - Failed to fetch the page.
 
 ## Run locally
 

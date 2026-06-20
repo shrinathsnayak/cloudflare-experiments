@@ -3,7 +3,7 @@ title: "Philosophy"
 description: "Design principles and goals behind Cloudflare Experiments"
 ---
 
-Cloudflare Experiments is built on the principle that **developers learn best by building real, useful tools** — not toy examples.
+Cloudflare Experiments is built on the principle that **developers learn best by studying reference implementations** for Cloudflare products - not toy examples or generic utilities.
 
 ## The Problem
 
@@ -23,7 +23,7 @@ While these are great for getting started, they don't showcase the **real power*
 
 ## The Solution
 
-Cloudflare Experiments bridges this gap by providing a curated collection of **real-world developer tools** that run entirely on the Cloudflare edge.
+Cloudflare Experiments bridges this gap by providing a curated collection of **reference implementations** - small, deployable examples that show how to wire up specific Cloudflare products and services.
 
 Every experiment in this repository is:
 
@@ -35,7 +35,11 @@ Each experiment demonstrates **one specific capability** of the Cloudflare platf
 - **Browser Rendering** → Screenshot API
 - **HTMLRewriter** → Website to API, Dependency Analyzer
 - **Edge Networking** → Is It Down, URL DNS Lookup
-- **D1 + KV** → Link Shortener, R2 Storage
+- **D1 + KV** → Link Shortener
+- **R2** → R2 Storage
+- **Durable Objects** → Durable Counter
+- **Cron Triggers** → Cron Heartbeat
+- **Queues** → Task Queue
 - **Request Metadata** → Where Am I, AI Bot Visibility
 
 <Callout type="idea">
@@ -138,7 +142,7 @@ export default {
 
 This means:
 
-- **Stateless first**: Most experiments use edge compute and fetch—no persistent storage required
+- **Stateless first**: Most experiments use edge compute and fetch-no persistent storage required
 - **No complex setup**: Works with default Cloudflare settings where possible
 - **Minimal dependencies**: Each experiment installs only what it needs
 - **Edge-optimized**: Run close to users with sub-100ms response times
@@ -168,22 +172,22 @@ This lowers the barrier to experimentation. You can:
 
 ## Design Principles
 
-### 1. Real Tools, Not Demos
+### 1. Product Reference, Not Generic Utilities
 
-Every experiment is something you might **actually want to use**:
+Every experiment maps to a **specific Cloudflare product or binding**:
 
 <Cards>
-  <Card title="Screenshot API">
-    Real use case: Social media preview images, monitoring, archiving
+  <Card title="Durable Counter">
+    Reference pattern: globally consistent state with Durable Objects
   </Card>
-  <Card title="Link Shortener">Real use case: URL shortening service with D1 persistence</Card>
-  <Card title="Is It Down">Real use case: Website monitoring, uptime checks</Card>
-  <Card title="AI Website Summary">
-    Real use case: Content analysis, research tools, browser extensions
+  <Card title="Task Queue">Reference pattern: async processing with Queues producer/consumer</Card>
+  <Card title="Link Shortener">Reference pattern: D1 primary storage with KV read cache</Card>
+  <Card title="Screenshot API">
+    Reference pattern: headless browser automation with Browser Rendering
   </Card>
 </Cards>
 
-These aren't toy examples—they're **production-ready patterns** you can build on.
+These are **starting points you can copy** when building on Cloudflare - not standalone utilities that happen to run on Workers.
 
 ### 2. Edge-First Architecture
 
@@ -362,7 +366,7 @@ You can:
 
 You can:
 
-- **Add new experiments**: Showcase other Cloudflare capabilities (Durable Objects, Queues, Vectorize)
+- **Add new experiments**: Showcase other Cloudflare capabilities (Vectorize, Images, Email Workers)
 - **Improve existing ones**: Better error handling, new features, performance optimizations
 - **Fix bugs**: Help make the examples more robust
 
@@ -372,12 +376,11 @@ See [CONTRIBUTING.md](https://github.com/shrinathsnayak/cloudflare-experiments/b
 
 The collection will continue to grow with experiments demonstrating:
 
-- **Durable Objects** - Stateful coordination at the edge
-- **Queues** - Asynchronous message processing
+- **Vectorize** - Vector search at the edge
 - **Images API** - On-the-fly image transformation
 - **Email Workers** - Process incoming email
-- **Vectorize** - Vector search at the edge
 - **Hyperdrive** - Accelerate database queries
+- **Workers Analytics Engine** - Event logging and analytics
 
 <Callout>
 
@@ -394,7 +397,7 @@ Cloudflare's edge platform is **incredibly powerful**, but the learning curve ca
 - Learn **platform capabilities** through working code
 - Build **production patterns** from day one
 
-The goal is simple: **help developers discover what's possible** on the Cloudflare edge by showing them real, useful tools they can deploy today.
+The goal is simple: **help developers discover what's possible** on the Cloudflare edge by showing them reference implementations they can deploy, read, and adapt.
 
 <Callout type="idea">
 

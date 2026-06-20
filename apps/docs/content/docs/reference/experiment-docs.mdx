@@ -7,13 +7,13 @@ Every worker under `apps/experiments/<name>/` should have a matching docs page a
 
 ## Where docs live
 
-| Artifact | Path |
-| -------- | ---- |
-| MDX page | `apps/docs/content/docs/experiments/<name>.mdx` |
-| Sidebar order | `apps/docs/content/docs/meta.json` |
-| Docs app | `apps/docs/` (Fumadocs + Next.js) |
-| Worker source | `apps/experiments/<name>/` |
-| Root index | `README.md` experiments table (new experiments only) |
+| Artifact      | Path                                                 |
+| ------------- | ---------------------------------------------------- |
+| MDX page      | `apps/docs/content/docs/experiments/<name>.mdx`      |
+| Sidebar order | `apps/docs/content/docs/meta.json`                   |
+| Docs app      | `apps/docs/` (Fumadocs + Next.js)                    |
+| Worker source | `apps/experiments/<name>/`                           |
+| Root index    | `README.md` experiments table (new experiments only) |
 
 Docs are **not** generated automatically on deploy. When you add or change an experiment, update its MDX page in the same PR (or immediately after).
 
@@ -40,11 +40,11 @@ Docs are **not** generated automatically on deploy. When you add or change an ex
 
     Read these files (source of truth):
 
-    1. `src/index.ts` — name, description, usage
-    2. `src/routes/*.ts` — endpoints, validation, `jsonError` codes
-    3. `src/types/` — response shapes
-    4. `wrangler.json` — bindings
-    5. `README.md` — examples (verify against code)
+    1. `src/index.ts` - name, description, usage
+    2. `src/routes/*.ts` - endpoints, validation, `jsonError` codes
+    3. `src/types/` - response shapes
+    4. `wrangler.json` - bindings
+    5. `README.md` - examples (verify against code)
 
     Replace every `TODO` in the MDX file.
 
@@ -94,30 +94,30 @@ Use the same description as `GET /` returns in `src/index.ts` when possible.
 
 ### Required sections
 
-1. **Intro** — What the worker does and which Cloudflare product it showcases
-2. **API Endpoint(s)** — One `### METHOD /path` block per public route
-3. **Parameters** — Document each query/body field
-4. **Example request** — `curl` against `https://your-worker.workers.dev`
-5. **Response fields** — Type + description for each JSON key
-6. **Example response** — Valid JSON
-7. **Error responses** — `{ error, code }` shape with real codes from routes
-8. **Use cases** — 3–5 bullets
-9. **Deployment** — `<Steps>` with deploy button + test command
-10. **Local development** — install, `npm run dev`, local `curl` on port `8787`
-11. **Cloudflare features used** — Bullets with links to developer docs
+1. **Intro** - What the worker does and which Cloudflare product it showcases
+2. **API Endpoint(s)** - One `### METHOD /path` block per public route
+3. **Parameters** - Document each query/body field
+4. **Example request** - `curl` against `https://your-worker.workers.dev`
+5. **Response fields** - Type + description for each JSON key
+6. **Example response** - Valid JSON
+7. **Error responses** - `{ error, code }` shape with real codes from routes
+8. **Use cases** - 3–5 bullets
+9. **Deployment** - `<Steps>` with deploy button + test command
+10. **Local development** - install, `npm run dev`, local `curl` on port `8787`
+11. **Cloudflare features used** - Bullets with links to developer docs
 
 ### Optional sections
 
 Add when they help readers:
 
-| Section | When |
-| ------- | ---- |
-| `<Callout type="warning">` | Experimental workers, AI cost/limits |
-| **Features** | Multiple capabilities beyond one endpoint |
-| **Implementation details** | AI pipelines, multi-step fetch/parse flows |
-| **Configuration** | Bindings, secrets, D1 schema SQL |
-| **Limitations** | Timeouts, size caps, local vs production differences |
-| **Next steps** | `<Cards>` to related experiments or Cloudflare docs |
+| Section                    | When                                                 |
+| -------------------------- | ---------------------------------------------------- |
+| `<Callout type="warning">` | Experimental workers, AI cost/limits                 |
+| **Features**               | Multiple capabilities beyond one endpoint            |
+| **Implementation details** | AI pipelines, multi-step fetch/parse flows           |
+| **Configuration**          | Bindings, secrets, D1 schema SQL                     |
+| **Limitations**            | Timeouts, size caps, local vs production differences |
+| **Next steps**             | `<Cards>` to related experiments or Cloudflare docs  |
 
 ### Reference examples
 
@@ -150,10 +150,10 @@ Always use the monorepo path `apps/experiments/<name>`:
 
 Registered in `apps/docs/components/mdx.tsx`:
 
-- `Callout` — notes and warnings
-- `Steps` / `Step` — numbered procedures
-- `Cards` / `Card` — related links
-- `Accordions` / `Accordion` — collapsible detail
+- `Callout` - notes and warnings
+- `Steps` / `Step` - numbered procedures
+- `Cards` / `Card` - related links
+- `Accordions` / `Accordion` - collapsible detail
 
 External images (e.g. deploy button SVG) use plain `<img>` / markdown image syntax.
 
@@ -161,13 +161,13 @@ External images (e.g. deploy button SVG) use plain `<img>` / markdown image synt
 
 Add new pages under the matching separator in `meta.json`:
 
-| Separator | Use for |
-| --------- | ------- |
-| `---AI & Machine Learning---` | Workers AI, LLM summarization, AI proxies |
+| Separator                      | Use for                                            |
+| ------------------------------ | -------------------------------------------------- |
+| `---AI & Machine Learning---`  | Workers AI, LLM summarization, AI proxies          |
 | `---Web Scraping & Parsing---` | HTML fetch/parse, metadata, llms.txt, dependencies |
-| `---Browser & Screenshots---` | Browser Rendering binding |
-| `---Network & Monitoring---` | DNS, uptime, redirects, geolocation, `request.cf` |
-| `---Storage & Data---` | R2, D1, KV, link shorteners |
+| `---Browser & Screenshots---`  | Browser Rendering binding                          |
+| `---Network & Monitoring---`   | DNS, uptime, redirects, geolocation, `request.cf`  |
+| `---Storage & Data---`         | R2, D1, KV, link shorteners                        |
 
 If an experiment spans categories, pick the **primary** capability shown in its README and issue proposal.
 
@@ -207,6 +207,6 @@ Invoke it when adding or updating experiment documentation.
 
 ## Related guides
 
-- [Adding New Experiments](/adding-experiments) — full worker scaffold process
-- [Code Standards](/code-standards) — API and folder conventions docs should reflect
-- [Contributing](/contributing) — PR expectations
+- [Adding New Experiments](/adding-experiments) - full worker scaffold process
+- [Code Standards](/code-standards) - API and folder conventions docs should reflect
+- [Contributing](/contributing) - PR expectations

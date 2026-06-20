@@ -1,0 +1,32 @@
+{
+  "name": "task-queue",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "queues": {
+    "producers": [
+      {
+        "binding": "TASK_QUEUE",
+        "queue": "task-queue"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "task-queue",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5
+      }
+    ]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "STATS",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

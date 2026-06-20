@@ -35,8 +35,8 @@ GET /metadata?url=https://www.cloudflare.com
 
 **Errors**
 
-- `400` — Missing or invalid `url`.
-- `502` — Failed to fetch or parse the page.
+- `400` - Missing or invalid `url`.
+- `502` - Failed to fetch or parse the page.
 
 ## Run locally
 

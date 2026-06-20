@@ -4,7 +4,7 @@ Get all DNS-related information for the hostname of any URL. Uses Cloudflare's D
 
 ## Features
 
-- **GET /dns?url=** — Pass a URL; returns the hostname and all resolved DNS records by type.
+- **GET /dns?url=** - Pass a URL; returns the hostname and all resolved DNS records by type.
 - Stateless; no bindings. Queries Cloudflare's public DoH API.
 - Runs on the edge in under 60 seconds.
 
@@ -60,8 +60,8 @@ Only record types that exist for the hostname are included. Each record has `nam
 
 **Errors**
 
-- `400` — Missing or invalid `url` (e.g. not http/https).
-- `502` — DNS lookup failed (e.g. DoH timeout or error).
+- `400` - Missing or invalid `url` (e.g. not http/https).
+- `502` - DNS lookup failed (e.g. DoH timeout or error).
 
 ## Run locally
 

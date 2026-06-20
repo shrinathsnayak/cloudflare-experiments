@@ -12,7 +12,7 @@ Use Cloudflare R2 from a Worker with configurable list/get/put/delete and **publ
 ## Setup (for upload and test)
 
 1. **Create two R2 buckets** in [Cloudflare dashboard](https://dash.cloudflare.com/) → R2 → Create bucket:
-   - `r2-storage-bucket` (private — leave default)
+   - `r2-storage-bucket` (private - leave default)
    - `r2-storage-public` (for public images)
 
 2. **Enable public access** on the public bucket only (see [How to get PUBLIC_BUCKET_URL](#how-to-get-public_bucket_url) below).
@@ -39,7 +39,7 @@ The public bucket URL is the base address where your R2 bucket is exposed (e.g. 
 2. Open **Settings** for that bucket.
 3. Under **Public Development URL** (or **Public access**), click **Enable**.
 4. When prompted, type `allow` and confirm. Cloudflare will enable a managed `r2.dev` subdomain for the bucket.
-5. The **Public Bucket URL** (or **Public Development URL**) is shown in the same Settings section — it looks like `https://pub-<id>.r2.dev`. Copy that full URL (no trailing slash).
+5. The **Public Bucket URL** (or **Public Development URL**) is shown in the same Settings section - it looks like `https://pub-<id>.r2.dev`. Copy that full URL (no trailing slash).
 6. Set it as `PUBLIC_BUCKET_URL` in `wrangler.json` under `vars`, or after deploy set it in **Workers & Pages** → your Worker → **Settings** → **Variables**.
 
 If you use a **custom domain** instead of the r2.dev URL, use that domain as `PUBLIC_BUCKET_URL` (e.g. `https://assets.example.com`).
@@ -63,7 +63,7 @@ curl -X PUT "$BASE/object?key=private/photo.png" \
   --data-binary @./your-image.png
 ```
 
-Expected: `{"key":"private/photo.png","uploaded":true}` (no `url` — private).
+Expected: `{"key":"private/photo.png","uploaded":true}` (no `url` - private).
 
 **Download / test**
 

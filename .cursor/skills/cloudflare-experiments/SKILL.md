@@ -17,7 +17,7 @@ description: Scaffolds and documents new Cloudflare Experiments. Use when adding
 2. **Implement**: Replace route logic, add any bindings in `wrangler.json` and type them in `src/types/env.d.ts`. Do not share code with other experiments.
 3. **Tests**: Add `test/` with Vitest smoke + unit/route tests per experiment standards.
 4. **Document**: Update the root [README.md](README.md) experiments table with name, description, and deploy link. In the experiment’s README, document purpose, API (query params, response shape), run locally, and deploy button.
-5. **Docs site**: Add or update the Fumadocs page — run `node apps/docs/scripts/scaffold-experiment-doc.mjs <name>`, fill TODOs from source, add to `apps/docs/content/docs/meta.json`. Follow the [experiment-docs skill](.cursor/skills/experiment-docs/SKILL.md) or [Experiment Documentation Guide](/reference/experiment-docs).
+5. **Docs site**: Add or update the Fumadocs page - run `node apps/docs/scripts/scaffold-experiment-doc.mjs <name>`, fill TODOs from source, add to `apps/docs/content/docs/meta.json`. Follow the [experiment-docs skill](.cursor/skills/experiment-docs/SKILL.md) or [Experiment Documentation Guide](/reference/experiment-docs).
 6. **Deploy button**: In the experiment README use:
    `[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/<owner>/cloudflare-experiments/tree/main/apps/experiments/<name>)`
    Replace `<owner>` and `<name>` with the real repo owner and experiment folder name.

@@ -19,11 +19,11 @@ Generate and maintain docs at `apps/docs/content/docs/experiments/<name>.mdx` fr
 
 ## Source of truth (read in this order)
 
-1. `apps/experiments/<name>/src/index.ts` — app name, description, usage on `GET /`
-2. `apps/experiments/<name>/src/routes/*.ts` — endpoints, validation, response shapes, error codes
-3. `apps/experiments/<name>/src/types/` — request/response types
-4. `apps/experiments/<name>/wrangler.json` — bindings (AI, R2, D1, KV, browser, etc.)
-5. `apps/experiments/<name>/README.md` — examples, setup notes (do not copy blindly; verify against code)
+1. `apps/experiments/<name>/src/index.ts` - app name, description, usage on `GET /`
+2. `apps/experiments/<name>/src/routes/*.ts` - endpoints, validation, response shapes, error codes
+3. `apps/experiments/<name>/src/types/` - request/response types
+4. `apps/experiments/<name>/wrangler.json` - bindings (AI, R2, D1, KV, browser, etc.)
+5. `apps/experiments/<name>/README.md` - examples, setup notes (do not copy blindly; verify against code)
 6. Closest existing doc for tone/structure:
    - **Simple** (single GET, no bindings): `apps/docs/content/docs/experiments/is-it-down.mdx`, `whereami.mdx`
    - **Full** (AI, multi-step, config): `apps/docs/content/docs/experiments/ai-website-summary.mdx`
@@ -65,9 +65,9 @@ Optional (add when relevant):
 - `<Callout type="warning">` for experimental workers or AI usage
 - **Features** list (capabilities beyond raw API)
 - **Implementation Details** / request flow `<Steps>` for AI or multi-hop workers
-- **Configuration** — `wrangler.json` bindings, secrets, D1 schema
-- **Limitations** — timeouts, size limits, local vs deployed behavior
-- **Next Steps** — `<Cards>` linking to related docs or Cloudflare products
+- **Configuration** - `wrangler.json` bindings, secrets, D1 schema
+- **Limitations** - timeouts, size limits, local vs deployed behavior
+- **Next Steps** - `<Cards>` linking to related docs or Cloudflare products
 
 ### 3. Register navigation
 
@@ -102,7 +102,7 @@ Confirm: OG image generates, sidebar link works, code blocks render with Google 
 ## Workflow: update existing experiment docs
 
 1. Diff `apps/experiments/<name>/` (routes, types, wrangler, README)
-2. Update matching sections in `apps/docs/content/docs/experiments/<name>.mdx` only — do not rewrite unrelated sections
+2. Update matching sections in `apps/docs/content/docs/experiments/<name>.mdx` only - do not rewrite unrelated sections
 3. If routes renamed/added/removed, update API + curl examples + error codes
 4. If bindings changed, update Deployment, Configuration, Cloudflare Features Used
 5. Run `npm run build -- --filter=docs`
@@ -123,7 +123,7 @@ Confirm: OG image generates, sidebar link works, code blocks render with Google 
 The target URL (http or https only).
 ```
 
-- **Components**: `Callout`, `Steps`/`Step`, `Cards`/`Card`, `Accordions`/`Accordion` — see `apps/docs/components/mdx.tsx`
+- **Components**: `Callout`, `Steps`/`Step`, `Cards`/`Card`, `Accordions`/`Accordion` - see `apps/docs/components/mdx.tsx`
 - **External images**: plain markdown `![...](https://...)` (deploy button SVG); do not use paths that break `next/image`
 - **Links**: prefer `/...` for internal pages (no `/docs` prefix); full URLs for Cloudflare developer docs
 - **Code citations in prose**: use repo paths like `src/routes/check.ts` without line numbers unless referencing a specific implementation walkthrough
@@ -152,8 +152,8 @@ Before finishing:
 
 ## Related skills
 
-- `cloudflare-experiments` — scaffold worker + README + root table
-- Per-experiment skills under `.cursor/skills/<name>/` — route and binding reminders when editing that worker
+- `cloudflare-experiments` - scaffold worker + README + root table
+- Per-experiment skills under `.cursor/skills/<name>/` - route and binding reminders when editing that worker
 
 ## Full guideline
 

@@ -1,0 +1,20 @@
+{
+  "name": "cron-heartbeat",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+  "kv_namespaces": [
+    {
+      "binding": "STATUS",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

@@ -1,34 +1,37 @@
 # Cloudflare Experiments
 
-A curated collection of experiments demonstrating what developers can build using the **Cloudflare platform**.
+A curated collection of **reference implementations** for building with **Cloudflare products and services**.
 
 📖 **Documentation:** [cloudflare-experiments.com](https://cloudflare-experiments.com) · source in [`apps/docs/`](apps/docs/) (Fumadocs + Next.js)
 
-The goal of this repository is to showcase **real-world developer tools and utilities** that run entirely on the **Cloudflare edge**, often without requiring any backend servers or persistent storage.
+The goal of this repository is to help developers **learn how to use Cloudflare platform features** by studying small, deployable examples. Each experiment maps to a specific product or capability - Workers AI, Durable Objects, Queues, D1, R2, Browser Rendering, and more.
 
 Each experiment is:
 
-- Small and focused
-- Independently deployable
-- Easy to understand
-- Designed to run in under 60 seconds
-- Deployable with **Click-to-Deploy on Cloudflare**
+- **Product-focused** - demonstrates one Cloudflare capability
+- **Independently deployable** - clone or deploy a single example
+- **Easy to understand** - minimal code, consistent structure
+- **Designed to run in under 60 seconds**
+- **Click-to-Deploy ready**
 
 ---
 
 ## Philosophy
 
-Most Cloudflare tutorials show very simple examples (Hello World, simple KV counters, basic fetch). This repository focuses instead on **real tools developers would actually want to use**.
+Most Cloudflare tutorials show very simple examples (Hello World, basic KV counters, simple fetch). This repository focuses instead on **reference implementations you can copy when building with Cloudflare products**.
 
-Every experiment demonstrates **practical capabilities of the Cloudflare platform**, including:
+Every experiment demonstrates **one specific Cloudflare capability**, including:
 
 - Cloudflare Workers
 - Workers AI
 - Browser Rendering
-- Edge networking
+- Durable Objects
+- Queues
+- Cron Triggers
+- D1 + KV
+- R2
 - HTMLRewriter
-- Request/Response manipulation
-- Global edge compute
+- Edge networking
 
 ---
 
@@ -55,7 +58,10 @@ cloudflare-experiments/
 │       ├── r2-storage/
 │       ├── whereami/
 │       ├── link-shortener/
-│       └── edge-redirect-simulator/
+│       ├── edge-redirect-simulator/
+│       ├── durable-counter/
+│       ├── cron-heartbeat/
+│       └── task-queue/
 ├── turbo.json
 ├── .cursor/
 │   ├── rules/
@@ -89,6 +95,9 @@ This is a **Turborepo** monorepo. Worker experiments live in `apps/experiments/`
 | [Where Am I](apps/experiments/whereami/)                                   | Request metadata from Cloudflare's edge (request.cf geolocation, colo)                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/whereami)                   |
 | [Link Shortener](apps/experiments/link-shortener/)                         | Shorten URLs and redirect with D1 (POST /shorten, GET /:code)                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)             |
 | [Edge Redirect Simulator](apps/experiments/edge-redirect-simulator/)       | Show redirect chains for any URL (each hop and status code)                               | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/edge-redirect-simulator)    |
+| [Durable Counter](apps/experiments/durable-counter/)                       | Globally consistent counter using Durable Objects (reference pattern)                     | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/durable-counter)            |
+| [Cron Heartbeat](apps/experiments/cron-heartbeat/)                         | Scheduled tasks with Cron Triggers; persists run metadata in KV                           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cron-heartbeat)             |
+| [Task Queue](apps/experiments/task-queue/)                                 | Enqueue background tasks with Queues; async consumer with KV stats                        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/task-queue)                 |
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 
@@ -112,8 +121,8 @@ By participating, you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 ## Key Features
 
 - **Independent deployments**: Every experiment includes a Cloudflare Deploy Button; deploy a single experiment without touching the others.
-- **Stateless first**: Most experiments use edge compute, fetch, and HTML parsing—no persistent storage.
-- **Single responsibility**: Each experiment demonstrates one specific Cloudflare capability.
+- **Product reference**: Each experiment teaches how to wire up a specific Cloudflare product or binding.
+- **Single responsibility**: One experiment, one Cloudflare capability.
 
 ---
 
@@ -121,14 +130,14 @@ By participating, you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 Additional platform features that may be explored:
 
-- Durable Objects
-- Queues
+- Vectorize
 - Images API
 - Email Workers
-- Vectorize
+- Hyperdrive
+- Workers Analytics Engine
 
 ---
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).

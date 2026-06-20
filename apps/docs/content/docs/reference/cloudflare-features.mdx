@@ -24,9 +24,8 @@ The experiments in this repository demonstrate various Cloudflare platform featu
 <Card title="Workers AI">
   **Serverless AI inference** at the edge with built-in models. Run language models directly from
   Workers: - Text generation and summarization - No GPU infrastructure required - Pay-per-inference
-  pricing - Multiple model options Used in: - [AI Website
-  Summary](/experiments/ai-website-summary) - [GitHub Repo
-  Explainer](/experiments/github-repo-explainer) - [Cloud AI
+  pricing - Multiple model options Used in: - [AI Website Summary](/experiments/ai-website-summary)
+  - [GitHub Repo Explainer](/experiments/github-repo-explainer) - [Cloud AI
   Proxy](/experiments/cloud-ai-proxy)
 </Card>
 
@@ -74,7 +73,9 @@ The experiments in this repository demonstrate various Cloudflare platform featu
 <Card title="Workers KV">
   **Global key-value store** optimized for high-read workloads. Distributed KV storage: - Eventually
   consistent reads - Global edge caching - TTL support - Ideal for read-heavy caching Used in: -
-  [Link Shortener](/experiments/link-shortener) (read-through cache)
+  [Link Shortener](/experiments/link-shortener) (read-through cache) - [Cron
+  Heartbeat](/experiments/cron-heartbeat) (scheduled run metadata) - [Task
+  Queue](/experiments/task-queue) (enqueue/process stats)
 </Card>
 
   <Card title="R2 Storage">
@@ -89,6 +90,36 @@ The experiments in this repository demonstrate various Cloudflare platform featu
     
     Used in:
     - [R2 Storage](/experiments/r2-storage)
+  </Card>
+</Cards>
+
+## Stateful & Async Features
+
+<Cards>
+  <Card title="Durable Objects">
+    **Strongly consistent state** at the edge. Single-threaded objects with persistent storage for
+    coordination, counters, sessions, and real-time apps.
+
+    Used in:
+    - [Durable Counter](/experiments/durable-counter)
+
+  </Card>
+
+  <Card title="Cron Triggers">
+    **Scheduled Workers** that run on a cron schedule without external schedulers.
+
+    Used in:
+    - [Cron Heartbeat](/experiments/cron-heartbeat)
+
+  </Card>
+
+  <Card title="Queues">
+    **Asynchronous message processing** between Workers. Decouple HTTP requests from background
+    work with producer/consumer handlers.
+
+    Used in:
+    - [Task Queue](/experiments/task-queue)
+
   </Card>
 </Cards>
 
@@ -124,14 +155,17 @@ The experiments in this repository demonstrate various Cloudflare platform featu
 
 ## Feature Comparison
 
-| Feature           | Type    | Use Case              | Cold Start | Pricing Model        |
-| ----------------- | ------- | --------------------- | ---------- | -------------------- |
-| Workers           | Compute | Edge functions        | &lt;1ms    | Per request          |
-| Workers AI        | AI/ML   | Inference             | ~50ms      | Per inference        |
-| Browser Rendering | Compute | Screenshots, scraping | ~2s        | Per session          |
-| D1                | Storage | Relational data       | ~5ms       | Reads + writes       |
-| KV                | Storage | Caching               | &lt;1ms    | Reads + writes       |
-| R2                | Storage | Object storage        | ~10ms      | Storage + operations |
+| Feature           | Type    | Use Case                  | Cold Start | Pricing Model         |
+| ----------------- | ------- | ------------------------- | ---------- | --------------------- |
+| Workers           | Compute | Edge functions            | &lt;1ms    | Per request           |
+| Workers AI        | AI/ML   | Inference                 | ~50ms      | Per inference         |
+| Browser Rendering | Compute | Screenshots, scraping     | ~2s        | Per session           |
+| D1                | Storage | Relational data           | ~5ms       | Reads + writes        |
+| KV                | Storage | Caching                   | &lt;1ms    | Reads + writes        |
+| R2                | Storage | Object storage            | ~10ms      | Storage + operations  |
+| Durable Objects   | Compute | Strongly consistent state | ~5ms       | Requests + storage    |
+| Queues            | Async   | Background processing     | ~10ms      | Messages + operations |
+| Cron Triggers     | Compute | Scheduled tasks           | ~5ms       | Per invocation        |
 
 ## Architecture Patterns
 
@@ -163,6 +197,24 @@ Combine D1 (primary) with KV (cache) for optimal performance:
 Public and private R2 buckets with direct URLs:
 
 - R2 Storage
+
+### Durable Objects Pattern
+
+Single named object for globally consistent state:
+
+- Durable Counter
+
+### Scheduled Tasks Pattern
+
+Cron handler writes metadata to KV; HTTP route reads status:
+
+- Cron Heartbeat
+
+### Queue Producer/Consumer Pattern
+
+HTTP enqueues messages; `queue()` handler processes asynchronously:
+
+- Task Queue
 
 ## Learn More
 

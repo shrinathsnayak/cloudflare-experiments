@@ -1,6 +1,4 @@
-import type { RobotsRules } from "../types/visibility";
-import type { PageRobotSignals } from "../types/visibility";
-import type { VisibilityResponse, CrawlerStatus } from "../types/visibility";
+import type { RobotsRules, PageRobotSignals, VisibilityResponse, CrawlerStatus } from "../types/visibility";
 import { AI_CRAWLERS } from "../constants/crawlers";
 import { isAllowedByRobots } from "./robots";
 import {

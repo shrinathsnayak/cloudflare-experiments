@@ -9,10 +9,12 @@ const FILE_MAP = {
 };
 
 function convertLinks(content) {
-  return content
-    // Internal links stay at site root (no /docs prefix).
-    .replace(/href="\/(?!\/)([^"#?][^"]*)"/g, (_match, slug) => `href="/${slug}"`)
-    .replace(/]\(\/(?!\/)([^)#?]+)\)/g, (_match, slug) => `](/${slug})`);
+  return (
+    content
+      // Internal links stay at site root (no /docs prefix).
+      .replace(/href="\/(?!\/)([^"#?][^"]*)"/g, (_match, slug) => `href="/${slug}"`)
+      .replace(/]\(\/(?!\/)([^)#?]+)\)/g, (_match, slug) => `](/${slug})`)
+  );
 }
 
 function convertCallouts(content) {

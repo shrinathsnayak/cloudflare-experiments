@@ -124,25 +124,25 @@ Local development will return an empty object or minimal data since `request.cf`
 
 Depending on the request, the `cf` object may also include:
 
-- `latitude` / `longitude` — Geographic coordinates
-- `postalCode` — Postal/ZIP code
-- `metroCode` — Metro area code
-- `continent` — Two-letter continent code
-- `regionCode` — ISO 3166-2 region code
-- `tlsVersion` — TLS version used (e.g., "TLSv1.3")
-- `tlsCipher` — TLS cipher suite
-- `httpProtocol` — HTTP protocol version (e.g., "HTTP/2")
+- `latitude` / `longitude` - Geographic coordinates
+- `postalCode` - Postal/ZIP code
+- `metroCode` - Metro area code
+- `continent` - Two-letter continent code
+- `regionCode` - ISO 3166-2 region code
+- `tlsVersion` - TLS version used (e.g., "TLSv1.3")
+- `tlsCipher` - TLS cipher suite
+- `httpProtocol` - HTTP protocol version (e.g., "HTTP/2")
 
 See the [Cloudflare request.cf documentation](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties) for a complete list.
 
 ## Implementation Details
 
-- Completely stateless — no external requests
+- Completely stateless - no external requests
 - No database or KV storage required
 - Returns raw `request.cf` object from Cloudflare
 - Works immediately after deployment
 
 ## Cloudflare Features Used
 
-- **Workers** — Edge compute runtime
-- **request.cf** — Incoming request metadata including geolocation
+- **Workers** - Edge compute runtime
+- **request.cf** - Incoming request metadata including geolocation

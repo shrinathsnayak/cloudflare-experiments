@@ -47,8 +47,8 @@ GET /chat?model=@cf/meta/llama-3.1-8b-instruct-fast&prompt=Say%20hello
 
 **Errors**
 
-- `400` — `INVALID_BODY`, `MISSING_MODEL`, `MISSING_PROMPT`, `INVALID_MAX_TOKENS`
-- `502` — `AI_ERROR` (model run failed)
+- `400` - `INVALID_BODY`, `MISSING_MODEL`, `MISSING_PROMPT`, `INVALID_MAX_TOKENS`
+- `502` - `AI_ERROR` (model run failed)
 
 ## Run locally
 

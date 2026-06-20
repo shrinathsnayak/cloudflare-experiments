@@ -18,7 +18,7 @@ GET /llms.txt?url=https://www.cloudflare.com
 
 **Response**
 
-`Content-Type: text/plain; charset=utf-8` — body is the generated llms.txt content:
+`Content-Type: text/plain; charset=utf-8` - body is the generated llms.txt content:
 
 ```text
 # Example Domain
@@ -39,8 +39,8 @@ The output follows the llms.txt convention: H1 (site/title), blockquote (descrip
 
 **Errors**
 
-- `400` — Missing or invalid `url`.
-- `502` — Failed to fetch the page.
+- `400` - Missing or invalid `url`.
+- `502` - Failed to fetch the page.
 
 ## Run locally
 

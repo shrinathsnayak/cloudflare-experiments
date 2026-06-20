@@ -1,0 +1,89 @@
+---
+title: "Durable Counter"
+description: "Reference implementation for Durable Objects - a globally consistent counter with persistent edge state"
+---
+
+A minimal reference for **Durable Objects**: a single `Counter` class with persistent storage, exposed via HTTP routes. Use this pattern when you need strongly consistent state at the edge (rate limits, sessions, coordination).
+
+## API Endpoints
+
+### GET /counter
+
+Returns the current counter value.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/counter"
+```
+
+#### Example Response
+
+```json
+{ "value": 42 }
+```
+
+### POST /counter/increment
+
+Increments the counter by 1.
+
+```bash
+curl -X POST "https://your-worker.workers.dev/counter/increment"
+```
+
+### POST /counter/reset
+
+Resets the counter to 0.
+
+```bash
+curl -X POST "https://your-worker.workers.dev/counter/reset"
+```
+
+## Use Cases
+
+- Learn how to define and export a Durable Object class
+- Shared counters or rate limiters across all edge locations
+- Starting point for session storage or real-time coordination
+- Understanding `idFromName()` for addressing a single global object
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/durable-counter)
+
+  </Step>
+  <Step>
+
+### Test the API
+
+    ```bash
+    curl "https://your-worker.workers.dev/counter"
+    curl -X POST "https://your-worker.workers.dev/counter/increment"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/durable-counter
+npm install
+npm run dev
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Durable Object binding** `COUNTER` → class `Counter`
+- **Migration** `v1` registering the `Counter` class
+
+## Cloudflare Features Used
+
+- [Durable Objects](https://developers.cloudflare.com/durable-objects/) - strongly consistent state and storage
+- [Workers](https://developers.cloudflare.com/workers/) - HTTP routes that call into the DO stub

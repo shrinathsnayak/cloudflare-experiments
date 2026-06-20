@@ -15,7 +15,7 @@ Thank you for your interest in contributing. This document explains how to propo
 ## Development Setup
 
 1. **Fork and clone** the repository.
-2. **Install dependencies** (Turborepo workspaces — once per clone):
+2. **Install dependencies** (Turborepo workspaces - once per clone):
    ```bash
    npm install
    ```

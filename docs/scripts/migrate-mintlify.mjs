@@ -60,7 +60,7 @@ function convertCodeGroups(content) {
 
     const labels = fences.map(([, lang, label]) => label ?? lang);
     const tabs = fences
-      .map(([, lang, label, code], i) => {
+      .map(([, lang, _label, code], i) => {
         const value = labels[i];
         return `<Tab value="${value}">\n\`\`\`${lang}\n${code}\`\`\`\n</Tab>`;
       })

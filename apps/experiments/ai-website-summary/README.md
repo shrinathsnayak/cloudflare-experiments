@@ -27,8 +27,8 @@ GET /summary?url=https://www.cloudflare.com
 
 **Errors**
 
-- `400` — Missing or invalid `url`.
-- `502` — Failed to fetch the page or AI error.
+- `400` - Missing or invalid `url`.
+- `502` - Failed to fetch the page or AI error.
 
 ## Run locally
 

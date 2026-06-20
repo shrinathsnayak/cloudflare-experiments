@@ -7,7 +7,7 @@ export const uiFont = Google_Sans({
   display: "swap",
 });
 
-/** Monospace companion to Google Sans — code blocks, inline code, file trees. */
+/** Monospace companion to Google Sans - code blocks, inline code, file trees. */
 export const codeFont = Google_Sans_Code({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],

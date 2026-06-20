@@ -5,7 +5,7 @@
  * Usage (from repo root):
  *   node apps/docs/scripts/scaffold-experiment-doc.mjs <experiment-name>
  *
- * Does not modify meta.json or README — update those manually or via the experiment-docs skill.
+ * Does not modify meta.json or README - update those manually or via the experiment-docs skill.
  */
 
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
@@ -64,11 +64,13 @@ const exampleQuery = path.includes("?") ? path : `${path}?url=https://example.co
 const pathOnly = path.split("?")[0];
 
 const bindings = [];
-if (wranglerJson.includes('"ai"') || wranglerJson.includes("[ai]")) bindings.push("Workers AI (`AI` binding)");
+if (wranglerJson.includes('"ai"') || wranglerJson.includes("[ai]"))
+  bindings.push("Workers AI (`AI` binding)");
 if (wranglerJson.includes("r2_buckets") || wranglerJson.includes('"R2"')) bindings.push("R2");
 if (wranglerJson.includes("d1_databases") || wranglerJson.includes('"DB"')) bindings.push("D1");
 if (wranglerJson.includes("kv_namespaces") || wranglerJson.includes('"KV"')) bindings.push("KV");
-if (wranglerJson.includes("browser") || wranglerJson.includes("BROWSER")) bindings.push("Browser Rendering");
+if (wranglerJson.includes("browser") || wranglerJson.includes("BROWSER"))
+  bindings.push("Browser Rendering");
 
 const bindingNotes =
   bindings.length > 0
@@ -76,7 +78,7 @@ const bindingNotes =
     : "No additional configuration required.";
 
 const readmeHint = readme
-  ? "\n<!-- README.md exists — copy API examples and setup notes from apps/experiments/" +
+  ? "\n<!-- README.md exists - copy API examples and setup notes from apps/experiments/" +
   experimentName +
   "/README.md -->\n"
   : "";
@@ -90,7 +92,7 @@ description: "${description}"
 
 ${description}
 
-<!-- TODO: Expand intro — what Cloudflare capability this demonstrates -->
+<!-- TODO: Expand intro - what Cloudflare capability this demonstrates -->
 ${readmeHint}
 ## API Endpoint
 
@@ -131,8 +133,8 @@ curl "https://your-worker.workers.dev${exampleQuery}"
 
 <!-- TODO: List codes from jsonError() calls in routes -->
 
-- \`400\` — Invalid input
-- \`502\` — Upstream or binding error (if applicable)
+- \`400\` - Invalid input
+- \`502\` - Upstream or binding error (if applicable)
 
 ## Use Cases
 
@@ -186,8 +188,8 @@ curl "http://localhost:8787${exampleQuery}"
 
 ## Cloudflare Features Used
 
-- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
-${bindings.map((b) => `- **${b.split(" ")[0]}** — TODO: link to Cloudflare docs`).join("\n")}
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+${bindings.map((b) => `- **${b.split(" ")[0]}** - TODO: link to Cloudflare docs`).join("\n")}
 `;
 
 writeFileSync(outPath, mdx);

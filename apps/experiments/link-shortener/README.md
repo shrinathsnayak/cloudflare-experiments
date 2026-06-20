@@ -4,8 +4,8 @@ Minimal URL shortener using Cloudflare D1 (primary) and KV (read cache). Shorten
 
 ## Features
 
-- **POST /shorten** — Body `{ "url": "https://..." }`; returns `{ code, url }`. Stores in D1 and populates KV cache.
-- **GET /:code** — Redirects to the stored URL (302). Reads from KV first; on cache miss, reads from D1 and caches the result. Returns 404 if not found.
+- **POST /shorten** - Body `{ "url": "https://..." }`; returns `{ code, url }`. Stores in D1 and populates KV cache.
+- **GET /:code** - Redirects to the stored URL (302). Reads from KV first; on cache miss, reads from D1 and caches the result. Returns 404 if not found.
 - No analytics or expiry; single table (code, url, created_at). D1 is source of truth; KV is a read-through cache.
 
 ## API
@@ -35,7 +35,7 @@ Redirect: `GET /a1B2c3` → 302 to the URL.
 
 **Errors**
 
-- `400` — Missing/invalid JSON or invalid `url` (non-http(s)).
+- `400` - Missing/invalid JSON or invalid `url` (non-http(s)).
 
 ### `GET /:code`
 

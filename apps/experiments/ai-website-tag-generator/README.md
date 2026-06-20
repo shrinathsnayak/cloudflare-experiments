@@ -26,8 +26,8 @@ GET /tags?url=example.com
 
 **Errors**
 
-- `400` — Missing or invalid `url`.
-- `502` — Failed to fetch the page or AI error.
+- `400` - Missing or invalid `url`.
+- `502` - Failed to fetch the page or AI error.
 
 ## Run locally
 

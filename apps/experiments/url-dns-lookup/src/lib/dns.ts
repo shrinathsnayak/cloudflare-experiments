@@ -1,5 +1,4 @@
-import type { DnsLookupResponse, DohResponse } from "../types/dns";
-import type { DnsRecord } from "../types/dns";
+import type { DnsLookupResponse, DohResponse, DnsRecord } from "../types/dns";
 import { DOH_BASE, DNS_RECORD_TYPES, DOH_TIMEOUT_MS } from "../constants/defaults";
 
 const RECORD_TYPE_NAMES: Record<number, string> = {

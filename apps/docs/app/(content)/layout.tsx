@@ -7,7 +7,7 @@ import { siteBanner } from "@/lib/shared";
 export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <>
-      <Banner className="bg-[#f38020] text-white">{siteBanner.text}</Banner>
+      <Banner className="bg-[#f38020] text-sm text-white ">{siteBanner.text}</Banner>
       <DocsLayout tree={source.getPageTree()} {...baseOptions()}>
         {children}
       </DocsLayout>
