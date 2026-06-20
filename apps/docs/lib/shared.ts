@@ -14,7 +14,8 @@ export const siteKeywords = [
   "edge platform",
 ];
 export const siteUrl = "https://cloudflare-experiments.com";
-export const docsRoute = "/";
+export const docsRoute = "/docs";
+export const homeRoute = "/";
 export const docsImageRoute = "/og";
 export const docsContentRoute = "/llms.mdx";
 

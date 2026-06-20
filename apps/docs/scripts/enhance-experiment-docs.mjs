@@ -193,4 +193,6 @@ for (const file of files) {
   }
 }
 
-console.log(`Done. Updated ${updated}/${files.length} experiment docs (${Object.keys(META).length} icons loaded).`);
+console.log(
+  `Done. Updated ${updated}/${files.length} experiment docs (${Object.keys(META).length} icons loaded).`
+);

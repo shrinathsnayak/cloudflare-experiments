@@ -5,6 +5,19 @@ import { createMDX } from "fumadocs-mdx/next";
 const withMDX = createMDX();
 const monorepoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
+/** Legacy doc URLs (pre-homepage) redirect into /docs. */
+const legacyDocRedirects = [
+  "quickstart",
+  "philosophy",
+  "contributing",
+  "adding-experiments",
+  "code-standards",
+].map((segment) => ({
+  source: `/${segment}`,
+  destination: `/docs/${segment}`,
+  permanent: true,
+}));
+
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
@@ -22,9 +35,10 @@ const config = {
   },
   async redirects() {
     return [
-      { source: "/docs", destination: "/", permanent: true },
-      { source: "/docs/:path*", destination: "/:path*", permanent: true },
-      { source: "/introduction", destination: "/", permanent: true },
+      { source: "/introduction", destination: "/docs", permanent: true },
+      ...legacyDocRedirects,
+      { source: "/experiments/:path*", destination: "/docs/experiments/:path*", permanent: true },
+      { source: "/reference/:path*", destination: "/docs/reference/:path*", permanent: true },
     ];
   },
 };

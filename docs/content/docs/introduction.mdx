@@ -77,59 +77,53 @@ Every experiment demonstrates **practical capabilities of the Cloudflare platfor
     - **AI Gateway Dashboard** - Workers AI through AI Gateway with cache and latency metadata
   </Accordion>
 
-  <Accordion title="Web Scraping & Parsing">
-    - **Website Metadata Extractor** - Extract title, description, Open Graph data, and canonical URL
-    - **Website to API** - Turn webpages into structured JSON
-    - **Website to llms.txt** - Convert pages for LLM consumption
-    - **DevTools Inspector** - DevTools-style inspection of websites
-    - **Dependency Analyzer** - Analyze external resources loaded by a page
-    - **HTML Rewriter** - Extract HTML stats and transform pages with HTMLRewriter
-    - **Social Preview Inspector** - Preview Twitter/X, Open Graph, and Google snippets side by side
-    - **Readability Extractor** - Extract clean article content with readability-style heuristics
-  </Accordion>
+<Accordion title="Web Scraping & Parsing">
+  - **Website Metadata Extractor** - Extract title, description, Open Graph data, and canonical URL
+  - **Website to API** - Turn webpages into structured JSON - **Website to llms.txt** - Convert
+  pages for LLM consumption - **DevTools Inspector** - DevTools-style inspection of websites -
+  **Dependency Analyzer** - Analyze external resources loaded by a page - **HTML Rewriter** -
+  Extract HTML stats and transform pages with HTMLRewriter - **Social Preview Inspector** - Preview
+  Twitter/X, Open Graph, and Google snippets side by side - **Readability Extractor** - Extract
+  clean article content with readability-style heuristics
+</Accordion>
 
-  <Accordion title="Browser Rendering">
-    - **Screenshot API** - Capture screenshots from the edge
-    - **PDF API** - Generate PDF documents from any webpage
-    - **Page Metrics** - Collect Puppeteer page load metrics
-    - **Rendered Text** - Extract JavaScript-rendered visible text
-    - **Browser Links** - Extract links from JavaScript-rendered pages
-  </Accordion>
+<Accordion title="Browser Rendering">
+  - **Screenshot API** - Capture screenshots from the edge - **PDF API** - Generate PDF documents
+  from any webpage - **Page Metrics** - Collect Puppeteer page load metrics - **Rendered Text** -
+  Extract JavaScript-rendered visible text - **Browser Links** - Extract links from
+  JavaScript-rendered pages
+</Accordion>
 
-  <Accordion title="Network & Monitoring">
-    - **Is It Down** - Check if websites are reachable from the edge
-    - **URL DNS Lookup** - Get DNS records for any hostname
-    - **DNS Propagation Checker** - Compare answers from Cloudflare, Google, and Quad9 resolvers
-    - **Edge Redirect Simulator** - Trace redirect chains and status codes
-    - **Where Am I** - Request metadata and geolocation from the edge
-    - **Response Headers** - Inspect HTTP response headers for any URL
-    - **SSL Certificate Inspector** - Inspect TLS certificate metadata for a domain
-    - **Multi-PoP Latency Map** - Fetch latency plus serving colo per request
-    - **Website Change Tracker** - Scheduled snapshots with R2 storage and D1 diff history
-    - **Uptime Monitor Alerts** - Persistent URL monitors with D1 history and email alerts
-    - **CORS Preflight Tester** - Simulate browser CORS preflight and analyze response headers
-  </Accordion>
+<Accordion title="Network & Monitoring">
+  - **Is It Down** - Check if websites are reachable from the edge - **URL DNS Lookup** - Get DNS
+  records for any hostname - **DNS Propagation Checker** - Compare answers from Cloudflare, Google,
+  and Quad9 resolvers - **Edge Redirect Simulator** - Trace redirect chains and status codes -
+  **Where Am I** - Request metadata and geolocation from the edge - **Response Headers** - Inspect
+  HTTP response headers for any URL - **SSL Certificate Inspector** - Inspect TLS certificate
+  metadata for a domain - **Multi-PoP Latency Map** - Fetch latency plus serving colo per request -
+  **Website Change Tracker** - Scheduled snapshots with R2 storage and D1 diff history - **Uptime
+  Monitor Alerts** - Persistent URL monitors with D1 history and email alerts - **CORS Preflight
+  Tester** - Simulate browser CORS preflight and analyze response headers
+</Accordion>
 
-  <Accordion title="Edge Platform">
-    - **Edge Cache** - Fetch URLs with the Workers Cache API
-    - **Crypto Hash** - Compute SHA digests with the Web Crypto API
-    - **WebSocket Echo** - WebSocket echo server on Workers
-    - **Image Resizer** - Resize remote images with Cloudflare Image Resizing
-    - **Turnstile Verify** - Verify Cloudflare Turnstile tokens via siteverify
-    - **JWT Inspector** - Decode, verify, and issue JWTs for experimentation
-    - **Rate Limiter Demo** - Native Workers Rate Limiting binding with 429 responses
-    - **Webhook Signature Verifier** - Verify HMAC-SHA256 webhook signatures with timing-safe compare
-  </Accordion>
+<Accordion title="Edge Platform">
+  - **Edge Cache** - Fetch URLs with the Workers Cache API - **Crypto Hash** - Compute SHA digests
+  with the Web Crypto API - **WebSocket Echo** - WebSocket echo server on Workers - **Image
+  Resizer** - Resize remote images with Cloudflare Image Resizing - **Turnstile Verify** - Verify
+  Cloudflare Turnstile tokens via siteverify - **JWT Inspector** - Decode, verify, and issue JWTs
+  for experimentation - **Rate Limiter Demo** - Native Workers Rate Limiting binding with 429
+  responses - **Webhook Signature Verifier** - Verify HMAC-SHA256 webhook signatures with
+  timing-safe compare
+</Accordion>
 
-  <Accordion title="Storage & Data">
-    - **R2 Storage** - R2 object storage with list/get/put/delete
-    - **Link Shortener** - URL shortener using D1 and KV
-    - **D1 SQL Playground** - Read-only SQL playground over a seeded D1 database
-    - **KV Notes** - Simple note storage with Workers KV
-    - **Vectorize Search** - Semantic search with Workers AI embeddings and Vectorize
-    - **Presigned R2 Upload** - Presigned PUT URLs for direct browser-to-R2 uploads
-    - **API Mock Server** - Define mock HTTP endpoints in KV and serve them on demand
-  </Accordion>
+<Accordion title="Storage & Data">
+  - **R2 Storage** - R2 object storage with list/get/put/delete - **Link Shortener** - URL shortener
+  using D1 and KV - **D1 SQL Playground** - Read-only SQL playground over a seeded D1 database -
+  **KV Notes** - Simple note storage with Workers KV - **Vectorize Search** - Semantic search with
+  Workers AI embeddings and Vectorize - **Presigned R2 Upload** - Presigned PUT URLs for direct
+  browser-to-R2 uploads - **API Mock Server** - Define mock HTTP endpoints in KV and serve them on
+  demand
+</Accordion>
 
   <Accordion title="Stateful & Async">
     - **Durable Counter** - Globally consistent counter with Durable Objects

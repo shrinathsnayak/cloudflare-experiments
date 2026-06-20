@@ -1,5 +1,5 @@
 import { source } from "@/lib/source";
-import { docsRoute, siteUrl } from "@/lib/shared";
+import { docsRoute, homeRoute, siteUrl } from "@/lib/shared";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -12,11 +12,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: siteUrl,
+      url: `${siteUrl}${homeRoute}`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1,
     },
-    ...docsPages,
+    {
+      url: `${siteUrl}${docsRoute}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    ...docsPages.filter((page) => page.url !== docsRoute),
   ];
 }
