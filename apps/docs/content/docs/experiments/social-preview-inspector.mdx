@@ -1,0 +1,112 @@
+---
+title: "Social Preview Inspector"
+description: "Preview Twitter/X Cards, Open Graph unfurls, and Google snippets side by side with HTMLRewriter"
+icon: "LayoutPanelTop"
+tags:
+  - scraping
+---
+
+Fetch any URL and extract `og:*`, `twitter:*`, `<title>`, and meta description tags with **HTMLRewriter**. Returns side-by-side preview validation for Twitter/X, Open Graph (Facebook/Slack), and Google search snippets, flagging missing required fields per platform.
+
+## Features
+
+- GET /inspect — extract meta tags and validate per-platform preview requirements
+- Side-by-side Twitter, Open Graph, and Google preview objects
+- Flags missing and fallback fields (e.g. og:title used when twitter:title absent)
+
+## API Reference
+
+### GET /inspect
+
+Fetch a page and return social preview validation for three platforms.
+
+<TypeTable
+  type={{
+    url: {
+      description: "Target URL (http or https only).",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
+
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/inspect?url=https://example.com"
+```
+
+#### Success Response
+
+```json
+{
+  "url": "https://example.com/",
+  "extracted": { "title": "Example", "description": "...", "openGraph": {}, "twitter": {} },
+  "previews": {
+    "openGraph": { "platform": "openGraph", "valid": true, "missing": [], "fields": {} },
+    "twitter": { "platform": "twitter", "valid": false, "missing": ["image"], "fields": {} },
+    "google": { "platform": "google", "valid": true, "missing": [], "fields": {} }
+  }
+}
+```
+
+#### Error Codes
+
+- `400` — `INVALID_URL`
+- `502` — `FETCH_ERROR`
+
+## Use Cases
+
+- Debug why a link unfurls incorrectly on Slack, Twitter, or iMessage
+- Audit marketing pages for missing Open Graph or Twitter Card tags
+- Compare Google snippet fields against social preview metadata
+
+## Limitations
+
+- Uses raw HTML fetch; does not execute JavaScript (client-rendered tags may be missing)
+- Single URL per request; no batch inspection
+- Platform validation rules are heuristic, not identical to each platform's renderer
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/social-preview-inspector)
+
+  </Step>
+  <Step>
+
+### Configure bindings
+
+    See `wrangler.json` and the experiment README for required bindings.
+
+  </Step>
+  <Step>
+
+### Test your deployment
+
+    See the experiment README for curl examples.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/social-preview-inspector
+npm install
+npm run dev
+```
+
+## Configuration
+
+No bindings required beyond the Workers runtime.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)**
+- **[HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/)**

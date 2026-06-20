@@ -1,53 +1,66 @@
 #!/usr/bin/env node
 /**
  * Adds icon/tags/bindings frontmatter and converts **`param`** blocks to TypeTable.
+ * Icons are loaded from apps/docs/lib/experiment-docs-meta.ts (single source of truth).
  * Run from repo root: node apps/docs/scripts/enhance-experiment-docs.mjs
  */
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const DOCS_DIR = join(import.meta.dirname, "../content/docs/experiments");
+const META_PATH = join(import.meta.dirname, "../lib/experiment-docs-meta.ts");
 
-const META = {
-  "ai-website-summary": { icon: "Sparkles", tags: ["ai", "workers-ai"], bindings: ["AI"] },
-  "ai-website-tag-generator": { icon: "Tags", tags: ["ai", "workers-ai"], bindings: ["AI"] },
-  "github-repo-explainer": { icon: "GitBranch", tags: ["ai", "workers-ai"], bindings: ["AI"] },
-  "ai-bot-visibility": { icon: "Bot", tags: ["ai", "seo"], bindings: [] },
-  "cloud-ai-proxy": { icon: "Cpu", tags: ["ai", "workers-ai"], bindings: ["AI"] },
-  "text-translator": { icon: "Languages", tags: ["ai", "workers-ai"], bindings: ["AI"] },
-  "sentiment-analyzer": { icon: "Smile", tags: ["ai", "workers-ai"], bindings: ["AI"] },
-  "text-similarity": { icon: "GitCompareArrows", tags: ["ai", "embeddings"], bindings: ["AI"] },
-  "ai-image-generator": { icon: "Image", tags: ["ai", "workers-ai"], bindings: ["AI"] },
-  "website-metadata-extractor": { icon: "FileSearch", tags: ["scraping"], bindings: [] },
-  "website-to-api": { icon: "Code", tags: ["scraping"], bindings: [] },
-  "website-to-llms-txt": { icon: "FileText", tags: ["scraping"], bindings: [] },
-  "website-devtools-inspector": { icon: "Search", tags: ["scraping"], bindings: ["BROWSER"] },
-  "dependency-analyzer": { icon: "Package", tags: ["scraping"], bindings: [] },
-  "html-rewriter": { icon: "FileCode", tags: ["scraping"], bindings: [] },
-  "screenshot-api": { icon: "Camera", tags: ["browser"], bindings: ["BROWSER"] },
-  "pdf-api": { icon: "FileType", tags: ["browser"], bindings: ["BROWSER"] },
-  "page-metrics": { icon: "Gauge", tags: ["browser"], bindings: ["BROWSER"] },
-  "rendered-text": { icon: "FileText", tags: ["browser"], bindings: ["BROWSER"] },
-  "browser-links": { icon: "Link", tags: ["browser"], bindings: ["BROWSER"] },
-  "is-it-down": { icon: "Activity", tags: ["network"], bindings: [] },
-  "url-dns-lookup": { icon: "Globe", tags: ["network"], bindings: [] },
-  "edge-redirect-simulator": { icon: "Route", tags: ["network"], bindings: [] },
-  "whereami": { icon: "MapPin", tags: ["network"], bindings: [] },
-  "response-headers": { icon: "List", tags: ["network"], bindings: [] },
-  "edge-cache": { icon: "Database", tags: ["edge"], bindings: [] },
-  "crypto-hash": { icon: "Hash", tags: ["edge"], bindings: [] },
-  "websocket-echo": { icon: "Radio", tags: ["edge"], bindings: [] },
-  "image-resizer": { icon: "ImageDown", tags: ["edge"], bindings: [] },
-  "turnstile-verify": { icon: "ShieldCheck", tags: ["edge"], bindings: [] },
-  "r2-storage": { icon: "HardDrive", tags: ["storage"], bindings: ["R2"] },
-  "link-shortener": { icon: "Link2", tags: ["storage"], bindings: ["D1", "KV"] },
-  "kv-notes": { icon: "StickyNote", tags: ["storage"], bindings: ["KV"] },
-  "vectorize-search": { icon: "Search", tags: ["storage", "ai"], bindings: ["AI", "VECTORIZE"] },
-  "durable-counter": { icon: "Hash", tags: ["stateful"], bindings: ["DO"] },
-  "cron-heartbeat": { icon: "Clock", tags: ["stateful"], bindings: ["KV"] },
-  "task-queue": { icon: "ListOrdered", tags: ["stateful"], bindings: ["QUEUE", "KV"] },
-  "analytics-engine": { icon: "ChartBar", tags: ["stateful"], bindings: ["ANALYTICS"] },
-};
+function loadExperimentDocsMeta() {
+  const raw = readFileSync(META_PATH, "utf8");
+  const body = raw.slice(raw.indexOf("{"), raw.lastIndexOf("};"));
+  const meta = {};
+
+  for (const match of body.matchAll(/(?:"([^"]+)"|(\w+)):\s*\{/g)) {
+    const slug = match[1] ?? match[2];
+    const start = match.index + match[0].length;
+    let depth = 1;
+    let i = start;
+    while (i < body.length && depth > 0) {
+      if (body[i] === "{") depth++;
+      else if (body[i] === "}") depth--;
+      i++;
+    }
+    const block = body.slice(start, i - 1);
+    const icon = block.match(/icon:\s*"([^"]+)"/)?.[1];
+    if (!icon) continue;
+
+    const tagsMatch = block.match(/tags:\s*\[([\s\S]*?)\]/);
+    const tags = tagsMatch ? [...tagsMatch[1].matchAll(/"([^"]+)"/g)].map((m) => m[1]) : [];
+
+    const bindingsMatch = block.match(/bindings:\s*\[([\s\S]*?)\]/);
+    const bindings = bindingsMatch
+      ? [...bindingsMatch[1].matchAll(/"([^"]+)"/g)].map((m) => m[1])
+      : [];
+
+    meta[slug] = { icon, tags, bindings };
+  }
+
+  return meta;
+}
+
+const META = loadExperimentDocsMeta();
+
+function validateLucideIcons() {
+  let lucideIcons;
+  try {
+    lucideIcons = require("lucide-react").icons;
+  } catch {
+    return;
+  }
+
+  for (const [slug, { icon }] of Object.entries(META)) {
+    if (!(icon in lucideIcons)) {
+      console.warn(`[enhance-experiment-docs] Invalid Lucide icon "${icon}" for ${slug}`);
+    }
+  }
+}
+
+validateLucideIcons();
 
 function parseFrontmatter(raw) {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
@@ -90,7 +103,8 @@ function buildTypeTable(fields) {
         `      type: "${field.type}"`,
       ];
       if (field.required) parts.push("      required: true");
-      if (field.default !== undefined) parts.push(`      default: "${escapeJsxString(field.default)}"`);
+      if (field.default !== undefined)
+        parts.push(`      default: "${escapeJsxString(field.default)}"`);
       return `    ${name}: {\n${parts.join(",\n")},\n    }`;
     })
     .join(",\n");
@@ -179,4 +193,4 @@ for (const file of files) {
   }
 }
 
-console.log(`Done. Updated ${updated}/${files.length} experiment docs.`);
+console.log(`Done. Updated ${updated}/${files.length} experiment docs (${Object.keys(META).length} icons loaded).`);

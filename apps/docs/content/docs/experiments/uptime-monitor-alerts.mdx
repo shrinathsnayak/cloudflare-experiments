@@ -1,0 +1,97 @@
+---
+title: "Uptime Monitor Alerts"
+description: "Persistent URL monitors with D1 history, cron checks, and email alerts on downtime"
+icon: "HeartPulse"
+tags:
+  - network
+  - monitoring
+bindings:
+  - D1
+  - EMAIL
+---
+
+Extend the is-it-down pattern into a persistent monitor. **Cron** pings registered URLs, logs checks to **D1**, and sends **email alerts** when a URL transitions from up to down.
+
+## Features
+
+- POST /monitors — register URL + alert email
+- DELETE /monitors/:id — remove monitor
+- GET /monitors/:id/history — check history and uptime percentage
+- Scheduled checks every 5 minutes
+
+## API Reference
+
+### POST /monitors
+
+```json
+{ "url": "https://example.com", "alertEmail": "you@example.com" }
+```
+
+### DELETE /monitors/:id
+
+Remove a monitor.
+
+### GET /monitors/:id/history
+
+Returns check history and uptime percentage.
+
+#### Error Codes
+
+- `400` — `INVALID_URL`, `INVALID_EMAIL`, `INVALID_BODY`
+- `404` — `NOT_FOUND`
+
+## Use Cases
+
+- Lightweight uptime monitoring for side projects
+- Learn Cron + D1 + send_email alert patterns on Workers
+- Track uptime percentage over time for SLA reporting
+
+## Limitations
+
+- Requires D1, Cron, and send_email bindings configured for your domain
+- 5-minute check interval; not sub-minute alerting
+- Single-region edge checks; not global multi-PoP consensus
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/uptime-monitor-alerts)
+
+  </Step>
+  <Step>
+
+### Configure bindings
+
+    D1 `DB`, `send_email` binding `EMAILER`, cron `*/5 * * * *`. Configure allowed sender/destination addresses in wrangler.
+
+  </Step>
+  <Step>
+
+### Test your deployment
+
+    See the experiment README for curl examples.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/uptime-monitor-alerts
+npm install
+npm run dev
+```
+
+## Configuration
+
+D1 `DB`, `send_email` binding `EMAILER`, cron `*/5 * * * *`. Configure allowed sender/destination addresses in wrangler.
+
+## Cloudflare Features Used
+
+- **[D1](https://developers.cloudflare.com/d1/)**
+- **[Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/)**
+- **[Email Routing / send_email](https://developers.cloudflare.com/email-routing/email-workers/send-email-workers/)**

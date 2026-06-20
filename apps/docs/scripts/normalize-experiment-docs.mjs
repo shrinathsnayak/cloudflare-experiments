@@ -123,7 +123,8 @@ function normalizeSections(sections, slug) {
   if (configParts.length) {
     const configIdx = merged.findIndex((s) => s.title === "Configuration");
     if (configIdx >= 0) {
-      merged[configIdx].content = `${merged[configIdx].content}\n\n${configParts.join("\n\n")}`.trim();
+      merged[configIdx].content =
+        `${merged[configIdx].content}\n\n${configParts.join("\n\n")}`.trim();
     } else {
       merged.push({ title: "Configuration", content: configParts.join("\n\n") });
     }

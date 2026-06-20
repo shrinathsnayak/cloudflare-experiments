@@ -12,7 +12,8 @@ const LINKS = {
   workers: "https://developers.cloudflare.com/workers/",
   fetch: "https://developers.cloudflare.com/workers/runtime-apis/fetch/",
   edge: "https://developers.cloudflare.com/workers/reference/how-workers-works/",
-  requestCf: "https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties",
+  requestCf:
+    "https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties",
   browser: "https://developers.cloudflare.com/browser-rendering/",
   workersAi: "https://developers.cloudflare.com/workers-ai/",
   d1: "https://developers.cloudflare.com/d1/",
@@ -143,12 +144,18 @@ const SECTION_PATTERN =
 function replaceOrInsertSection(content, replacement) {
   const match = content.match(SECTION_PATTERN);
   if (match) {
-    return content.slice(0, match.index) + `${replacement}\n\n` + content.slice(match.index + match[0].length);
+    return (
+      content.slice(0, match.index) +
+      `${replacement}\n\n` +
+      content.slice(match.index + match[0].length)
+    );
   }
 
   const useCases = content.match(/\n## Use Cases\n/);
   if (useCases?.index !== undefined) {
-    return content.slice(0, useCases.index) + `\n\n${replacement}\n` + content.slice(useCases.index);
+    return (
+      content.slice(0, useCases.index) + `\n\n${replacement}\n` + content.slice(useCases.index)
+    );
   }
 
   return null;

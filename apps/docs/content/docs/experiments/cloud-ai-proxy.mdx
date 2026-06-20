@@ -8,6 +8,7 @@ tags:
 bindings:
   - AI
 ---
+
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -80,7 +81,7 @@ Query params: `model` (required), `prompt` (required), optional `max_tokens`.
       description: "The prompt text. URL-encoded.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -97,14 +98,12 @@ curl "https://your-worker.workers.dev/chat?model=@cf/meta/llama-3.1-8b-instruct-
 
 ## Use Cases
 
-
 - Try Workers AI models from curl, Postman, or external tools without managing bindings
 - Prototype chat APIs before adding authentication and rate limiting
 - Compare model outputs by swapping the `model` parameter
 - Integrate edge AI into apps via a simple HTTP proxy
 
 ## Limitations
-
 
 - Public endpoint with no authentication or rate limiting by default
 - Workers AI is subject to [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
@@ -170,5 +169,3 @@ Call the endpoint at `http://localhost:8787/chat` with POST (JSON body) or GET (
     href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cloud-ai-proxy"
   ></Card>
 </Cards>
-
-

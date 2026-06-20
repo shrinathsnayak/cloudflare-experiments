@@ -1,0 +1,103 @@
+---
+title: "DNS Propagation Checker"
+description: "Compare DNS answers from Cloudflare, Google, and Quad9 resolvers in parallel via DoH"
+icon: "GlobeCheck"
+tags:
+  - network
+  - dns
+---
+
+Query **DNS-over-HTTPS** resolvers (Cloudflare 1.1.1.1, Google 8.8.8.8, Quad9) in parallel for a domain and record type. Reports whether answers agree, each resolver's values, and response time.
+
+## Features
+
+- GET /check — parallel DoH queries across three public resolvers
+- Supports A, AAAA, CNAME, MX, TXT, NS record types
+- Agreement summary plus per-resolver values and latency
+
+## API Reference
+
+### GET /check
+
+**`domain`** `string` (required) — Hostname to query (no scheme).
+
+**`type`** `string` (required) — Record type: `A`, `AAAA`, `CNAME`, `MX`, `TXT`, or `NS`.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/check?domain=example.com&type=A"
+```
+
+#### Success Response
+
+```json
+{
+  "domain": "example.com",
+  "type": "A",
+  "agreement": true,
+  "resolvers": [
+    { "name": "Cloudflare", "values": ["93.184.216.34"], "responseTimeMs": 42, "error": null }
+  ]
+}
+```
+
+#### Error Codes
+
+- `400` — `INVALID_DOMAIN`, `INVALID_TYPE`
+- `502` — `DNS_ERROR`
+
+## Use Cases
+
+- Verify DNS changes have propagated globally after a cutover
+- Compare resolver behavior during TTL or nameserver migrations
+- Debug split-horizon or stale cache issues across providers
+
+## Limitations
+
+- Queries three public DoH endpoints only; not exhaustive global propagation
+- Single record type per request
+- Resolver errors return partial results rather than failing the whole request
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/dns-propagation-checker)
+
+  </Step>
+  <Step>
+
+### Configure bindings
+
+    See `wrangler.json` and the experiment README for required bindings.
+
+  </Step>
+  <Step>
+
+### Test your deployment
+
+    See the experiment README for curl examples.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/dns-propagation-checker
+npm install
+npm run dev
+```
+
+## Configuration
+
+No bindings required beyond the Workers runtime.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)**
+- **[DNS over HTTPS](https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/)**

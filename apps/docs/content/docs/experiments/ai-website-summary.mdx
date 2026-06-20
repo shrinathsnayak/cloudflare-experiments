@@ -8,6 +8,7 @@ tags:
 bindings:
   - AI
 ---
+
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -36,7 +37,7 @@ Generate an AI summary of any webpage.
       description: "The webpage URL to summarize. Must use `http://` or `https://` scheme.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -204,7 +205,6 @@ app.get("/summary", async (c) => {
 
 ## Use Cases
 
-
 - **Content Curation** - Automatically generate summaries for bookmarking tools
 - **Research Assistants** - Quickly preview webpage content before visiting
 - **News Aggregators** - Create summaries for article feeds
@@ -212,7 +212,6 @@ app.get("/summary", async (c) => {
 - **Slack/Discord Bots** - Share link summaries in team chats
 
 ## Limitations
-
 
 - **JavaScript-heavy sites**: Only static HTML is fetched; JavaScript-rendered content is not executed
 - **Rate limits**: Workers AI has [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) based on your plan
@@ -292,6 +291,7 @@ No additional environment variables or secrets are required.
   }
 }
 ```
+
 ## Cloudflare Features Used
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
@@ -317,5 +317,3 @@ No additional environment variables or secrets are required.
     Explore other Cloudflare experiments
   </Card>
 </Cards>
-
-

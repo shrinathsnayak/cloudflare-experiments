@@ -1,0 +1,31 @@
+{
+  "name": "website-change-tracker",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["nodejs_compat_v2"],
+  "triggers": {
+    "crons": ["*/30 * * * *"]
+  },
+  "browser": {
+    "binding": "BROWSER"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "website-change-tracker-db",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "SNAPSHOTS",
+      "bucket_name": "website-change-tracker-snapshots"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

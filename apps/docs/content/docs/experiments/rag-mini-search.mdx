@@ -1,0 +1,141 @@
+---
+title: "RAG Mini Search"
+description: "Grounded Q&A over experiment docs using Vectorize retrieval and Workers AI"
+icon: "BookOpenCheck"
+tags:
+  - ai
+  - vectorize
+bindings:
+  - AI
+  - VECTORIZE
+---
+
+A minimal **retrieval-augmented generation** demo: embed a small corpus of experiment descriptions into **Vectorize**, retrieve top matches for a question, and generate a grounded answer with **Workers AI** plus cited source titles.
+
+## Features
+
+- **POST /seed** — Embed and upsert demo experiment docs into Vectorize
+- **POST /ask** — Question → retrieve → generate grounded answer
+- **Cited sources** — Response includes matched experiment titles and scores
+- **Demo corpus** — 10 experiment descriptions from this repo
+
+## API Reference
+
+### POST /seed
+
+Load the demo document corpus into Vectorize. Run once after deploy or locally before asking questions.
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/seed"
+```
+
+#### Success Response
+
+```json
+{
+  "seeded": 10,
+  "documents": ["Is It Down", "Link Shortener", "Cloud AI Proxy"]
+}
+```
+
+#### Error Codes
+
+- `502` — Seeding failed (`SEED_ERROR`)
+
+### POST /ask
+
+Ask a question against the indexed corpus.
+
+<TypeTable
+  type={{
+    question: {
+      description: "Natural language question (max 500 characters).",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/ask" \
+  -H "Content-Type: application/json" \
+  -d '{"question":"Which experiment uses Durable Objects?"}'
+```
+
+#### Success Response
+
+```json
+{
+  "question": "Which experiment uses Durable Objects?",
+  "answer": "The Durable Counter experiment uses Durable Objects for a globally consistent counter (Durable Counter).",
+  "sources": [{ "id": "durable-counter", "title": "Durable Counter", "score": 0.89 }]
+}
+```
+
+#### Error Codes
+
+- `400` — Invalid JSON (`INVALID_BODY`) or question (`INVALID_QUESTION`)
+- `404` — No indexed documents; run `POST /seed` first (`NOT_INDEXED`)
+- `502` — RAG pipeline error (`RAG_ERROR`)
+
+## Use Cases
+
+- Learn Vectorize + Workers AI RAG patterns end-to-end
+- Prototype documentation or support bots over a small corpus
+- Compare embedding retrieval quality before scaling to larger indexes
+
+## Limitations
+
+- Demo corpus is fixed (10 documents); not auto-synced with repo changes
+- Must call `POST /seed` before `POST /ask`
+- Requires Vectorize index `rag-mini-search` and Workers AI
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rag-mini-search)
+
+  </Step>
+
+  <Step>
+
+### Create Vectorize index
+
+    Create index `rag-mini-search` (or update `wrangler.json`), then seed:
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/seed"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/rag-mini-search
+npm install
+npm run dev
+npm run seed
+```
+
+## Configuration
+
+| Binding     | Purpose                                                                                |
+| ----------- | -------------------------------------------------------------------------------------- |
+| `AI`        | Embeddings (`@cf/baai/bge-base-en-v1.5`) + LLM (`@cf/meta/llama-3.1-8b-instruct-fast`) |
+| `VECTORIZE` | Vector index `rag-mini-search`                                                         |
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** — Embeddings and text generation
+- **[Vectorize](https://developers.cloudflare.com/vectorize/)** — Vector search at the edge

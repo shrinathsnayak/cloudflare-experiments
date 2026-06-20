@@ -1,0 +1,174 @@
+---
+title: "DO Alarm Scheduler"
+description: "Schedule one-off reminders with the Durable Object Alarm API and poll for fired status"
+icon: "BellRing"
+tags:
+  - stateful
+bindings:
+  - DO
+---
+
+Schedule a one-off reminder **N seconds in the future** using the Durable Object **Alarm API** (`setAlarm`). Poll `GET /status/:id` to confirm when the alarm fired — since there is no push channel in this demo, polling is the intended pattern.
+
+## Features
+
+- **POST /schedule** — Schedule a reminder with `{ seconds, message }`
+- **GET /status/:id** — Poll for `scheduled` or `fired` status
+- **Alarm API** — `storage.setAlarm()` + `alarm()` handler
+- **One DO per schedule** — Each schedule id maps to its own Durable Object instance
+
+## API Reference
+
+### POST /schedule
+
+Schedule a one-off reminder.
+
+<TypeTable
+  type={{
+    seconds: {
+      description: "Delay before the alarm fires (1–300 seconds).",
+      type: "number",
+      required: true,
+    },
+    message: {
+      description: "Reminder message (max 500 characters).",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/schedule" \
+  -H "Content-Type: application/json" \
+  -d '{"seconds":30,"message":"Check the deploy"}'
+```
+
+#### Success Response (201)
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "message": "Check the deploy",
+  "seconds": 30,
+  "status": "scheduled",
+  "scheduledFor": "2025-06-20T12:00:30.000Z"
+}
+```
+
+#### Error Codes
+
+- `400` — Invalid JSON (`INVALID_BODY`), seconds (`INVALID_SECONDS`), or message (`INVALID_MESSAGE`)
+- `502` — Schedule failed (`SCHEDULE_ERROR`)
+
+### GET /status/:id
+
+Poll schedule status. After the alarm fires, `status` becomes `fired` and `firedAt` is set.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/status/550e8400-e29b-41d4-a716-446655440000"
+```
+
+#### Success Response (scheduled)
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "message": "Check the deploy",
+  "seconds": 30,
+  "status": "scheduled",
+  "scheduledFor": "2025-06-20T12:00:30.000Z"
+}
+```
+
+#### Success Response (fired)
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "message": "Check the deploy",
+  "seconds": 30,
+  "status": "fired",
+  "scheduledFor": "2025-06-20T12:00:30.000Z",
+  "firedAt": "2025-06-20T12:00:30.123Z"
+}
+```
+
+#### Error Codes
+
+- `400` — Missing id (`INVALID_ID`)
+- `404` — Schedule not found (`NOT_FOUND`)
+
+## Use Cases
+
+- Learn Durable Object Alarm API (`setAlarm`, `alarm()` handler)
+- Prototype delayed tasks without Cron Triggers or external schedulers
+- Build polling-based reminder demos before adding webhooks or email
+
+## Limitations
+
+- Max delay 300 seconds (5 minutes) for the demo
+- No push notification when alarm fires; client must poll
+- One alarm per Durable Object instance (one schedule id)
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/do-alarm-scheduler)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Durable Object migration for `AlarmScheduler` is included in `wrangler.json`.
+
+  </Step>
+
+  <Step>
+
+### Test scheduling
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/schedule" \
+      -H "Content-Type: application/json" \
+      -d '{"seconds":10,"message":"Hello from the alarm"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/do-alarm-scheduler
+npm install
+npm run dev
+```
+
+Poll status after the delay:
+
+```bash
+curl "http://localhost:8787/status/YOUR_SCHEDULE_ID"
+```
+
+## Configuration
+
+| Binding     | Purpose                                           |
+| ----------- | ------------------------------------------------- |
+| `SCHEDULER` | Durable Object namespace (`AlarmScheduler` class) |
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** — Per-schedule state and alarms
+- **Alarm API** — One-off delayed execution via `setAlarm()`

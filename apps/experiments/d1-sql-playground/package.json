@@ -1,0 +1,24 @@
+{
+  "name": "d1-sql-playground",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:create": "wrangler d1 create d1-sql-playground-db",
+    "db:migrate": "wrangler d1 migrations apply d1-sql-playground-db",
+    "db:migrate:local": "wrangler d1 migrations apply d1-sql-playground-db --local"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.0.0",
+    "wrangler": "^4"
+  },
+  "dependencies": {
+    "hono": "^4.6.12"
+  }
+}

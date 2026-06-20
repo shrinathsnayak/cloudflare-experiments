@@ -8,6 +8,7 @@ tags:
 bindings:
   - AI
 ---
+
 Translate text between languages using [Workers AI](https://developers.cloudflare.com/workers-ai/) and Meta's m2m100 model. Send text via query parameters and receive a translation without external API keys.
 
 ## Features
@@ -38,7 +39,7 @@ Translates the provided text from a source language to a target language.
     source: {
       description: "Source language code (default: `en`)",
       type: "string",
-    }
+    },
   }}
 />
 
@@ -93,14 +94,12 @@ The translated text
 
 ## Use Cases
 
-
 - Add on-the-fly translation to edge APIs and proxies
 - Localize user-facing strings without a third-party translation service
 - Learn Workers AI text-to-text models in a stateless Worker
 - Prototype multilingual chatbots and content tools at the edge
 
 ## Limitations
-
 
 - Workers AI is subject to [usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
 - Input text length is capped
@@ -154,5 +153,3 @@ curl "http://localhost:8787/translate?text=hello&target=es&source=en"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - `@cf/meta/m2m100-1.2b` machine translation model
-
-

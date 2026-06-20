@@ -1,0 +1,12 @@
+{
+  "name": "do-alarm-scheduler",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "durable_objects": {
+    "bindings": [{ "name": "SCHEDULER", "class_name": "AlarmScheduler" }]
+  },
+  "migrations": [{ "tag": "v1", "new_classes": ["AlarmScheduler"] }],
+  "observability": {
+    "logs": { "enabled": true, "invocation_logs": true }
+  }
+}

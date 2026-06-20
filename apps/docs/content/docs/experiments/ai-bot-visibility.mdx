@@ -7,6 +7,7 @@ tags:
   - seo
 full: true
 ---
+
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -42,7 +43,7 @@ Check AI crawler visibility configuration for a URL.
       description: "The target URL to check. Must use `http://` or `https://` scheme.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -443,7 +444,6 @@ app.get("/site-check", async (c) => {
 
 ## Use Cases
 
-
 - **SEO Tools** - Add AI crawler visibility checks to SEO audit dashboards
 - **CMS Plugins** - Integrate into WordPress/Drupal to show AI bot status
 - **Privacy Compliance** - Monitor which AI platforms can access your content
@@ -452,7 +452,6 @@ app.get("/site-check", async (c) => {
 - **Web Scraping Tools** - Check if your scraper is allowed before crawling
 
 ## Limitations
-
 
 - **Configuration only**: Does not verify actual indexing by AI platforms (no public APIs exist)
 - **Static analysis**: Does not execute JavaScript; only analyzes HTML and headers
@@ -531,6 +530,7 @@ No bindings or environment variables are required. The `wrangler.json` is minima
   }
 }
 ```
+
 ## Cloudflare Features Used
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
@@ -565,5 +565,3 @@ No bindings or environment variables are required. The `wrangler.json` is minima
     View the complete source code
   </Card>
 </Cards>
-
-

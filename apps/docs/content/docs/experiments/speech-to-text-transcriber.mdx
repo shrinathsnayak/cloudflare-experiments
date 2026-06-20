@@ -1,0 +1,112 @@
+---
+title: "Speech to Text Transcriber"
+description: "Transcribe uploaded audio with Workers AI Whisper at the edge"
+icon: "Mic"
+tags:
+  - ai
+  - workers-ai
+bindings:
+  - AI
+---
+
+Upload an audio file and receive a transcript using **Workers AI Whisper** (`@cf/openai/whisper-large-v3-turbo`). Validates file size and content type before calling the model.
+
+## Features
+
+- **POST /transcribe** — Multipart upload with field `audio`
+- **Whisper model** — `@cf/openai/whisper-large-v3-turbo`
+- **Validation** — Max 2 MB, `audio/*` types only
+- **Timing** — Returns `durationMs` for the transcription call
+
+## API Reference
+
+### POST /transcribe
+
+Transcribe an uploaded audio file.
+
+**`audio`** `file` (required, multipart)
+
+Audio file (max 2 MB). Accepted types include `audio/mpeg`, `audio/wav`, `audio/webm`, `audio/ogg`, and other `audio/*` MIME types.
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/transcribe" \
+  -F "audio=@sample.mp3"
+```
+
+#### Success Response
+
+```json
+{
+  "text": "Hello, this is a test recording.",
+  "language": "en",
+  "durationMs": 842
+}
+```
+
+#### Error Codes
+
+- `400` — Missing or invalid audio (`INVALID_AUDIO`)
+- `502` — Transcription failed or empty result (`TRANSCRIBE_ERROR`)
+
+## Use Cases
+
+- Add speech-to-text to edge apps without external API keys
+- Prototype voice note or meeting transcription workflows
+- Learn Workers AI audio model integration patterns
+
+## Limitations
+
+- Max upload size 2 MB per request (Whisper model limits apply)
+- No chunking for long recordings; split large files client-side
+- Requires Workers AI enabled on your Cloudflare account
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/speech-to-text-transcriber)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Enable Workers AI. The `AI` binding is declared in `wrangler.json`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/transcribe" -F "audio=@sample.mp3"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/speech-to-text-transcriber
+npm install
+npm run dev
+```
+
+## Configuration
+
+| Binding | Purpose                  |
+| ------- | ------------------------ |
+| `AI`    | Workers AI Whisper model |
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** — Whisper speech-to-text

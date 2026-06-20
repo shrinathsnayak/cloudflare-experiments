@@ -1,0 +1,13 @@
+{
+  "name": "queue-job-visualizer",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "queues": {
+    "producers": [{ "binding": "JOBS_QUEUE", "queue": "queue-job-visualizer" }],
+    "consumers": [{ "queue": "queue-job-visualizer", "max_batch_size": 5, "max_batch_timeout": 2 }]
+  },
+  "kv_namespaces": [{ "binding": "JOBS", "id": "00000000000000000000000000000000" }],
+  "observability": {
+    "logs": { "enabled": true, "invocation_logs": true }
+  }
+}

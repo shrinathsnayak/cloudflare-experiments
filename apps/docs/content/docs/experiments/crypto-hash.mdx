@@ -5,6 +5,7 @@ icon: "Hash"
 tags:
   - edge
 ---
+
 Compute SHA-256, SHA-384, or SHA-512 digests for any text input using the Web Crypto API in Workers.
 
 ## API Reference
@@ -23,7 +24,7 @@ Returns a hex-encoded hash for the provided text.
     algorithm: {
       description: "Hash algorithm: `SHA-256` (default), `SHA-384`, or `SHA-512`",
       type: "string",
-    }
+    },
   }}
 />
 
@@ -71,14 +72,12 @@ Length of the input text in characters
 
 ## Use Cases
 
-
 - Hash strings at the edge without shipping crypto libraries
 - Verify content fingerprints in API workflows
 - Learn Web Crypto (`crypto.subtle.digest`) in Workers
 - Compare digest sizes across SHA-256, SHA-384, and SHA-512
 
 ## Limitations
-
 
 - Hashes plain text only; no file upload or streaming input
 - No HMAC, salting, or keyed hashing in this experiment
@@ -132,5 +131,3 @@ curl "http://localhost:8787/hash?text=hello"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Web Crypto API](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)** - `crypto.subtle.digest` for SHA hashing
-
-

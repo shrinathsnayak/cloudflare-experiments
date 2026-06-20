@@ -5,6 +5,7 @@ icon: "FileCode"
 tags:
   - scraping
 ---
+
 Fetch remote HTML pages and analyze or transform them using the [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) API. Stream-parse documents at the edge to count elements or inject content without loading a full DOM parser.
 
 ## API Reference
@@ -19,7 +20,7 @@ Fetches a page and returns HTML statistics collected via HTMLRewriter handlers.
       description: "Page URL to analyze (`http://` or `https://` only)",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -87,9 +88,10 @@ Fetches a page and injects a banner `<div>` at the top of `<body>` using HTMLRew
       required: true,
     },
     banner: {
-      description: "Banner text to inject (default: `Transformed by Cloudflare HTMLRewriter at the edge`)",
+      description:
+        "Banner text to inject (default: `Transformed by Cloudflare HTMLRewriter at the edge`)",
       type: "string",
-    }
+    },
   }}
 />
 
@@ -137,14 +139,12 @@ The transformed HTML document
 
 ## Use Cases
 
-
 - Audit page structure (links, images, headings) without a headless browser
 - Inject edge banners or notices into proxied HTML responses
 - Learn streaming HTML transformation with HTMLRewriter handlers
 - Build lightweight HTML analysis tools at the edge
 
 ## Limitations
-
 
 - Static HTML fetch only; JavaScript-rendered content is not executed
 - HTML body size is capped before streaming through HTMLRewriter
@@ -201,5 +201,3 @@ curl "http://localhost:8787/transform?url=https://example.com"
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/)** - Streaming HTML parsing and transformation
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote HTML retrieval
-
-

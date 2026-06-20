@@ -1,0 +1,153 @@
+---
+title: "Rate Limiter Demo"
+description: "Native Workers Rate Limiting binding with 429 responses and usage visualization"
+icon: "CircleGauge"
+tags:
+  - edge
+bindings:
+  - RATE_LIMITER
+  - KV
+---
+
+Demonstrates the native **Workers Rate Limiting** binding. `GET /limited` enforces per-key limits and returns **429** with `Retry-After` when exceeded. `GET /status` shows configured limits and demo usage counters stored in KV.
+
+## Features
+
+- **GET /limited** — Rate-limited endpoint (10 req / 60s per key)
+- **GET /status?key=** — View limit config and usage counters
+- **429 responses** — Includes `Retry-After` header and `RATE_LIMITED` code
+- **Per-key limiting** — Defaults to client IP; override with `?key=`
+
+## API Reference
+
+### GET /limited
+
+Request the rate-limited resource.
+
+**`key`** `string` (optional query)
+
+Override rate limit key (max 128 chars). Defaults to `CF-Connecting-IP`.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/limited"
+curl "https://your-worker.workers.dev/limited?key=demo-client"
+```
+
+#### Success Response
+
+```json
+{
+  "message": "Request allowed",
+  "key": "203.0.113.1",
+  "limit": 10,
+  "periodSeconds": 60
+}
+```
+
+#### Rate Limited Response (429)
+
+```json
+{
+  "error": "Rate limit exceeded",
+  "code": "RATE_LIMITED",
+  "key": "203.0.113.1",
+  "retryAfterSeconds": 60
+}
+```
+
+Response includes header: `Retry-After: 60`
+
+### GET /status
+
+View rate limit configuration and demo usage counters.
+
+**`key`** `string` (optional query)
+
+Key to inspect. Defaults to client IP.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/status?key=demo-client"
+```
+
+#### Success Response
+
+```json
+{
+  "key": "demo-client",
+  "config": { "limit": 10, "periodSeconds": 60 },
+  "usage": {
+    "key": "demo-client",
+    "allowed": 7,
+    "blocked": 3,
+    "lastSeen": "2025-06-20T12:00:00.000Z"
+  },
+  "note": "Native Rate Limiting binding enforces limits per PoP..."
+}
+```
+
+## Use Cases
+
+- Learn the Workers Rate Limiting binding (`limit()` API)
+- Prototype API throttling before production WAF rules
+- Demonstrate 429 + Retry-After client handling
+
+## Limitations
+
+- Rate limits are enforced per PoP by the native binding
+- KV usage counters are for demo visualization only (not authoritative)
+- Configured limit: 10 requests per 60 seconds (see `wrangler.json`)
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rate-limiter-demo)
+
+  </Step>
+
+  <Step>
+
+### Configure KV
+
+    Create a KV namespace bound as `USAGE`. Rate limit binding is declared in `wrangler.json`.
+
+  </Step>
+
+  <Step>
+
+### Test rate limiting
+
+    ```bash
+    for i in $(seq 1 12); do curl -s -o /dev/null -w "%{http_code}\n" "https://your-worker.workers.dev/limited"; done
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/rate-limiter-demo
+npm install
+npm run dev
+```
+
+## Configuration
+
+| Binding / setting | Purpose                              |
+| ----------------- | ------------------------------------ |
+| `RATE_LIMITER`    | Native rate limiting (10 req / 60s)  |
+| `USAGE`           | KV namespace for demo usage counters |
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **[Rate Limiting binding](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)** — Native per-key throttling
+- **[Workers KV](https://developers.cloudflare.com/kv/)** — Demo usage tracking

@@ -5,6 +5,7 @@ icon: "Code"
 tags:
   - scraping
 ---
+
 Convert any webpage into clean, structured JSON data. Extract the title, all headings with their hierarchy, internal and external links, and images. Perfect for web scraping, content analysis, or building custom search indices.
 
 ## API Reference
@@ -19,7 +20,7 @@ Transform a webpage into structured JSON by providing its URL.
       description: "The URL of the webpage to convert. Must be a valid HTTP or HTTPS URL.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -143,7 +144,6 @@ Array of unique absolute image URLs extracted from `<img>` tags. All relative UR
 
 ## Use Cases
 
-
 - **Web Scraping**: Extract structured data from websites without parsing HTML
 - **Content Analysis**: Analyze page structure and heading hierarchy
 - **Link Extraction**: Build sitemaps or discover related content
@@ -152,7 +152,6 @@ Array of unique absolute image URLs extracted from `<img>` tags. All relative UR
 - **SEO Audits**: Analyze heading structure and internal linking
 
 ## Limitations
-
 
 - Static HTML parsing only; JavaScript-rendered content is not available
 - Fetch timeout and HTML size limits apply
@@ -206,5 +205,3 @@ curl "http://localhost:8787/api?url=https://example.com"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote HTML retrieval and structured parsing
-
-

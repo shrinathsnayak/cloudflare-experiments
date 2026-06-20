@@ -1,0 +1,167 @@
+---
+title: "Queue Job Visualizer"
+description: "Cloudflare Queues producer/consumer with KV-backed job status and simulated retries"
+icon: "SquareKanban"
+tags:
+  - stateful
+  - queues
+bindings:
+  - QUEUE
+  - KV
+---
+
+Enqueue simulated jobs over HTTP, process them asynchronously with a **Queues consumer**, and track status transitions in **KV** (`queued` → `processing` → `done` / `failed`). The consumer simulates ~35% failure rate and retries via `message.retry()`.
+
+## Features
+
+- **POST /jobs** — Enqueue a resize or fetch job
+- **GET /jobs/:id** — Poll job status from KV
+- **Simulated failures** — Consumer retries up to 3 attempts before marking failed
+- **KV state machine** — Full transition history on each job record
+
+## API Reference
+
+### POST /jobs
+
+Enqueue a new job.
+
+<TypeTable
+  type={{
+    type: {
+      description: "Job type: `resize` or `fetch`.",
+      type: "string",
+      required: true,
+    },
+    target: {
+      description: "Job target string (e.g. URL or filename, max 500 chars).",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/jobs" \
+  -H "Content-Type: application/json" \
+  -d '{"type":"fetch","target":"https://example.com/image.png"}'
+```
+
+#### Success Response (201)
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "type": "fetch",
+  "target": "https://example.com/image.png",
+  "status": "queued",
+  "attempts": 0,
+  "enqueuedAt": "2025-06-20T12:00:00.000Z",
+  "updatedAt": "2025-06-20T12:00:00.000Z"
+}
+```
+
+#### Error Codes
+
+- `400` — Invalid JSON (`INVALID_BODY`), type (`INVALID_TYPE`), or target (`INVALID_TARGET`)
+
+### GET /jobs/:id
+
+Returns the current job record from KV.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/jobs/550e8400-e29b-41d4-a716-446655440000"
+```
+
+#### Success Response
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "type": "fetch",
+  "target": "https://example.com/image.png",
+  "status": "done",
+  "attempts": 1,
+  "result": "Fetched https://example.com/image.png (simulated)",
+  "enqueuedAt": "2025-06-20T12:00:00.000Z",
+  "updatedAt": "2025-06-20T12:01:00.000Z"
+}
+```
+
+#### Error Codes
+
+- `404` — Job not found (`NOT_FOUND`)
+
+<Callout>
+
+Status may stay `queued` or `processing` briefly until the queue consumer runs. Poll until `done` or `failed`.
+
+</Callout>
+
+## Use Cases
+
+- Learn Queues producer (`send`) and consumer (`queue()` handler) setup
+- Visualize async job lifecycles with KV-backed status
+- Demonstrate retry semantics with `message.retry()` and `message.ack()`
+
+## Limitations
+
+- Jobs are simulated; no actual image resize or fetch occurs
+- Failure rate is deterministic per job id + attempt (demo only)
+- Requires KV namespace and Queue configured in `wrangler.json`
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/queue-job-visualizer)
+
+  </Step>
+
+  <Step>
+
+### Configure KV and Queue
+
+    Create a KV namespace bound as `JOBS` and a queue named `queue-job-visualizer`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/jobs" \
+      -H "Content-Type: application/json" \
+      -d '{"type":"resize","target":"photo.png"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/queue-job-visualizer
+npm install
+npm run dev
+```
+
+## Configuration
+
+| Binding      | Purpose                             |
+| ------------ | ----------------------------------- |
+| `JOBS_QUEUE` | Cloudflare Queue producer/consumer  |
+| `JOBS`       | KV namespace for job status records |
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **[Queues](https://developers.cloudflare.com/queues/)** — Async job processing
+- **[Workers KV](https://developers.cloudflare.com/kv/)** — Job status storage

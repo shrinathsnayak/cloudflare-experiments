@@ -272,7 +272,7 @@ const CONTENT = {
       "WebSocket connections are subject to Worker CPU and duration limits",
     ],
   },
-  "whereami": {
+  whereami: {
     limitations: [
       "Returns Cloudflare `request.cf` metadata only; not a standalone geolocation API",
       "Local development returns minimal or empty `cf` data",
@@ -333,7 +333,11 @@ function enhanceBody(slug, body) {
     if (hasSection(next, "Use Cases")) {
       next = insertAfterSection(next, "Use Cases", formatSection("Limitations", meta.limitations));
     } else if (hasSection(next, "Deployment")) {
-      next = insertBeforeSection(next, "Deployment", formatSection("Limitations", meta.limitations));
+      next = insertBeforeSection(
+        next,
+        "Deployment",
+        formatSection("Limitations", meta.limitations)
+      );
     } else {
       next = appendAtEnd(next, formatSection("Limitations", meta.limitations));
     }

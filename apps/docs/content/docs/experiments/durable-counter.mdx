@@ -7,6 +7,7 @@ tags:
 bindings:
   - DO
 ---
+
 A minimal reference for **Durable Objects**: a single `Counter` class with persistent storage, exposed via HTTP routes. Use this pattern when you need strongly consistent state at the edge (rate limits, sessions, coordination).
 
 ## API Reference
@@ -45,14 +46,12 @@ curl -X POST "https://your-worker.workers.dev/counter/reset"
 
 ## Use Cases
 
-
 - Learn how to define and export a Durable Object class
 - Shared counters or rate limiters across all edge locations
 - Starting point for session storage or real-time coordination
 - Understanding `idFromName()` for addressing a single global object
 
 ## Limitations
-
 
 - Demo uses a single global counter via `idFromName()`; not sharded for high throughput
 - Requires a Durable Objects binding and migration
@@ -99,5 +98,3 @@ npm run dev
 
 - [Durable Objects](https://developers.cloudflare.com/durable-objects/) - strongly consistent state and storage
 - [Workers](https://developers.cloudflare.com/workers/) - HTTP routes that call into the DO stub
-
-

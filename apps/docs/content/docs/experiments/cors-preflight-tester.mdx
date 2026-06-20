@@ -1,0 +1,96 @@
+---
+title: "CORS Preflight Tester"
+description: "Simulate browser CORS preflight OPTIONS requests and analyze response headers"
+icon: "Unplug"
+tags:
+  - network
+  - cors
+---
+
+Send an **OPTIONS** preflight to a target URL with a simulated origin, method, and requested headers. Reports which CORS response headers are present, missing, or misconfigured relative to what the browser would require.
+
+## Features
+
+- POST /test — simulate Access-Control-Request-Method/Headers preflight
+- Analyzes Allow-Origin, Allow-Methods, Allow-Headers, Allow-Credentials
+- Returns actionable pass/fail per header requirement
+
+## API Reference
+
+### POST /test
+
+**`url`** `string` (required) — Target URL (http or https).
+
+**`origin`** `string` (required) — Simulated Origin header value.
+
+**`method`** `string` (required) — Intended request method (e.g. `POST`).
+
+**`headers`** `string[]` (optional) — Request headers for preflight (e.g. `["Content-Type"]`).
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/test" \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://api.example.com/data","origin":"https://app.example.com","method":"POST","headers":["Content-Type"]}'
+```
+
+#### Error Codes
+
+- `400` — `INVALID_BODY`, `INVALID_URL`, `INVALID_ORIGIN`, `INVALID_METHOD`
+- `502` — `PREFLIGHT_ERROR`
+
+## Use Cases
+
+- Debug why a browser blocks cross-origin API calls
+- Validate CORS headers before deploying a new frontend origin
+- Compare preflight behavior across staging and production APIs
+
+## Limitations
+
+- Simulates preflight from Workers egress, not from an end-user browser network
+- Does not follow complex redirect chains for OPTIONS
+- Single preflight scenario per request
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cors-preflight-tester)
+
+  </Step>
+  <Step>
+
+### Configure bindings
+
+    See `wrangler.json` and the experiment README for required bindings.
+
+  </Step>
+  <Step>
+
+### Test your deployment
+
+    See the experiment README for curl examples.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/cors-preflight-tester
+npm install
+npm run dev
+```
+
+## Configuration
+
+No bindings required beyond the Workers runtime.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)**
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)**

@@ -5,6 +5,7 @@ icon: "MapPin"
 tags:
   - network
 ---
+
 Retrieve detailed metadata about incoming requests from Cloudflare's edge network, including geographic location, data center, ASN, and timezone.
 
 ## API Reference
@@ -88,7 +89,6 @@ See the [Cloudflare request.cf documentation](https://developers.cloudflare.com/
 
 ## Use Cases
 
-
 - Determine visitor geographic location without external APIs
 - Display localized content based on country/region
 - Show the nearest edge data center serving the request
@@ -96,7 +96,6 @@ See the [Cloudflare request.cf documentation](https://developers.cloudflare.com/
 - Build geographic routing logic
 
 ## Limitations
-
 
 - Returns Cloudflare `request.cf` metadata only; not a standalone geolocation API
 - Local development returns minimal or empty `cf` data
@@ -156,5 +155,3 @@ Local development will return an empty object or minimal data since `request.cf`
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[request.cf](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties)** - Incoming request metadata including geolocation
-
-

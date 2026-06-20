@@ -1,0 +1,110 @@
+---
+title: "Live Cursor Tracker"
+description: "Real-time shared cursor positions over WebSocket using Durable Objects and the Hibernation API"
+icon: "MousePointer2"
+tags:
+  - stateful
+  - websocket
+bindings:
+  - DO
+---
+
+Broadcast cursor positions to every client in a shared room using a **Durable Object** and the **WebSocket Hibernation API**. Open multiple tabs to `/` and move your mouse to see colored cursors sync in real time.
+
+## Features
+
+- **GET /** — Demo page with canvas and WebSocket client
+- **GET /ws/:room** — WebSocket upgrade; one DO instance per room name
+- **Hibernation API** — `acceptWebSocket`, `webSocketMessage`, `webSocketClose`
+- **Colored cursors** — Each client gets a stable color and guest label
+
+## API Reference
+
+### GET /
+
+Returns an HTML demo page with inline JavaScript that connects to `/ws/:room`.
+
+Open `http://localhost:8787/` in two browser tabs to test locally.
+
+### GET /ws/:room
+
+Upgrades to WebSocket and joins the room's Durable Object.
+
+**`room`** `string` (path, required)
+
+Room name: letters, numbers, `_`, or `-` (max 64 characters).
+
+#### Client messages (JSON)
+
+Send cursor position updates:
+
+```json
+{ "x": 120, "y": 340 }
+```
+
+#### Server messages (JSON)
+
+```json
+{ "type": "join", "id": "uuid", "color": "#3b82f6", "name": "Guest-a1b2" }
+{ "type": "cursor", "id": "uuid", "x": 120, "y": 340, "color": "#3b82f6", "name": "Guest-a1b2" }
+{ "type": "leave", "id": "uuid", "color": "#3b82f6", "name": "Guest-a1b2" }
+```
+
+#### Error Codes
+
+- `400` — Invalid room name (`INVALID_ROOM`)
+- `426` — Missing WebSocket upgrade header
+
+## Use Cases
+
+- Learn Durable Object WebSocket hibernation patterns
+- Prototype collaborative UI features (cursors, presence, cursors-on-canvas)
+- Demo real-time broadcast without an external pub/sub service
+
+## Limitations
+
+- No authentication; any client can join any room name
+- Cursor state is ephemeral (not persisted to storage)
+- Demo page only; production apps would use a custom frontend
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/live-cursor-tracker)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Durable Object migration is included in `wrangler.json`. No additional bindings required.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/live-cursor-tracker
+npm install
+npm run dev
+```
+
+Open `http://localhost:8787/` in two tabs.
+
+## Configuration
+
+| Binding | Purpose                                       |
+| ------- | --------------------------------------------- |
+| `ROOMS` | Durable Object namespace (`CursorRoom` class) |
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** — Room-scoped WebSocket coordination
+- **WebSocket Hibernation API** — Efficient long-lived connections

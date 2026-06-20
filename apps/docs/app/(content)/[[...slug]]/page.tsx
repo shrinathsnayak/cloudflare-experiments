@@ -27,11 +27,7 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
   return (
     <>
       <JsonLd data={createDocsPageJsonLd(page)} />
-      <DocsPage
-        toc={page.data.toc}
-        full={page.data.full}
-        tableOfContent={{ enabled: true }}
-      >
+      <DocsPage toc={page.data.toc} full={page.data.full} tableOfContent={{ enabled: true }}>
         <DocsTitle>{page.data.title}</DocsTitle>
         <DocsDescription>{page.data.description}</DocsDescription>
         <div className="flex flex-row flex-wrap items-center gap-2 not-prose">

@@ -1,0 +1,121 @@
+---
+title: "Multi-PoP Latency Map"
+description: "Measure fetch latency and report the Cloudflare colo that served the Worker invocation"
+icon: "Timer"
+tags:
+  - network
+  - latency
+---
+
+Fetch a target URL from the edge and report response time plus the **Cloudflare colo** (`cf.colo`) that handled the Worker invocation. Documents honestly that each request runs in a **single PoP** — not a global multi-region sweep.
+
+## Features
+
+- **GET /latency?url=** — Response time, status code, and edge location
+- **Colo metadata** — `colo`, `city`, `country` from `request.cf`
+- **Transparent limitations** — Response includes `limitation` and `tip` fields
+- **Cache bypass** — Uses `cf: { cacheTtl: 0 }` on the outbound fetch
+
+## API Reference
+
+### GET /latency
+
+Measure fetch latency from the current edge location.
+
+<TypeTable
+  type={{
+    url: {
+      description: "Target URL (http or https only).",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
+
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/latency?url=https://www.cloudflare.com"
+```
+
+#### Success Response
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "responseTimeMs": 87,
+  "statusCode": 200,
+  "colo": "SFO",
+  "city": "San Francisco",
+  "country": "US",
+  "timestamp": "2025-06-20T12:00:00.000Z",
+  "limitation": "Each Worker invocation runs in a single Cloudflare PoP...",
+  "tip": "For multi-region comparison, call this endpoint repeatedly from different client locations..."
+}
+```
+
+#### Error Codes
+
+- `400` — Invalid URL (`INVALID_URL`)
+- `502` — Fetch failed (`FETCH_ERROR`)
+
+<Callout type="warning">
+
+This endpoint reports latency from **one PoP per request**. It does not perform a simultaneous multi-region ping. Call repeatedly from different geographic clients to compare colos.
+
+</Callout>
+
+## Use Cases
+
+- Show students how `request.cf.colo` identifies the serving edge
+- Compare latency when calling the worker from different client locations
+- Learn honest edge networking constraints in Workers
+
+## Limitations
+
+- Single PoP per invocation; no built-in multi-region orchestration
+- `colo` reflects where the Worker ran, not every hop to the origin
+- Outbound fetch timing includes DNS + TLS + TTFB for the target URL
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/multi-pop-latency-map)
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/latency?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/multi-pop-latency-map
+npm install
+npm run dev
+```
+
+<Callout>
+
+`colo` and geolocation fields are populated when deployed to Cloudflare's edge. Local `wrangler dev` may return null for some `cf` properties.
+
+</Callout>
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **`request.cf`** — Colo and geolocation metadata
+- **Fetch API** — Outbound HTTP with cache controls

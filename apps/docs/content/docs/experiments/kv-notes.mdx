@@ -7,6 +7,7 @@ tags:
 bindings:
   - KV
 ---
+
 Store and retrieve small text notes using a dedicated Workers KV namespace.
 
 ## API Reference
@@ -26,7 +27,7 @@ Create or update a note.
       description: "Note body (max 4,000 characters)",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -73,13 +74,11 @@ Delete a note by id.
 
 ## Use Cases
 
-
 - Learn KV read/write/delete patterns without D1
 - Store small configuration blobs at the edge
 - Prototype simple key-value APIs before adding auth
 
 ## Limitations
-
 
 - Note IDs are capped at 64 characters; content at 4,000 characters
 - No authentication; any client can read, write, or delete by ID
@@ -117,5 +116,3 @@ npm run dev
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Workers KV](https://developers.cloudflare.com/kv/)** - Global key-value storage
-
-

@@ -66,6 +66,7 @@ cloudflare-experiments/
 │       ├── whereami/
 │       ├── response-headers/
 │       ├── link-shortener/
+│       ├── d1-sql-playground/
 │       ├── kv-notes/
 │       ├── edge-redirect-simulator/
 │       ├── durable-counter/
@@ -83,6 +84,17 @@ cloudflare-experiments/
 │       ├── ai-image-generator/
 │       ├── analytics-engine/
 │       └── turnstile-verify/
+│       ├── workflows-pipeline-demo/
+│       ├── live-cursor-tracker/
+│       ├── queue-job-visualizer/
+│       ├── speech-to-text-transcriber/
+│       ├── rag-mini-search/
+│       ├── ssl-certificate-inspector/
+│       ├── multi-pop-latency-map/
+│       ├── jwt-inspector/
+│       ├── rate-limiter-demo/
+│       ├── presigned-r2-upload/
+│       └── do-alarm-scheduler/
 ├── turbo.json
 ├── .cursor/
 │   ├── rules/
@@ -119,6 +131,7 @@ This is a **Turborepo** monorepo. Worker experiments live in `apps/experiments/`
 | [R2 Storage](apps/experiments/r2-storage/)                                 | R2 storage API with list/get/put/delete and configurable list options                     | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-storage)                 |
 | [Where Am I](apps/experiments/whereami/)                                   | Request metadata from Cloudflare's edge (request.cf geolocation, colo)                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/whereami)                   |
 | [Link Shortener](apps/experiments/link-shortener/)                         | Shorten URLs and redirect with D1 (POST /shorten, GET /:code)                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)             |
+| [D1 SQL Playground](apps/experiments/d1-sql-playground/)                   | Read-only SQL playground over a seeded D1 database (POST /query)                          | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/d1-sql-playground)          |
 | [KV Notes](apps/experiments/kv-notes/)                                     | Simple note storage with Workers KV (POST/GET/DELETE /notes)                              | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/kv-notes)                   |
 | [Edge Redirect Simulator](apps/experiments/edge-redirect-simulator/)       | Show redirect chains for any URL (each hop and status code)                               | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/edge-redirect-simulator)    |
 | [Response Headers](apps/experiments/response-headers/)                     | Inspect HTTP response headers for any URL from the edge                                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/response-headers)           |
@@ -137,6 +150,27 @@ This is a **Turborepo** monorepo. Worker experiments live in `apps/experiments/`
 | [AI Image Generator](apps/experiments/ai-image-generator/)                 | Generate images from text prompts using Workers AI (FLUX)                                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-image-generator)         |
 | [Analytics Engine](apps/experiments/analytics-engine/)                     | Write custom analytics events with Workers Analytics Engine                               | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/analytics-engine)           |
 | [Turnstile Verify](apps/experiments/turnstile-verify/)                     | Verify Cloudflare Turnstile tokens via the siteverify API                                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/turnstile-verify)           |
+| [Workflows Pipeline Demo](apps/experiments/workflows-pipeline-demo/)       | Durable fetch → AI summarize → R2 pipeline with Cloudflare Workflows                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/workflows-pipeline-demo)    |
+| [Live Cursor Tracker](apps/experiments/live-cursor-tracker/)               | Real-time shared cursors over WebSocket via Durable Objects                               | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/live-cursor-tracker)        |
+| [Queue Job Visualizer](apps/experiments/queue-job-visualizer/)             | Queues producer/consumer with KV job status and simulated retries                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/queue-job-visualizer)       |
+| [Speech to Text Transcriber](apps/experiments/speech-to-text-transcriber/) | Transcribe uploaded audio with Workers AI Whisper                                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/speech-to-text-transcriber) |
+| [RAG Mini Search](apps/experiments/rag-mini-search/)                       | Grounded Q&A with Vectorize retrieval and Workers AI                                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rag-mini-search)            |
+| [SSL Certificate Inspector](apps/experiments/ssl-certificate-inspector/)   | Inspect TLS certificate metadata for a domain                                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ssl-certificate-inspector)  |
+| [Multi-PoP Latency Map](apps/experiments/multi-pop-latency-map/)           | Fetch latency plus serving colo (single PoP per request)                                  | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/multi-pop-latency-map)      |
+| [JWT Inspector](apps/experiments/jwt-inspector/)                           | Decode, verify, and issue JWTs for experimentation                                        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/jwt-inspector)              |
+| [Rate Limiter Demo](apps/experiments/rate-limiter-demo/)                   | Native Workers Rate Limiting binding with 429 responses                                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rate-limiter-demo)          |
+| [Presigned R2 Upload](apps/experiments/presigned-r2-upload/)               | Presigned PUT URLs for direct browser-to-R2 uploads                                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/presigned-r2-upload)        |
+| [DO Alarm Scheduler](apps/experiments/do-alarm-scheduler/)                 | One-off reminders with the Durable Object Alarm API                                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/do-alarm-scheduler)         |
+| [Social Preview Inspector](apps/experiments/social-preview-inspector/)     | Preview Twitter/X, Open Graph, and Google snippets side by side with HTMLRewriter         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/social-preview-inspector)   |
+| [DNS Propagation Checker](apps/experiments/dns-propagation-checker/)       | Compare DNS answers from Cloudflare, Google, and Quad9 resolvers in parallel              | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/dns-propagation-checker)    |
+| [Webhook Signature Verifier](apps/experiments/webhook-signature-verifier/) | Verify HMAC-SHA256 webhook signatures with timing-safe compare                            | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/webhook-signature-verifier) |
+| [CORS Preflight Tester](apps/experiments/cors-preflight-tester/)           | Simulate browser CORS preflight OPTIONS and analyze response headers                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cors-preflight-tester)      |
+| [API Mock Server](apps/experiments/api-mock-server/)                       | Define mock HTTP endpoints in KV and serve them on demand                                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/api-mock-server)            |
+| [AI Gateway Dashboard](apps/experiments/ai-gateway-dashboard/)             | Workers AI through AI Gateway with cache and latency metadata                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-gateway-dashboard)       |
+| [Readability Extractor](apps/experiments/readability-extractor/)           | Extract clean article content with Browser Rendering and readability heuristics           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/readability-extractor)      |
+| [Webhook Relay Inspector](apps/experiments/webhook-relay-inspector/)       | Capture inbound webhooks in a Durable Object session for debugging                        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/webhook-relay-inspector)    |
+| [Website Change Tracker](apps/experiments/website-change-tracker/)         | Scheduled snapshots with R2 storage and D1 diff history                                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/website-change-tracker)     |
+| [Uptime Monitor Alerts](apps/experiments/uptime-monitor-alerts/)           | Persistent URL monitors with D1 history and email alerts on downtime                      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/uptime-monitor-alerts)      |
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 

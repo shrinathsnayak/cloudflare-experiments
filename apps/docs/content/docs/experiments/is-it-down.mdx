@@ -5,6 +5,7 @@ icon: "Activity"
 tags:
   - network
 ---
+
 Check whether any website is reachable from Cloudflare's edge, with response time, status code, and edge location information.
 
 ## API Reference
@@ -19,7 +20,7 @@ Checks if the specified URL is reachable and returns timing and status informati
       description: "The target URL to check (must be http or https)",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -87,14 +88,12 @@ Error message explaining why the site is unreachable (only present when status i
 
 ## Use Cases
 
-
 - Monitor website availability from the edge
 - Measure response times from different geographic locations
 - Build uptime monitoring tools
 - Check if a site is down globally or just from your location
 
 ## Limitations
-
 
 - Checks from the edge colo serving the request, not from every region globally
 - Fetch timeout may mark slow but reachable sites as down
@@ -155,5 +154,3 @@ The `colo` field will not be populated during local development. It only appears
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests with timing
 - **[Edge network](https://developers.cloudflare.com/workers/reference/how-workers-works/)** - Request metadata including data center location
-
-

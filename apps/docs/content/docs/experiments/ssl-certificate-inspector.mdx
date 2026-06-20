@@ -1,0 +1,123 @@
+---
+title: "SSL Certificate Inspector"
+description: "Inspect TLS certificate metadata for a domain using Certificate Transparency and HTTPS probes"
+icon: "LockKeyhole"
+tags:
+  - network
+  - tls
+---
+
+Inspect TLS certificate metadata for a domain. Uses **Certificate Transparency** logs (crt.sh) for issuer, subject, validity, SAN list, and days-until-expiry, plus an HTTPS HEAD probe for reachability.
+
+## Features
+
+- **GET /inspect?domain=** — Certificate metadata + reachability
+- **CT-based cert data** — Issuer, subject, validity window, SANs
+- **HTTPS probe** — Confirms the domain is reachable over TLS
+- **Honest limitations** — Documents that full live cert chain inspection is limited in Workers
+
+## API Reference
+
+### GET /inspect
+
+Inspect certificate metadata for a hostname.
+
+<TypeTable
+  type={{
+    domain: {
+      description: "Hostname only (no scheme). Example: `cloudflare.com`",
+      type: "string",
+      required: true,
+    }
+  }}
+/>
+
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/inspect?domain=cloudflare.com"
+```
+
+#### Success Response
+
+```json
+{
+  "domain": "cloudflare.com",
+  "reachable": true,
+  "tlsVersion": "TLSv1.3",
+  "certificate": {
+    "issuer": "CN=WE1,O=Google Trust Services,C=US",
+    "subject": "CN=cloudflare.com",
+    "notBefore": "2025-01-01T00:00:00",
+    "notAfter": "2026-01-01T00:00:00",
+    "daysUntilExpiry": 180,
+    "san": ["cloudflare.com", "*.cloudflare.com"],
+    "serialNumber": "03:AB:CD..."
+  },
+  "source": "certificate-transparency",
+  "note": "Certificate metadata comes from Certificate Transparency logs (crt.sh)..."
+}
+```
+
+#### Error Codes
+
+- `400` — Invalid domain (`INVALID_DOMAIN`)
+- `502` — Lookup or probe failed (`INSPECT_ERROR`)
+
+<Callout>
+
+Workers cannot perform arbitrary live TLS certificate handshakes for any domain. This experiment uses CT logs for certificate fields and a HEAD request for reachability. For production cert monitoring, consider dedicated TLS inspection tooling.
+
+</Callout>
+
+## Use Cases
+
+- Check certificate expiry and SAN coverage from the edge
+- Learn CT log lookup patterns for domain security audits
+- Prototype cert monitoring alerts before integrating a full scanner
+
+## Limitations
+
+- Certificate data comes from CT logs, not a live handshake
+- crt.sh availability and freshness affect results
+- `tlsVersion` on the Worker request reflects the Worker's outbound fetch, not the target's full chain
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ssl-certificate-inspector)
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/inspect?domain=cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/ssl-certificate-inspector
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/inspect?domain=example.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute and outbound fetch
+- **Fetch API** — HTTPS reachability probe

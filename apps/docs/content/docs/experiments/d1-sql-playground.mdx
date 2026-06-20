@@ -1,0 +1,165 @@
+---
+title: "D1 SQL Playground"
+description: "Read-only SQL playground over a seeded D1 database with safe SELECT validation"
+icon: "Database"
+tags:
+  - storage
+  - d1
+bindings:
+  - D1
+---
+
+Run safe, read-only `SELECT` queries against a seeded Cloudflare D1 database. Returns JSON rows, inferred column metadata, and query timing.
+
+## Features
+
+- **POST /query** — Execute a validated `SELECT` and receive rows plus column types
+- **Seeded schema** — `products` catalog and `experiments` table from this repo
+- **Read-only guardrails** — Rejects writes, DDL, semicolons, comments, `UNION`, and disallowed tables
+- **GET /** — Lists queryable tables
+
+## API Reference
+
+### POST /query
+
+Execute a single read-only `SELECT` against the seeded database.
+
+<TypeTable
+  type={{
+    sql: {
+      description:
+        "One `SELECT` statement. Must reference only `products` or `experiments`. No semicolons, SQL comments, or multiple statements.",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/query" \
+  -H "Content-Type: application/json" \
+  -d '{"sql":"SELECT name, price FROM products WHERE in_stock = 1 ORDER BY price DESC LIMIT 5"}'
+```
+
+#### Success Response
+
+```json
+{
+  "columns": [
+    { "name": "name", "type": "text" },
+    { "name": "price", "type": "number" }
+  ],
+  "rows": [
+    { "name": "Browser Rendering Frame", "price": 59.99 },
+    { "name": "Workers AI Prompt Pack", "price": 49.99 }
+  ],
+  "rowCount": 2,
+  "durationMs": 3
+}
+```
+
+#### Error Codes
+
+- `400` — Invalid JSON (`INVALID_BODY`) or disallowed SQL (`INVALID_SQL`)
+- `502` — D1 execution error (`QUERY_ERROR`)
+
+### GET /
+
+Returns app metadata and the list of allowed tables (`products`, `experiments`).
+
+## Seeded Tables
+
+| Table         | Columns (high level)                                        |
+| ------------- | ----------------------------------------------------------- |
+| `products`    | `id`, `name`, `category`, `price`, `in_stock`, `created_at` |
+| `experiments` | `slug`, `name`, `category`, `description`                   |
+
+Example queries:
+
+```sql
+SELECT category, COUNT(*) AS total FROM products GROUP BY category
+SELECT slug, name FROM experiments WHERE category = 'Storage & Data'
+SELECT p.name, e.name FROM products p JOIN experiments e ON p.category LIKE '%' || e.category || '%' LIMIT 5
+```
+
+## Use Cases
+
+- Learn D1 query patterns without provisioning your own schema
+- Prototype read-only analytics APIs over SQLite at the edge
+- Teach SQL safely with guardrails against writes and injection
+- Explore JOINs and aggregations on realistic sample data
+
+## Limitations
+
+- Read-only: `INSERT`, `UPDATE`, `DELETE`, DDL, and `UNION` are rejected
+- Only `products` and `experiments` tables are queryable
+- Column types are inferred from the first result row (empty results return no column metadata)
+- Requires D1 migrations before first use (local and remote)
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/d1-sql-playground)
+
+  </Step>
+
+  <Step>
+
+### Configure D1
+
+    Create a D1 database, set `database_id` in `wrangler.json`, then apply migrations:
+
+    ```bash
+    npm run db:migrate
+    ```
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/query" \
+      -H "Content-Type: application/json" \
+      -d '{"sql":"SELECT * FROM products LIMIT 3"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/d1-sql-playground
+npm install
+npm run db:migrate:local
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl -X POST "http://localhost:8787/query" \
+  -H "Content-Type: application/json" \
+  -d '{"sql":"SELECT * FROM experiments LIMIT 5"}'
+```
+
+## Configuration
+
+| Binding | Purpose                              |
+| ------- | ------------------------------------ |
+| `DB`    | D1 database (`d1-sql-playground-db`) |
+
+Migrations live in `migrations/0000_init.sql`. Apply with `npm run db:migrate:local` (dev) or `npm run db:migrate` (remote).
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **[D1](https://developers.cloudflare.com/d1/)** — SQLite database at the edge with seeded read-only playground data

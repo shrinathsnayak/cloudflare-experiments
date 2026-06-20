@@ -5,6 +5,7 @@ icon: "Globe"
 tags:
   - network
 ---
+
 Retrieve all DNS record types for any URL's hostname using Cloudflare's DNS over HTTPS (DoH) API.
 
 ## API Reference
@@ -19,7 +20,7 @@ Extracts the hostname from the provided URL and returns all available DNS record
       description: "Any http or https URL. The hostname will be extracted and looked up.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -157,14 +158,12 @@ The API queries for the following DNS record types:
 
 ## Use Cases
 
-
 - Resolve DNS records for the hostname extracted from any URL
 - Debug DNS configuration during deployments or migrations
 - Build diagnostic tools without running `dig` locally
 - Verify mail (MX), certificate (CAA), or CDN (CNAME) records from the edge
 
 ## Limitations
-
 
 - Uses the hostname only; URL path and query string are ignored
 - Queries a fixed set of record types; no PTR or SRV in this experiment
@@ -220,5 +219,3 @@ curl "http://localhost:8787/dns?url=https://www.cloudflare.com"
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests to Cloudflare DoH
 - **[Edge network](https://developers.cloudflare.com/workers/reference/how-workers-works/)** - Low-latency DNS lookups
-
-

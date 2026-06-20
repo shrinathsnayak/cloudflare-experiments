@@ -1,0 +1,90 @@
+---
+title: "Readability Extractor"
+description: "Extract clean article content from URLs using Browser Rendering and readability heuristics"
+icon: "BookOpenText"
+tags:
+  - browser
+  - scraping
+bindings:
+  - BROWSER
+---
+
+Load a fully rendered page with **Browser Rendering**, then strip navigation, ads, and sidebars using readability-style heuristics. Returns title, author (when detectable), body text, word count, and estimated read time.
+
+## Features
+
+- GET /extract — rendered DOM extraction with readability heuristics
+- Returns title, author, body, wordCount, readTimeMinutes
+- Uses @cloudflare/puppeteer like other Browser Rendering experiments
+
+## API Reference
+
+### GET /extract
+
+**`url`** `string` (required) — Article URL (http or https).
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/extract?url=https://example.com/article"
+```
+
+#### Error Codes
+
+- `400` — `INVALID_URL`
+- `502` — `EXTRACT_ERROR`
+
+## Use Cases
+
+- Build reading-mode or newsletter digest pipelines
+- Extract main content from JavaScript-heavy news sites
+- Prototype RAG document ingestion from article URLs
+
+## Limitations
+
+- Requires Browser Rendering on your account
+- Heuristic extraction; not identical to Mozilla Readability
+- Local dev may need `wrangler dev --remote` for browser binding
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/readability-extractor)
+
+  </Step>
+  <Step>
+
+### Configure bindings
+
+    Browser binding `BROWSER` and `nodejs_compat_v2` in `wrangler.json`.
+
+  </Step>
+  <Step>
+
+### Test your deployment
+
+    See the experiment README for curl examples.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/readability-extractor
+npm install
+npm run dev
+```
+
+## Configuration
+
+Browser binding `BROWSER` and `nodejs_compat_v2` in `wrangler.json`.
+
+## Cloudflare Features Used
+
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)**
+- **[Workers](https://developers.cloudflare.com/workers/)**

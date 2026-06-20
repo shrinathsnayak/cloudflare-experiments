@@ -8,6 +8,7 @@ bindings:
   - R2
 full: true
 ---
+
 <Callout type="idea">
 
 Upload images and files to R2 with configurable private and public access. Objects in the private bucket are only accessible through the Worker, while public bucket objects get a direct URL.
@@ -471,7 +472,6 @@ View the complete source code on GitHub: [r2-storage](https://github.com/shrinat
 
 ## Use Cases
 
-
 ### Image hosting
 
 Upload images to the public bucket and use the returned URL in your app:
@@ -514,7 +514,6 @@ curl "https://your-worker.workers.dev/list?delimiter=/&public=true"
 ```
 
 ## Limitations
-
 
 - No authentication on API endpoints in this demo
 - List operations return at most 1,000 keys per request
@@ -587,5 +586,3 @@ Public R2 bucket binding (name: `r2-storage-public`)
 - **[R2](https://developers.cloudflare.com/r2/)** - Object storage with zero egress fees
 - **[Public buckets](https://developers.cloudflare.com/r2/buckets/public-buckets/)** - Direct public access to objects
 - **[Hono](https://hono.dev/)** - Lightweight web framework
-
-

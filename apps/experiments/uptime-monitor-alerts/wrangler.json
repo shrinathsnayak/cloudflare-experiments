@@ -1,0 +1,29 @@
+{
+  "name": "uptime-monitor-alerts",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "triggers": {
+    "crons": ["*/5 * * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "uptime-monitor-alerts-db",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "EMAILER"
+    }
+  ],
+  "vars": {
+    "ALERT_FROM_EMAIL": "alerts@example.com"
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

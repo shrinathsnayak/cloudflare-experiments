@@ -7,6 +7,7 @@ tags:
 bindings:
   - BROWSER
 ---
+
 Load a page in a headless browser and return all unique anchor links after JavaScript rendering.
 
 ## API Reference
@@ -19,7 +20,7 @@ Load a page in a headless browser and return all unique anchor links after JavaS
       description: "The website URL to inspect (must be http or https)",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -63,13 +64,11 @@ Each item has `href` and `text`
 
 ## Use Cases
 
-
 - Crawl SPAs and client-rendered navigation
 - Build sitemaps from fully rendered pages
 - Compare static HTML links vs browser-rendered links
 
 ## Limitations
-
 
 - Requires Browser Rendering enabled on your Cloudflare account
 - Local development needs `npx wrangler dev --remote` to reach a real browser
@@ -114,5 +113,3 @@ npm run dev
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`
-
-

@@ -1,0 +1,13 @@
+{
+  "name": "presigned-r2-upload",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "vars": {
+    "R2_ACCOUNT_ID": "",
+    "R2_BUCKET_NAME": "presigned-r2-upload"
+  },
+  "r2_buckets": [{ "binding": "UPLOADS", "bucket_name": "presigned-r2-upload" }],
+  "observability": {
+    "logs": { "enabled": true, "invocation_logs": true }
+  }
+}

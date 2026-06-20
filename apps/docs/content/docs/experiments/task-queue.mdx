@@ -8,6 +8,7 @@ bindings:
   - QUEUE
   - KV
 ---
+
 A minimal reference for **Queues**: HTTP requests enqueue messages via a producer binding; a `queue()` consumer processes them in the background. KV tracks enqueue and process counts.
 
 ## API Reference
@@ -22,7 +23,7 @@ Enqueues a message for async processing.
       description: "Task payload (max 500 characters).",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -76,14 +77,12 @@ curl "https://your-worker.workers.dev/stats"
 
 ## Use Cases
 
-
 - Learn producer (`TASK_QUEUE.send`) and consumer (`queue()`) setup
 - Decouple HTTP responses from slow background work
 - Webhook delivery, email sending, or data pipeline triggers
 - Building retryable async workflows on Cloudflare
 
 ## Limitations
-
 
 - Demo queue with basic stats; no dead-letter queue or idempotency guarantees
 - Message length is capped
@@ -141,5 +140,3 @@ npm run dev
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Queues](https://developers.cloudflare.com/queues/)** - async message processing
 - **[Workers KV](https://developers.cloudflare.com/kv/)** - enqueue/process statistics
-
-

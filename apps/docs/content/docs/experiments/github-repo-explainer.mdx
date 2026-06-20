@@ -8,6 +8,7 @@ tags:
 bindings:
   - AI
 ---
+
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -34,10 +35,11 @@ Generate a comprehensive AI explanation of a GitHub repository.
 <TypeTable
   type={{
     url: {
-      description: "The GitHub repository URL. Accepts formats: - `https://github.com/owner/repo` - `https://github.com/owner/repo.git` - `owner/repo` (shorthand)",
+      description:
+        "The GitHub repository URL. Accepts formats: - `https://github.com/owner/repo` - `https://github.com/owner/repo.git` - `owner/repo` (shorthand)",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -345,7 +347,6 @@ const priorityNames = [
 
 ## Use Cases
 
-
 - **Developer Onboarding** - Quickly understand new codebases before contributing
 - **Tech Stack Analysis** - Identify technologies and dependencies in projects
 - **Project Discovery** - Evaluate open-source libraries for your needs
@@ -354,7 +355,6 @@ const priorityNames = [
 - **IDE Extensions** - Add "explain this repo" functionality to editors
 
 ## Limitations
-
 
 - **Public repositories only**: Private repos require GitHub authentication (not implemented)
 - **Rate limits**: GitHub API has [rate limits](https://docs.github.com/en/rest/overview/rate-limits) (60 requests/hour unauthenticated)
@@ -439,6 +439,7 @@ No additional environment variables or secrets are required. GitHub API is used 
 ```
 
 The `jsonrepair` package helps handle malformed JSON responses from the AI model.
+
 ## Cloudflare Features Used
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
@@ -464,5 +465,3 @@ The `jsonrepair` package helps handle malformed JSON responses from the AI model
     Explore other Cloudflare experiments
   </Card>
 </Cards>
-
-

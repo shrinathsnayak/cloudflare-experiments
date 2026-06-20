@@ -1,0 +1,150 @@
+---
+title: "Presigned R2 Upload"
+description: "Generate presigned PUT URLs for direct browser-to-R2 uploads with aws4fetch"
+icon: "Upload"
+tags:
+  - storage
+bindings:
+  - R2
+---
+
+Generate **presigned PUT URLs** so browsers upload files directly to **R2** without routing file bytes through the Worker. Includes a demo HTML form at `GET /`.
+
+## Features
+
+- **POST /presign** — Returns a time-limited upload URL
+- **Direct browser upload** — Client PUTs to R2 using the signed URL
+- **Content-type validation** — Allowed types enforced at presign time
+- **Demo page** — `GET /` with file picker and upload flow
+
+## API Reference
+
+### POST /presign
+
+Generate a presigned PUT URL for R2.
+
+<TypeTable
+  type={{
+    filename: {
+      description:
+        "Filename (alphanumeric, dot, dash, underscore; max 128 chars, no path segments).",
+      type: "string",
+      required: true,
+    },
+    contentType: {
+      description:
+        "MIME type. Allowed: image/png, image/jpeg, image/webp, text/plain, application/pdf.",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/presign" \
+  -H "Content-Type: application/json" \
+  -d '{"filename":"photo.png","contentType":"image/png"}'
+```
+
+#### Success Response
+
+```json
+{
+  "uploadUrl": "https://account.r2.cloudflarestorage.com/bucket/uploads/uuid-photo.png?X-Amz-...",
+  "key": "uploads/550e8400-e29b-41d4-a716-446655440000-photo.png",
+  "contentType": "image/png",
+  "maxBytes": 5242880,
+  "expiresInSeconds": 900
+}
+```
+
+Upload the file with a matching `Content-Type`:
+
+```bash
+curl -X PUT "$uploadUrl" -H "Content-Type: image/png" --data-binary @photo.png
+```
+
+#### Error Codes
+
+- `400` — Invalid JSON (`INVALID_BODY`), filename (`INVALID_FILENAME`), or content type (`INVALID_CONTENT_TYPE`)
+- `502` — Presign failed, often missing R2 credentials (`PRESIGN_ERROR`)
+
+### GET /
+
+Returns an HTML demo page with presign + direct PUT upload flow.
+
+## Use Cases
+
+- Offload large file uploads from Workers to R2
+- Learn aws4fetch presigned URL generation at the edge
+- Prototype user-generated content uploads with size/type constraints
+
+## Limitations
+
+- Requires R2 API credentials as Worker secrets (`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`)
+- Browser uploads need R2 CORS configured for your origin
+- Signed `Content-Type` must match the client PUT header exactly
+- Documented max size 5 MB (enforced at presign documentation level)
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/presigned-r2-upload)
+
+  </Step>
+
+  <Step>
+
+### Configure R2 and secrets
+
+    ```bash
+    wrangler secret put R2_ACCESS_KEY_ID
+    wrangler secret put R2_SECRET_ACCESS_KEY
+    ```
+
+    Set `R2_ACCOUNT_ID` in `wrangler.json` vars. Configure R2 CORS for browser PUT uploads.
+
+  </Step>
+
+  <Step>
+
+### Test presign
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/presign" \
+      -H "Content-Type: application/json" \
+      -d '{"filename":"test.txt","contentType":"text/plain"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/presigned-r2-upload
+npm install
+npm run dev
+```
+
+Open `http://localhost:8787/` for the demo upload form.
+
+## Configuration
+
+| Setting                | Purpose                          |
+| ---------------------- | -------------------------------- |
+| `UPLOADS`              | R2 bucket binding                |
+| `R2_ACCOUNT_ID`        | Account ID for signing (var)     |
+| `R2_ACCESS_KEY_ID`     | R2 API token access key (secret) |
+| `R2_SECRET_ACCESS_KEY` | R2 API token secret (secret)     |
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **[R2](https://developers.cloudflare.com/r2/)** — Object storage with presigned uploads

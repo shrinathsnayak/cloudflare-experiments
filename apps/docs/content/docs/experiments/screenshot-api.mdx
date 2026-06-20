@@ -7,6 +7,7 @@ tags:
 bindings:
   - BROWSER
 ---
+
 Capture screenshots of any website from Cloudflare's edge network using Browser Rendering and Puppeteer.
 
 ## API Reference
@@ -21,7 +22,7 @@ Captures a PNG screenshot of the specified URL.
       description: "The website URL to screenshot (must be http or https)",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -74,14 +75,12 @@ The API uses the following configuration:
 
 ## Use Cases
 
-
 - Capture visual snapshots of web pages from the edge
 - Generate thumbnails or previews for link-sharing tools
 - Archive how a page looked at a point in time
 - Learn Browser Rendering with Puppeteer on Workers
 
 ## Limitations
-
 
 - Requires Browser Rendering enabled on your Cloudflare account
 - Fixed 1280×800 viewport; no custom dimensions in this experiment
@@ -142,5 +141,3 @@ curl "http://localhost:8787/screenshot?url=https://www.cloudflare.com" \
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via Puppeteer
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Network requests within the browser
-
-

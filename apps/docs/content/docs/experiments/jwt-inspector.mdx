@@ -1,0 +1,202 @@
+---
+title: "JWT Inspector"
+description: "Decode, verify, and issue JWTs for experimentation using Web Crypto"
+icon: "KeyRound"
+tags:
+  - edge
+  - security
+---
+
+Inspect JSON Web Tokens at the edge: **decode** header and payload without verification, **verify** HS256/RS256 signatures, and **issue** test HS256 tokens for experimentation.
+
+## Features
+
+- **POST /decode** — Parse JWT header and payload (no crypto verification)
+- **POST /verify** — Verify HS256 (secret) or RS256 (public key PEM)
+- **POST /issue** — Mint test HS256 tokens with configurable expiry
+- **Web Crypto** — No external JWT libraries required
+
+## API Reference
+
+### POST /decode
+
+Decode a JWT without verifying the signature.
+
+<TypeTable
+  type={{
+    token: {
+      description: "JWT string (three dot-separated segments).",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/decode" \
+  -H "Content-Type: application/json" \
+  -d '{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}'
+```
+
+#### Success Response
+
+```json
+{
+  "header": { "alg": "HS256", "typ": "JWT" },
+  "payload": { "sub": "user-1", "exp": 1710000000 }
+}
+```
+
+#### Error Codes
+
+- `400` — Invalid JSON (`INVALID_BODY`), token (`INVALID_TOKEN`), or decode error (`DECODE_ERROR`)
+
+### POST /verify
+
+Verify a JWT signature.
+
+<TypeTable
+  type={{
+    token: {
+      description: "JWT string to verify.",
+      type: "string",
+      required: true,
+    },
+    secret: {
+      description: "Shared secret for HS256 verification.",
+      type: "string",
+      required: false,
+    },
+    publicKey: {
+      description: "PEM-encoded public key for RS256 verification.",
+      type: "string",
+      required: false,
+    },
+  }}
+/>
+
+Provide `secret` (HS256) or `publicKey` (RS256), not both.
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/verify" \
+  -H "Content-Type: application/json" \
+  -d '{"token":"eyJ...","secret":"demo-secret-key"}'
+```
+
+#### Success Response
+
+```json
+{
+  "valid": true,
+  "algorithm": "HS256",
+  "payload": { "sub": "alice", "exp": 1710000000 }
+}
+```
+
+#### Error Codes
+
+- `400` — Invalid body/token (`INVALID_BODY`, `INVALID_TOKEN`, `MISSING_KEY`, `VERIFY_ERROR`)
+
+### POST /issue
+
+Issue a test HS256 JWT.
+
+<TypeTable
+  type={{
+    secret: {
+      description: "Signing secret (min 8 characters).",
+      type: "string",
+      required: true,
+    },
+    subject: {
+      description: "JWT `sub` claim (default: test-user).",
+      type: "string",
+      required: false,
+    },
+    expiresInSeconds: {
+      description: "Token lifetime in seconds (default: 3600).",
+      type: "number",
+      required: false,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/issue" \
+  -H "Content-Type: application/json" \
+  -d '{"secret":"demo-secret-key","subject":"alice","expiresInSeconds":3600}'
+```
+
+#### Success Response
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "payload": {
+    "sub": "alice",
+    "iat": 1710000000,
+    "exp": 1710003600,
+    "iss": "jwt-inspector-demo"
+  }
+}
+```
+
+#### Error Codes
+
+- `400` — Invalid body or secret (`INVALID_BODY`, `INVALID_SECRET`)
+- `502` — Signing failed (`ISSUE_ERROR`)
+
+## Use Cases
+
+- Debug JWT payloads during API integration
+- Test HS256/RS256 verification logic before production auth
+- Generate short-lived test tokens for local development
+
+## Limitations
+
+- Demo tool only; not a production identity provider
+- RS256 verification requires PEM public key in request body
+- No support for JWKS fetching or exotic algorithms
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/jwt-inspector)
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/issue" \
+      -H "Content-Type: application/json" \
+      -d '{"secret":"demo-secret-key","subject":"alice"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/jwt-inspector
+npm install
+npm run dev
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** — Edge compute runtime
+- **[Web Crypto API](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)** — HMAC and RSA signature operations

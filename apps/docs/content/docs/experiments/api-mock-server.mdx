@@ -1,0 +1,102 @@
+---
+title: "API Mock Server"
+description: "Define mock HTTP endpoints stored in Workers KV and serve them on demand"
+icon: "ServerCog"
+tags:
+  - storage
+bindings:
+  - KV
+---
+
+Create configurable mock API responses (path, method, status, JSON body, optional delay) stored in **Workers KV**. Any matching request to `/mock/:slug` returns the configured response.
+
+## Features
+
+- POST /configs — create a mock and receive a slug
+- GET /configs — list all mocks
+- GET /mock/:slug — serve the configured response
+- DELETE /configs/:slug — remove a mock
+
+## API Reference
+
+### POST /configs
+
+Create a mock endpoint configuration.
+
+**`path`** `string` (required) — Mock path (must start with `/`).
+
+**`method`** `string` (required) — HTTP method.
+
+**`status`** `number` (required) — Response status (100–599).
+
+**`body`** `object` (required) — JSON response body.
+
+**`delayMs`** `number` (optional) — Artificial delay (0–30000 ms).
+
+### GET /mock/:slug
+
+Serve the mock when the request method matches the stored config.
+
+### DELETE /configs/:slug
+
+Delete a mock by slug.
+
+#### Error Codes
+
+- `400` — `INVALID_BODY`, validation errors
+- `404` — `NOT_FOUND`
+
+## Use Cases
+
+- Stub third-party APIs during frontend development
+- Demo API integrations without standing up a full backend
+- Test client retry and timeout behavior with configurable delays
+
+## Limitations
+
+- Requires a KV namespace binding
+- No authentication on config endpoints
+- Mocks are global to the namespace; not multi-tenant
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/api-mock-server)
+
+  </Step>
+  <Step>
+
+### Configure bindings
+
+    Create a KV namespace and set its id in `wrangler.json` under `MOCKS`.
+
+  </Step>
+  <Step>
+
+### Test your deployment
+
+    See the experiment README for curl examples.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/api-mock-server
+npm install
+npm run dev
+```
+
+## Configuration
+
+Create a KV namespace and set its id in `wrangler.json` under `MOCKS`.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)**
+- **[Workers KV](https://developers.cloudflare.com/kv/)**

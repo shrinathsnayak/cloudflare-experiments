@@ -1,0 +1,101 @@
+---
+title: "Website Change Tracker"
+description: "Scheduled Browser Rendering snapshots with R2 storage and D1 diff history"
+icon: "GitCompare"
+tags:
+  - network
+  - monitoring
+bindings:
+  - D1
+  - R2
+  - BROWSER
+---
+
+Register URLs for on-demand and **Cron**-scheduled snapshots. Rendered text is stored in **R2**, content hashes and diff summaries in **D1**. View change history per tracked URL.
+
+## Features
+
+- POST /track — register a URL
+- DELETE /track?url= — unregister
+- GET /history?url= — snapshot diff history
+- Scheduled handler every 30 minutes for tracked URLs
+
+## API Reference
+
+### POST /track
+
+Register a URL for scheduled tracking.
+
+```json
+{ "url": "https://example.com" }
+```
+
+### DELETE /track?url=
+
+Unregister a tracked URL.
+
+### GET /history?url=
+
+Return snapshot history with content hashes and diff summaries.
+
+#### Error Codes
+
+- `400` — `INVALID_URL`, `INVALID_BODY`
+- `404` — `NOT_TRACKED`
+
+## Use Cases
+
+- Monitor marketing or legal pages for unexpected content changes
+- Learn R2 + D1 + Cron + Browser Rendering together
+- Prototype change-detection alerts before production hardening
+
+## Limitations
+
+- Requires D1, R2, Browser Rendering, and Cron bindings
+- Diff summary is line-based heuristic, not semantic
+- 30-minute cron interval; not real-time
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/website-change-tracker)
+
+  </Step>
+  <Step>
+
+### Configure bindings
+
+    D1 `DB`, R2 `SNAPSHOTS`, Browser `BROWSER`, cron `*/30 * * * *`. Run D1 migrations before deploy.
+
+  </Step>
+  <Step>
+
+### Test your deployment
+
+    See the experiment README for curl examples.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/website-change-tracker
+npm install
+npm run dev
+```
+
+## Configuration
+
+D1 `DB`, R2 `SNAPSHOTS`, Browser `BROWSER`, cron `*/30 * * * *`. Run D1 migrations before deploy.
+
+## Cloudflare Features Used
+
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)**
+- **[R2](https://developers.cloudflare.com/r2/)**
+- **[D1](https://developers.cloudflare.com/d1/)**
+- **[Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/)**

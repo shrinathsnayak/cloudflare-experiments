@@ -1,0 +1,27 @@
+{
+  "name": "workflows-pipeline-demo",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "ai": {
+    "binding": "AI"
+  },
+  "r2_buckets": [
+    {
+      "binding": "SUMMARIES",
+      "bucket_name": "workflows-pipeline-summaries"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "workflows-pipeline-demo",
+      "binding": "PIPELINE",
+      "class_name": "SummaryPipeline"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

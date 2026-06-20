@@ -7,6 +7,7 @@ tags:
 bindings:
   - BROWSER
 ---
+
 Inspect any website with a comprehensive analysis similar to browser DevTools. Get HTTP headers, cookies, response time, metadata, and all loaded resources including scripts, stylesheets, images, and links.
 
 ## API Reference
@@ -21,7 +22,7 @@ Perform a comprehensive inspection of a webpage by providing its URL.
       description: "The URL of the webpage to inspect. Must be a valid HTTP or HTTPS URL.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -199,7 +200,6 @@ Array of unique absolute URLs from `<a href="...">`. Excludes anchor links (#) a
 
 ## Use Cases
 
-
 - **Performance Monitoring**: Track response times and identify slow-loading resources
 - **Security Audits**: Analyze headers, cookies, and security configurations
 - **Asset Analysis**: Discover all external dependencies and third-party scripts
@@ -209,7 +209,6 @@ Array of unique absolute URLs from `<a href="...">`. Excludes anchor links (#) a
 - **Compliance Checks**: Verify cookie policies and header configurations
 
 ## Limitations
-
 
 - Static HTML fetch for most fields; not a live browser DevTools session
 - HTML body is capped at 1MB before parsing
@@ -264,5 +263,3 @@ curl "http://localhost:8787/devtools?url=https://example.com"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests for headers, HTML, and timing data
-
-

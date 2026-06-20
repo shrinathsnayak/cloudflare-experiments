@@ -5,6 +5,7 @@ icon: "Package"
 tags:
   - scraping
 ---
+
 Analyze all external resources and dependencies loaded by any webpage. Discover scripts, stylesheets, images, fonts, and iframes to understand a site's external dependencies and third-party integrations.
 
 ## API Reference
@@ -19,7 +20,7 @@ Analyze all external dependencies of a webpage by providing its URL.
       description: "The URL of the webpage to analyze. Must be a valid HTTP or HTTPS URL.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -169,7 +170,6 @@ Array of unique absolute URLs of embedded iframes via `<iframe src="...">`. Usef
 
 ## Use Cases
 
-
 - **Dependency Audits**: Identify all third-party dependencies and external resources
 - **Performance Analysis**: Discover resource-heavy pages loading too many external files
 - **Security Reviews**: Find all external scripts and potential security risks
@@ -179,7 +179,6 @@ Array of unique absolute URLs of embedded iframes via `<iframe src="...">`. Usef
 - **Competitive Analysis**: Understand what services and tools competitors use
 
 ## Limitations
-
 
 - Static HTML only; assets loaded dynamically by JavaScript are not detected
 - HTML body is capped before parsing
@@ -234,5 +233,3 @@ curl "http://localhost:8787/analyze?url=https://example.com"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote HTML retrieval and parsing
-
-

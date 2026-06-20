@@ -5,6 +5,7 @@ icon: "FileText"
 tags:
   - scraping
 ---
+
 Convert any webpage into the llms.txt format, a structured markdown format optimized for Large Language Model consumption. Extracts title, description, key links, and contact information in a standardized format that LLMs can easily parse.
 
 ## API Reference
@@ -19,7 +20,7 @@ Convert a webpage to llms.txt format by providing its URL.
       description: "The URL of the webpage to convert. Must be a valid HTTP or HTTPS URL.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -126,7 +127,6 @@ The llms.txt format follows this structure:
 
 ## Use Cases
 
-
 - **LLM Context**: Provide structured website information to language models
 - **AI Assistants**: Enable AI to understand website structure and navigation
 - **Documentation Parsing**: Convert documentation sites into LLM-friendly format
@@ -135,7 +135,6 @@ The llms.txt format follows this structure:
 - **RAG Systems**: Prepare website data for retrieval-augmented generation
 
 ## Limitations
-
 
 - Static HTML extraction; client-rendered content is not executed
 - Produces a simplified llms.txt for one URL, not a full site crawl
@@ -189,5 +188,3 @@ curl "http://localhost:8787/llms.txt?url=https://example.com"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Remote HTML retrieval for llms.txt conversion
-
-

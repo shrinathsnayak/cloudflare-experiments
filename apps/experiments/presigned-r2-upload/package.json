@@ -1,0 +1,22 @@
+{
+  "name": "presigned-r2-upload",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.0.0",
+    "wrangler": "^4"
+  },
+  "dependencies": {
+    "aws4fetch": "^1.0.20",
+    "hono": "^4.6.12"
+  }
+}

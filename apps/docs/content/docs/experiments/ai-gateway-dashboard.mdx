@@ -1,0 +1,96 @@
+---
+title: "AI Gateway Dashboard"
+description: "Route Workers AI through AI Gateway and surface cache and latency metadata"
+icon: "BrainCircuit"
+tags:
+  - ai
+  - gateway
+bindings:
+  - AI
+---
+
+Call **Workers AI** through **AI Gateway** instead of direct inference. Returns generated text plus gateway metadata (cache status, latency). Optionally compare cached vs fresh requests for the same prompt.
+
+## Features
+
+- POST /generate — text generation via AI Gateway
+- Returns latency and cache hit/miss metadata
+- Optional compareCache mode runs cached vs skipCache requests
+
+## API Reference
+
+### POST /generate
+
+**`prompt`** `string` (required) — Text prompt for the model.
+
+**`compareCache`** `boolean` (optional) — Run cached and fresh requests and compare latency.
+
+Default model: `@cf/meta/llama-3.1-8b-instruct-fast`.
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/generate" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Explain Workers AI in one sentence","compareCache":true}'
+```
+
+#### Error Codes
+
+- `400` — `INVALID_BODY`, `MISSING_PROMPT`
+- `502` — `AI_ERROR`
+
+## Use Cases
+
+- Learn AI Gateway cache behavior vs direct Workers AI calls
+- Compare latency for repeated prompts in prototyping
+- Reference pattern for gateway options in production Workers
+
+## Limitations
+
+- Requires Workers AI and AI Gateway enabled on your account
+- Cache metadata depends on gateway configuration
+- Text generation only; fixed default model
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-gateway-dashboard)
+
+  </Step>
+  <Step>
+
+### Configure bindings
+
+    AI binding in `wrangler.json`. Use gateway id `default` or your own gateway ID in code.
+
+  </Step>
+  <Step>
+
+### Test your deployment
+
+    See the experiment README for curl examples.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/ai-gateway-dashboard
+npm install
+npm run dev
+```
+
+## Configuration
+
+AI binding in `wrangler.json`. Use gateway id `default` or your own gateway ID in code.
+
+## Cloudflare Features Used
+
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)**
+- **[AI Gateway](https://developers.cloudflare.com/ai-gateway/)**

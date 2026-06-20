@@ -5,6 +5,7 @@ icon: "FileSearch"
 tags:
   - scraping
 ---
+
 Extract comprehensive metadata from any webpage including title, description, Open Graph properties, and canonical URL. Perfect for building link previews, SEO analysis tools, or content aggregators.
 
 ## API Reference
@@ -16,10 +17,11 @@ Extract metadata from a webpage by providing its URL.
 <TypeTable
   type={{
     url: {
-      description: "The URL of the webpage to extract metadata from. Must be a valid HTTP or HTTPS URL.",
+      description:
+        "The URL of the webpage to extract metadata from. Must be a valid HTTP or HTTPS URL.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -132,7 +134,6 @@ Open Graph site name (og:site_name)
 
 ## Use Cases
 
-
 - **Link Previews**: Generate rich previews for shared links in chat applications
 - **SEO Analysis**: Audit metadata across multiple pages
 - **Content Aggregation**: Collect and display metadata from external sources
@@ -140,7 +141,6 @@ Open Graph site name (og:site_name)
 - **Bookmark Managers**: Automatically fetch metadata when saving URLs
 
 ## Limitations
-
 
 - Static HTML only; tags set by client-side JavaScript may be missing
 - Fetch timeout and HTML size limits on upstream pages
@@ -194,5 +194,3 @@ curl "http://localhost:8787/metadata?url=https://example.com"
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTTP requests for HTML metadata extraction
-
-

@@ -1,0 +1,102 @@
+---
+title: "Webhook Relay Inspector"
+description: "Capture inbound HTTP webhooks in a Durable Object session for debugging and replay"
+icon: "Inbox"
+tags:
+  - stateful
+bindings:
+  - DO
+---
+
+Create a unique inbound URL per session with a **Durable Object**. Any HTTP request to that URL is captured (method, headers, body, timestamp) and can be listed or inspected for webhook debugging.
+
+## Features
+
+- POST /relay/new — create a capture session
+- ALL /relay/:id — capture inbound requests
+- GET /relay/:id/requests — list captures
+- GET /relay/:id/requests/:requestId — full request details
+
+## API Reference
+
+### POST /relay/new
+
+Create a new relay session.
+
+#### Success Response
+
+```json
+{ "id": "abc123", "inboundUrl": "https://your-worker.workers.dev/relay/abc123" }
+```
+
+### ALL /relay/:id
+
+Captures any inbound HTTP request to the session.
+
+### GET /relay/:id/requests
+
+List captured requests (summary).
+
+### GET /relay/:id/requests/:requestId
+
+Full request details including headers and body.
+
+#### Error Codes
+
+- `404` — `NOT_FOUND`
+- `400` — `INVALID_ID`
+
+## Use Cases
+
+- Debug Stripe, GitHub, or custom webhook payloads during integration
+- Share a temporary inbound URL with a third party for testing
+- Inspect headers and raw body without deploying a full receiver
+
+## Limitations
+
+- Requires Durable Objects binding and migration
+- Sessions are not authenticated; anyone with the URL can post
+- Storage is bounded by DO limits; not long-term log retention
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/webhook-relay-inspector)
+
+  </Step>
+  <Step>
+
+### Configure bindings
+
+    Durable Object `RELAY` / `WebhookRelay` with migration in `wrangler.json`.
+
+  </Step>
+  <Step>
+
+### Test your deployment
+
+    See the experiment README for curl examples.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/webhook-relay-inspector
+npm install
+npm run dev
+```
+
+## Configuration
+
+Durable Object `RELAY` / `WebhookRelay` with migration in `wrangler.json`.
+
+## Cloudflare Features Used
+
+- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)**
+- **[Workers](https://developers.cloudflare.com/workers/)**

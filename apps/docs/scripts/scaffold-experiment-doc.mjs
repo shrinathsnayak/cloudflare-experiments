@@ -87,13 +87,18 @@ const BINDING_DOCS = {
 
 const bindingLines =
   bindings.length > 0
-    ? bindings.map((b) => `- ${BINDING_DOCS[b] ?? `**${b}**`} - TODO: describe how this experiment uses the binding`).join("\n")
+    ? bindings
+        .map(
+          (b) =>
+            `- ${BINDING_DOCS[b] ?? `**${b}**`} - TODO: describe how this experiment uses the binding`
+        )
+        .join("\n")
     : "- TODO: list Cloudflare products used (if any beyond Workers)";
 
 const readmeHint = readme
   ? "\n<!-- README.md exists - copy API examples and setup notes from apps/experiments/" +
-  experimentName +
-  "/README.md -->\n"
+    experimentName +
+    "/README.md -->\n"
   : "";
 
 const deployUrl = `https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/${experimentName}`;

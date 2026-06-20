@@ -7,6 +7,7 @@ tags:
 bindings:
   - BROWSER
 ---
+
 Navigate to any URL in a headless browser and return Puppeteer page load metrics as JSON.
 
 ## API Reference
@@ -21,7 +22,7 @@ Loads the page and returns metrics from `page.metrics()`.
       description: "The website URL to measure (must be http or https)",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -71,14 +72,12 @@ Puppeteer metrics such as `Nodes`, `LayoutCount`, `ScriptDuration`, and `JSHeapU
 
 ## Use Cases
 
-
 - Measure DOM complexity and script cost after full page load
 - Compare client-side rendering overhead across sites
 - Debug performance issues that only appear in a real browser
 - Learn Puppeteer metrics collection on Workers
 
 ## Limitations
-
 
 - Requires Browser Rendering enabled on your Cloudflare account
 - Local development needs `npx wrangler dev --remote`
@@ -134,5 +133,3 @@ curl "http://localhost:8787/metrics?url=https://www.cloudflare.com"
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`
 - **[Puppeteer `page.metrics()`](https://developers.cloudflare.com/browser-rendering/platform/puppeteer/)** - Page load and memory metrics
-
-

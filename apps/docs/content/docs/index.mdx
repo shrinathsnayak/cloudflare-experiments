@@ -27,7 +27,7 @@ Each experiment is:
     Learn why this project exists
   </Card>
   <Card title="Browse Experiments" href="/experiments/ai-website-summary">
-    Explore 35+ edge computing experiments
+    Explore 60+ edge computing experiments
   </Card>
   <Card title="Contributing" href="/contributing">
     Add your own experiments
@@ -39,12 +39,24 @@ Each experiment is:
 Every experiment demonstrates **practical capabilities of the Cloudflare platform**:
 
 <Cards>
-  <Card title="Workers AI">Summarization, translation, sentiment, embeddings, and image generation</Card>
-  <Card title="Browser Rendering">Screenshot capture, PDF export, and browser automation</Card>
-  <Card title="Edge Networking">DNS lookup, monitoring, geolocation, and redirect tracing</Card>
-  <Card title="HTMLRewriter">Web scraping, parsing, and HTML transformation at the edge</Card>
-  <Card title="D1, KV & Vectorize">Edge databases, key-value storage, and semantic search</Card>
-  <Card title="R2 Storage">Object storage with public and private buckets</Card>
+  <Card title="Workers AI">
+    Summarization, translation, sentiment, embeddings, image generation, and AI Gateway
+  </Card>
+  <Card title="Browser Rendering">
+    Screenshots, PDF export, readability extraction, and browser automation
+  </Card>
+  <Card title="Edge Networking">
+    DNS lookup, propagation checks, uptime monitoring, CORS testing, and geolocation
+  </Card>
+  <Card title="HTMLRewriter">
+    Web scraping, social preview inspection, parsing, and HTML transformation
+  </Card>
+  <Card title="D1, KV & Vectorize">
+    Edge databases, mock APIs, key-value storage, and semantic search
+  </Card>
+  <Card title="R2 & Stateful Workers">
+    Object storage, change tracking, Durable Objects, Queues, and Cron Triggers
+  </Card>
 </Cards>
 
 ## Experiment Categories
@@ -60,6 +72,9 @@ Every experiment demonstrates **practical capabilities of the Cloudflare platfor
     - **Sentiment Analyzer** - Analyze text sentiment with Workers AI
     - **Text Similarity** - Compare text similarity with Workers AI embeddings
     - **AI Image Generator** - Generate images from text prompts with Workers AI
+    - **Speech to Text Transcriber** - Transcribe uploaded audio with Workers AI Whisper
+    - **RAG Mini Search** - Grounded Q&A with Vectorize retrieval and Workers AI
+    - **AI Gateway Dashboard** - Workers AI through AI Gateway with cache and latency metadata
   </Accordion>
 
   <Accordion title="Web Scraping & Parsing">
@@ -69,6 +84,8 @@ Every experiment demonstrates **practical capabilities of the Cloudflare platfor
     - **DevTools Inspector** - DevTools-style inspection of websites
     - **Dependency Analyzer** - Analyze external resources loaded by a page
     - **HTML Rewriter** - Extract HTML stats and transform pages with HTMLRewriter
+    - **Social Preview Inspector** - Preview Twitter/X, Open Graph, and Google snippets side by side
+    - **Readability Extractor** - Extract clean article content with readability-style heuristics
   </Accordion>
 
   <Accordion title="Browser Rendering">
@@ -80,11 +97,17 @@ Every experiment demonstrates **practical capabilities of the Cloudflare platfor
   </Accordion>
 
   <Accordion title="Network & Monitoring">
-    - **Is It Down** - Check if websites are reachable
+    - **Is It Down** - Check if websites are reachable from the edge
     - **URL DNS Lookup** - Get DNS records for any hostname
+    - **DNS Propagation Checker** - Compare answers from Cloudflare, Google, and Quad9 resolvers
     - **Edge Redirect Simulator** - Trace redirect chains and status codes
     - **Where Am I** - Request metadata and geolocation from the edge
     - **Response Headers** - Inspect HTTP response headers for any URL
+    - **SSL Certificate Inspector** - Inspect TLS certificate metadata for a domain
+    - **Multi-PoP Latency Map** - Fetch latency plus serving colo per request
+    - **Website Change Tracker** - Scheduled snapshots with R2 storage and D1 diff history
+    - **Uptime Monitor Alerts** - Persistent URL monitors with D1 history and email alerts
+    - **CORS Preflight Tester** - Simulate browser CORS preflight and analyze response headers
   </Accordion>
 
   <Accordion title="Edge Platform">
@@ -93,13 +116,19 @@ Every experiment demonstrates **practical capabilities of the Cloudflare platfor
     - **WebSocket Echo** - WebSocket echo server on Workers
     - **Image Resizer** - Resize remote images with Cloudflare Image Resizing
     - **Turnstile Verify** - Verify Cloudflare Turnstile tokens via siteverify
+    - **JWT Inspector** - Decode, verify, and issue JWTs for experimentation
+    - **Rate Limiter Demo** - Native Workers Rate Limiting binding with 429 responses
+    - **Webhook Signature Verifier** - Verify HMAC-SHA256 webhook signatures with timing-safe compare
   </Accordion>
 
   <Accordion title="Storage & Data">
     - **R2 Storage** - R2 object storage with list/get/put/delete
     - **Link Shortener** - URL shortener using D1 and KV
+    - **D1 SQL Playground** - Read-only SQL playground over a seeded D1 database
     - **KV Notes** - Simple note storage with Workers KV
     - **Vectorize Search** - Semantic search with Workers AI embeddings and Vectorize
+    - **Presigned R2 Upload** - Presigned PUT URLs for direct browser-to-R2 uploads
+    - **API Mock Server** - Define mock HTTP endpoints in KV and serve them on demand
   </Accordion>
 
   <Accordion title="Stateful & Async">
@@ -107,6 +136,11 @@ Every experiment demonstrates **practical capabilities of the Cloudflare platfor
     - **Cron Heartbeat** - Scheduled tasks with Cron Triggers and KV metadata
     - **Task Queue** - Enqueue tasks over HTTP and process them asynchronously
     - **Analytics Engine** - Write custom events to Workers Analytics Engine
+    - **Workflows Pipeline Demo** - Durable fetch → AI summarize → R2 pipeline with Workflows
+    - **Live Cursor Tracker** - Real-time shared cursors over WebSocket via Durable Objects
+    - **Queue Job Visualizer** - Queues producer/consumer with KV job status and simulated retries
+    - **DO Alarm Scheduler** - One-off reminders with the Durable Object Alarm API
+    - **Webhook Relay Inspector** - Capture inbound webhooks in a Durable Object session for debugging
   </Accordion>
 </Accordions>
 
@@ -128,7 +162,7 @@ Each experiment is production-ready and demonstrates a complete use case that yo
     touching the others
   </Card>
   <Card title="Stateless First">
-    Most experiments use edge compute, fetch, and HTML parsing - no persistent storage required
+    Many experiments use edge compute, fetch, and HTML parsing - no persistent storage required
   </Card>
   <Card title="Single Responsibility">
     Each experiment demonstrates one specific Cloudflare capability

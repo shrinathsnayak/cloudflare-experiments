@@ -8,6 +8,7 @@ tags:
 bindings:
   - AI
 ---
+
 <Callout type="warning">
 
 This is an experimental Worker. Use it as a starting point for your own projects.
@@ -33,10 +34,11 @@ Generate topic tags for any webpage.
 <TypeTable
   type={{
     url: {
-      description: "The webpage URL or hostname to tag. Use `http://` or `https://` for full URLs, or a bare hostname like `example.com`.",
+      description:
+        "The webpage URL or hostname to tag. Use `http://` or `https://` for full URLs, or a bare hostname like `example.com`.",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -90,14 +92,12 @@ Machine-readable error code.
 
 ## Use Cases
 
-
 - **Content tagging** - Auto-tag articles or bookmarks by topic
 - **SEO and discovery** - Suggest categories or related topics from page content
 - **Link previews** - Enrich shared links with topic tags
 - **Research and curation** - Quickly label pages by theme
 
 ## Limitations
-
 
 - **JavaScript-heavy sites** - Only static HTML is fetched; client-rendered content is not executed
 - **Workers AI limits** - Subject to [Workers AI usage limits](https://developers.cloudflare.com/workers-ai/platform/limits/) by plan
@@ -146,6 +146,7 @@ Test locally:
 ```bash
 curl "http://localhost:8787/tags?url=https://www.cloudflare.com"
 ```
+
 ## Cloudflare Features Used
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Serverless execution environment
@@ -171,5 +172,3 @@ curl "http://localhost:8787/tags?url=https://www.cloudflare.com"
     Explore other Cloudflare experiments
   </Card>
 </Cards>
-
-

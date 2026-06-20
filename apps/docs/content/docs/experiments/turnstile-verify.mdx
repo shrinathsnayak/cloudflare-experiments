@@ -5,6 +5,7 @@ icon: "ShieldCheck"
 tags:
   - edge
 ---
+
 Verify [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) tokens server-side by calling the siteverify API from a Worker. This experiment uses the `TURNSTILE_SECRET_KEY` environment secret - there is no Turnstile Worker binding.
 
 ## API Reference
@@ -19,7 +20,7 @@ Validates a client Turnstile token against the Cloudflare siteverify endpoint an
       description: "Turnstile response token from the client widget",
       type: "string",
       required: true,
-    }
+    },
   }}
 />
 
@@ -84,14 +85,12 @@ When verification fails:
 
 ## Use Cases
 
-
 - Validate Turnstile tokens on form submission before processing requests
 - Protect login, signup, or contact endpoints from bots at the edge
 - Learn server-side Turnstile verification without a backend framework
 - Return structured siteverify results to your frontend or API gateway
 
 ## Limitations
-
 
 - Requires a `TURNSTILE_SECRET_KEY` secret configured in the Worker
 - Server-side verification only; does not render the Turnstile widget
@@ -157,5 +156,3 @@ curl -X POST "http://localhost:8787/verify" \
 
 - **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
 - **[Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/)** - siteverify API for token validation
-
-

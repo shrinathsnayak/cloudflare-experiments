@@ -1,0 +1,15 @@
+{
+  "name": "ai-gateway-dashboard",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "ai": {
+    "binding": "AI",
+    "remote": true
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}
