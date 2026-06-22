@@ -11,7 +11,6 @@ import {
   repoStructure,
   type HomeExperiment,
 } from "@/lib/home-content";
-import { logoDimensions, logoPathPublic } from "@/lib/logo";
 import { appDescription, appName, docsRoute, gitConfig } from "@/lib/shared";
 import {
   ArrowRight,
@@ -25,7 +24,6 @@ import {
   Terminal,
   Zap,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -96,13 +94,6 @@ export function HomePage() {
       <section className="relative overflow-hidden border-b border-fd-border">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(243,128,32,0.12),transparent_55%)]" />
         <PageShell className="relative flex flex-col items-center gap-8 py-20 text-center md:py-28">
-          <Image
-            src={logoPathPublic}
-            alt="Cloudflare"
-            width={logoDimensions.og.width}
-            height={logoDimensions.og.height}
-            priority
-          />
           <div className="flex max-w-3xl flex-col gap-4">
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">{appName}</h1>
             <p className="text-lg text-fd-muted-foreground md:text-xl">{appDescription}</p>
