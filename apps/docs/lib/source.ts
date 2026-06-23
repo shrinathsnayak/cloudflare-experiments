@@ -1,6 +1,7 @@
 import { docs } from "collections/server";
 import { loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
+import { cache } from "react";
 import { docsContentRoute, docsImageRoute, docsRoute } from "./shared";
 
 // See https://fumadocs.dev/docs/headless/source-api for more info
@@ -9,6 +10,8 @@ export const source = loader({
   source: docs.toFumadocsSource(),
   plugins: [lucideIconsPlugin()],
 });
+
+export const getCachedPage = cache((slug?: string[]) => source.getPage(slug));
 
 export function getPageImage(page: (typeof source)["$inferPage"]) {
   const segments = [...page.slugs, "image.png"];

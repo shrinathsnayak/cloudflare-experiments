@@ -11,7 +11,7 @@ import {
   repoStructure,
   type HomeExperiment,
 } from "@/lib/home-content";
-import { appDescription, appName, docsRoute, gitConfig } from "@/lib/shared";
+import { appName, docsRoute, gitConfig, githubCloneUrl, githubRepoUrl, heroDescription, heroTitle } from "@/lib/shared";
 import {
   ArrowRight,
   BookOpen,
@@ -27,7 +27,20 @@ import {
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
+const homeInteractiveCardClass =
+  "group flex flex-col rounded-xl border border-fd-border bg-fd-background p-4 transition-colors hover:border-brand/40 hover:bg-fd-accent/40";
+
+function HoverRevealArrow({ size = "sm" }: { size?: "sm" | "md" }) {
+  const iconSize = size === "sm" ? "size-3.5" : "size-4";
+  const hoverWidth = size === "sm" ? "group-hover:w-3.5 group-focus-visible:w-3.5" : "group-hover:w-4 group-focus-visible:w-4";
+  const hoverMargin = size === "sm" ? "group-hover:ml-1.5 group-focus-visible:ml-1.5" : "group-hover:ml-1.5 group-focus-visible:ml-1.5";
+
+  return (
+    <ArrowRight
+      className={`${iconSize} w-0 shrink-0 overflow-hidden opacity-0 transition-all duration-200 motion-reduce:transition-none group-hover:opacity-100 group-focus-visible:opacity-100 ${hoverWidth} ${hoverMargin}`}
+    />
+  );
+}
 
 function experimentHref(slug: string): string {
   return `${docsRoute}/experiments/${slug}`;
@@ -67,14 +80,13 @@ function ExperimentCard({ experiment }: { experiment: HomeExperiment }) {
   return (
     <Link
       href={experimentHref(experiment.slug)}
-      className="group flex flex-col rounded-xl border border-fd-border bg-fd-background p-4 transition-colors hover:border-brand/40 hover:bg-fd-accent/40"
+      className={homeInteractiveCardClass}
     >
-      <span className="font-medium group-hover:text-brand">{experiment.title}</span>
-      <span className="mt-1 text-sm text-fd-muted-foreground">{experiment.description}</span>
-      <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-brand opacity-0 transition-opacity group-hover:opacity-100">
-        View docs
-        <ArrowRight className="size-3" />
+      <span className="inline-flex items-center font-medium group-hover:text-brand group-focus-visible:text-brand">
+        {experiment.title}
+        <HoverRevealArrow />
       </span>
+      <span className="mt-1 text-sm text-fd-muted-foreground">{experiment.description}</span>
     </Link>
   );
 }
@@ -94,14 +106,14 @@ export function HomePage() {
       <section className="relative overflow-hidden border-b border-fd-border">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(243,128,32,0.12),transparent_55%)]" />
         <PageShell className="relative flex flex-col items-center gap-8 py-20 text-center md:py-28">
-          <div className="flex max-w-3xl flex-col gap-4">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">{appName}</h1>
-            <p className="text-lg text-fd-muted-foreground md:text-xl">{appDescription}</p>
-            <p className="text-sm text-fd-muted-foreground md:text-base">
-              Real tools and reference implementations - not Hello World demos. Learn Workers AI,
-              Browser Rendering, D1, R2, Durable Objects, Queues, Cron, and more by deploying code
-              you can actually use.
+          <div className="flex max-w-3xl flex-col gap-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-brand">
+              {appName}
             </p>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl lg:text-6xl">
+              {heroTitle}
+            </h1>
+            <p className="text-base text-fd-muted-foreground md:text-lg">{heroDescription}</p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
@@ -119,7 +131,7 @@ export function HomePage() {
               Quick start
             </Link>
             <a
-              href={githubUrl}
+              href={githubRepoUrl}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-lg border border-fd-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-fd-accent"
@@ -128,13 +140,13 @@ export function HomePage() {
               View on GitHub
             </a>
           </div>
-          <div className="grid w-full max-w-3xl grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid w-full max-w-3xl grid-cols-2 gap-6 sm:grid-cols-4">
             {homeStats.map((stat) => (
               <div
                 key={stat.label}
                 className="rounded-xl border border-fd-border bg-fd-card/50 px-4 py-3 text-center"
               >
-                <div className="text-2xl font-bold text-brand">{stat.value}</div>
+                <div className="text-xl font-bold text-brand">{stat.value}</div>
                 <div className="text-xs text-fd-muted-foreground">{stat.label}</div>
               </div>
             ))}
@@ -197,8 +209,8 @@ export function HomePage() {
               <span className="text-xs text-fd-muted-foreground">Terminal</span>
             </div>
             <pre className="overflow-x-auto p-4 font-mono text-sm leading-relaxed">
-              <code>{`git clone ${githubUrl}.git
-cd cloudflare-experiments
+              <code>{`git clone ${githubCloneUrl}
+cd ${gitConfig.repo}
 npm install
 npm run dev -- --filter=ai-website-summary
 curl "http://localhost:8787/summary?url=https://example.com"`}</code>
@@ -236,14 +248,16 @@ curl "http://localhost:8787/summary?url=https://example.com"`}</code>
               <Link
                 key={title}
                 href={docHref(href)}
-                className="group flex flex-col rounded-xl border border-fd-border bg-fd-background p-5 transition-colors hover:border-brand/40 hover:bg-fd-accent/40"
+                className={`${homeInteractiveCardClass} p-5`}
               >
                 <span className="flex size-10 items-center justify-center rounded-lg bg-brand/10 text-brand">
                   <Icon className="size-5" />
                 </span>
-                <h3 className="mt-4 font-semibold group-hover:text-brand">{title}</h3>
+                <h3 className="mt-4 inline-flex items-center font-semibold group-hover:text-brand group-focus-visible:text-brand">
+                  {title}
+                  <HoverRevealArrow size="md" />
+                </h3>
                 <p className="mt-2 flex-1 text-sm text-fd-muted-foreground">{description}</p>
-                <ArrowRight className="mt-4 size-4 text-brand opacity-0 transition-opacity group-hover:opacity-100" />
               </Link>
             ))}
           </div>
@@ -310,7 +324,7 @@ curl "http://localhost:8787/summary?url=https://example.com"`}</code>
           />
           <div className="mt-12 space-y-14">
             {homeCategories.map((category) => (
-              <div key={category.id} id={category.id}>
+              <div key={category.id} id={category.id} className="home-catalog-category">
                 <div className="mb-6 flex items-start gap-4">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand">
                     <category.icon className="size-5" />
@@ -399,7 +413,7 @@ curl "http://localhost:8787/summary?url=https://example.com"`}</code>
             description="Jump in with the path that fits your goal."
           />
           <div className="mt-10">
-            <Cards>
+            <Cards className="grid gap-4 sm:grid-cols-3">
               <Card
                 title="Introduction"
                 description="What this project is, how experiments are organized, and platform capabilities."

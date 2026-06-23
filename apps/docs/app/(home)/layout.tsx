@@ -6,7 +6,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <>
       <SiteBanner />
-      <HomeLayout {...homeLayoutOptions()}>{children}</HomeLayout>
+      <HomeLayout {...homeLayoutOptions}>{children}</HomeLayout>
     </>
   );
 }

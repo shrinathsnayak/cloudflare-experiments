@@ -37,12 +37,23 @@ export function OgImage({ title, description, site, logoSrc }: OgImageProps) {
           marginBottom: "48px",
         }}
       >
-        <img
-          src={logoSrc}
-          width={logoDimensions.og.width}
-          height={logoDimensions.og.height}
-          alt=""
-        />
+        <div
+          style={{
+            display: "flex",
+            width: logoDimensions.og.width,
+            height: logoDimensions.og.height,
+            borderRadius: 14,
+            overflow: "hidden",
+            flexShrink: 0,
+          }}
+        >
+          <img
+            src={logoSrc}
+            width={logoDimensions.og.width}
+            height={logoDimensions.og.height}
+            alt=""
+          />
+        </div>
         <p
           style={{
             fontFamily: ogSansFamily,
@@ -89,7 +100,13 @@ export function OgImage({ title, description, site, logoSrc }: OgImageProps) {
   );
 }
 
+const fontCache = new Map<string, ArrayBuffer>();
+
 async function loadGoogleFont(font: string, weight: number, text: string) {
+  const cacheKey = `${font}:${weight}:${text}`;
+  const cached = fontCache.get(cacheKey);
+  if (cached) return cached;
+
   const family = font.replace(/ /g, "+");
   const url = `https://fonts.googleapis.com/css2?family=${family}:wght@${weight}&text=${encodeURIComponent(text)}`;
   const css = await (await fetch(url)).text();
@@ -104,7 +121,9 @@ async function loadGoogleFont(font: string, weight: number, text: string) {
     throw new Error(`Failed to fetch font data: ${font}`);
   }
 
-  return response.arrayBuffer();
+  const data = await response.arrayBuffer();
+  fontCache.set(cacheKey, data);
+  return data;
 }
 
 function collectText(...parts: Array<ReactNode | undefined>) {

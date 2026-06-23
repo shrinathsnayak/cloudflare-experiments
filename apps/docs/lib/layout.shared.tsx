@@ -1,11 +1,24 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { Globe } from "lucide-react";
-import { appName, docsRoute, gitConfig, homeRoute, portfolioUrl } from "./shared";
+import { AppLogo } from "@/components/app-logo";
+import { docsRoute, githubRepoUrl, homeRoute, portfolioUrl } from "./shared";
 
-const githubUrl = `https://github.com/${gitConfig.user}/${gitConfig.repo}`;
+const nav = {
+  title: <AppLogo />,
+  url: homeRoute,
+} as const;
+
+const portfolioLink = {
+  type: "icon" as const,
+  url: portfolioUrl,
+  label: "Portfolio",
+  text: "Portfolio",
+  icon: <Globe />,
+  external: true,
+};
 
 const sharedLayout: Pick<BaseLayoutProps, "githubUrl" | "themeSwitch" | "searchToggle"> = {
-  githubUrl,
+  githubUrl: githubRepoUrl,
   themeSwitch: {
     enabled: true,
     mode: "light-dark-system",
@@ -16,60 +29,31 @@ const sharedLayout: Pick<BaseLayoutProps, "githubUrl" | "themeSwitch" | "searchT
 };
 
 /** Docs sidebar layout ( /docs/* ) */
-export function docsLayoutOptions(): BaseLayoutProps {
-  return {
-    ...sharedLayout,
-    nav: {
-      title: appName,
+export const docsLayoutOptions: BaseLayoutProps = {
+  ...sharedLayout,
+  nav,
+  links: [
+    {
+      type: "main",
+      text: "Home",
       url: homeRoute,
+      active: "url",
     },
-    links: [
-      {
-        type: "main",
-        text: "Home",
-        url: homeRoute,
-        active: "url",
-      },
-      {
-        type: "icon",
-        url: portfolioUrl,
-        label: "Portfolio",
-        text: "Portfolio",
-        icon: <Globe />,
-        external: true,
-      },
-    ],
-  };
-}
+    portfolioLink,
+  ],
+};
 
 /** Marketing homepage layout ( / ) */
-export function homeLayoutOptions(): BaseLayoutProps {
-  return {
-    ...sharedLayout,
-    nav: {
-      title: appName,
-      url: homeRoute,
+export const homeLayoutOptions: BaseLayoutProps = {
+  ...sharedLayout,
+  nav,
+  links: [
+    {
+      type: "main",
+      text: "Documentation",
+      url: docsRoute,
+      active: "nested-url",
     },
-    links: [
-      {
-        type: "main",
-        text: "Documentation",
-        url: docsRoute,
-        active: "nested-url",
-      },
-      {
-        type: "icon",
-        url: portfolioUrl,
-        label: "Portfolio",
-        text: "Portfolio",
-        icon: <Globe />,
-        external: true,
-      },
-    ],
-  };
-}
-
-/** @deprecated use docsLayoutOptions */
-export function baseOptions(): BaseLayoutProps {
-  return docsLayoutOptions();
-}
+    portfolioLink,
+  ],
+};

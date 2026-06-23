@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
+import { siteIcons } from "@/lib/logo";
 import { getPageImage, getPageMarkdownUrl, type source } from "@/lib/source";
-import { appDescription, appName, gitConfig, siteKeywords, siteUrl } from "@/lib/shared";
+import {
+  appDescription,
+  appName,
+  gitConfig,
+  githubProfileUrl,
+  githubRepoUrl,
+  siteKeywords,
+  siteUrl,
+} from "@/lib/shared";
 
 type DocsPage = ReturnType<(typeof source)["getPage"]> & {};
 
 export function absoluteUrl(path: string): string {
   return new URL(path, siteUrl).href;
 }
-
-const githubProfileUrl = `https://github.com/${gitConfig.user}`;
-const githubRepoUrl = `${githubProfileUrl}/${gitConfig.repo}`;
 
 export function createRootMetadata(): Metadata {
   const ogImage = "/opengraph-image";
@@ -67,13 +73,16 @@ export function createRootMetadata(): Metadata {
     },
     icons: {
       icon: [
-        { url: "/favicon.ico", sizes: "any" },
-        { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
-        { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-        { url: "/favicon-48.png", sizes: "48x48", type: "image/png" },
+        { url: siteIcons.favicon192, sizes: "192x192", type: "image/png" },
+        { url: siteIcons.favicon256, sizes: "256x256", type: "image/png" },
+        { url: siteIcons.favicon128, sizes: "128x128", type: "image/png" },
+        { url: siteIcons.favicon64, sizes: "64x64", type: "image/png" },
+        { url: siteIcons.favicon48, sizes: "48x48", type: "image/png" },
+        { url: siteIcons.favicon32, sizes: "32x32", type: "image/png" },
+        { url: siteIcons.favicon16, sizes: "16x16", type: "image/png" },
       ],
-      shortcut: "/favicon.ico",
-      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+      shortcut: siteIcons.favicon32,
+      apple: [{ url: siteIcons.appleTouch, sizes: "180x180", type: "image/png" }],
     },
   };
 }

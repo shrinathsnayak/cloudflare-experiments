@@ -1,5 +1,0 @@
-{
-  "title": "Reference",
-  "root": true,
-  "pages": ["cloudflare-features", "deployment", "architecture"]
-}

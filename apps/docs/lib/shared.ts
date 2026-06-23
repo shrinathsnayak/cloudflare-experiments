@@ -1,4 +1,7 @@
 export const appName = "Cloudflare Experiments";
+export const heroTitle = "Build at the edge. For real.";
+export const heroDescription =
+  "60+ deployable experiments across the Cloudflare platform - not Hello World demos.";
 export const appDescription =
   "Documentation and deployable Cloudflare Workers experiments - edge computing tools using Workers AI, Browser Rendering, R2, D1, and more.";
 export const siteKeywords = [
@@ -24,6 +27,14 @@ export const gitConfig = {
   repo: "cloudflare-experiments",
   branch: "main",
 };
+
+export const githubProfileUrl = `https://github.com/${gitConfig.user}`;
+export const githubRepoUrl = `${githubProfileUrl}/${gitConfig.repo}`;
+export const githubCloneUrl = `${githubRepoUrl}.git`;
+
+export function githubDocsBlobUrl(pagePath: string): string {
+  return `${githubRepoUrl}/blob/${gitConfig.branch}/apps/docs/content/docs/${pagePath}`;
+}
 
 export const portfolioUrl = "https://snayak.dev";
 

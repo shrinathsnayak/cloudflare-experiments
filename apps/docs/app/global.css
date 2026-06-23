@@ -38,6 +38,11 @@ html {
   scrollbar-gutter: stable;
 }
 
+.home-catalog-category {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
+
 html > body[data-scroll-locked] {
   margin-right: 0px !important;
   --removed-body-scroll-bar-size: 0px !important;

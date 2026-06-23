@@ -1,5 +1,5 @@
 import { OgImage, getOgImageOptions } from "@/lib/og";
-import { getLogoDataUrl } from "@/lib/logo";
+import { getLogoDataUrl } from "@/lib/logo.server";
 import { getPageImage, source } from "@/lib/source";
 import { appName } from "@/lib/shared";
 import { ImageResponse } from "next/og";
@@ -24,7 +24,6 @@ export async function GET(_req: Request, { params }: RouteContext<"/og/[...slug]
 
 export function generateStaticParams() {
   return source.getPages().map((page) => ({
-    lang: page.locale,
     slug: getPageImage(page).segments,
   }));
 }

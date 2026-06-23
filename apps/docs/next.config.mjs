@@ -21,6 +21,10 @@ const legacyDocRedirects = [
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
+  cacheComponents: true,
+  experimental: {
+    optimizePackageImports: ["lucide-react", "fumadocs-ui"],
+  },
   turbopack: {
     root: monorepoRoot,
   },

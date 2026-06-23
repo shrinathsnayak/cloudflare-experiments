@@ -9,7 +9,7 @@ export default function Layout({ children }: LayoutProps<"/docs">) {
     <>
       <SiteBanner />
       <DocsLayout
-        {...docsLayoutOptions()}
+        {...docsLayoutOptions}
         tree={source.getPageTree()}
         sidebar={{
           collapsible: true,
