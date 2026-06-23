@@ -23,7 +23,7 @@ const config = {
   reactStrictMode: true,
   cacheComponents: true,
   experimental: {
-    optimizePackageImports: ["lucide-react", "fumadocs-ui"],
+    optimizePackageImports: ["lucide-react"],
   },
   turbopack: {
     root: monorepoRoot,

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { ImageResponse } from "next/og";
 import { logoDimensions } from "@/lib/logo";
 
-export const ogPrimary = "#f38020";
+const ogPrimary = "#f38020";
 
 /** Satori (next/og) cannot render Google Sans; Roboto is the closest compatible match for previews. */
 const ogSansFamily = "Roboto";

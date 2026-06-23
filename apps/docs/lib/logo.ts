@@ -20,5 +20,4 @@ export const siteIcons = {
   favicon192: "/favicon-192.png",
   favicon256: "/favicon-256.png",
   appleTouch: "/apple-touch-icon.png",
-  icon512: "/icon-512.png",
 } as const;

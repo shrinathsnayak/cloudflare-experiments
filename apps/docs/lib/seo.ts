@@ -11,9 +11,9 @@ import {
   siteUrl,
 } from "@/lib/shared";
 
-type DocsPage = ReturnType<(typeof source)["getPage"]> & {};
+type DocsPage = ReturnType<(typeof source)["getPage"]>;
 
-export function absoluteUrl(path: string): string {
+function absoluteUrl(path: string): string {
   return new URL(path, siteUrl).href;
 }
 
