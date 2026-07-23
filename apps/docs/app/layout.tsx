@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next"
 import { JsonLd } from "@/components/json-ld";
 import { DocsRootProvider } from "@/components/root-provider";
 import "./global.css";
@@ -12,6 +13,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
       <body className={`${uiFont.className} flex flex-col min-h-screen`}>
         <JsonLd data={createWebsiteJsonLd()} />
         <DocsRootProvider>{children}</DocsRootProvider>
+        <Analytics />
       </body>
     </html>
   );

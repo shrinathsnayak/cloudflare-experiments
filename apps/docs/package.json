@@ -11,6 +11,7 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "fumadocs-core": "16.10.4",
     "fumadocs-mdx": "15.0.12",
     "fumadocs-ui": "16.10.4",
