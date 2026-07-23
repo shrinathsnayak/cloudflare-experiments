@@ -1,0 +1,160 @@
+---
+title: "Email Auth Checker"
+description: "Analyze SPF, DMARC, and DKIM email authentication records via Cloudflare DoH"
+icon: "Mail"
+status: new
+tags:
+  - network
+  - dns
+  - email
+---
+
+Look up MX, SPF, DMARC, and common DKIM selectors for a domain using Cloudflare DNS over HTTPS, with pass/warn/fail guidance.
+
+## Features
+
+- Accepts a bare domain or http(s) URL (hostname extracted)
+- Parses SPF and DMARC policies with actionable warnings
+- Probes common DKIM selectors (`google`, `selector1`, `selector2`, `default`, `k1`)
+- Stateless; no bindings required
+
+## API Reference
+
+### GET /check
+
+<TypeTable
+  type={{
+    domain: {
+      description: "Domain name or http(s) URL whose hostname will be checked",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/check?domain=cloudflare.com"
+```
+
+#### Success Response
+
+**`domain`** `string`
+
+Normalized domain that was checked
+
+**`mx`** `array`
+
+MX records with `priority` and `exchange`
+
+**`spf`** / **`dmarc`** / **`dkim`** `object`
+
+Per-record analysis with `status`, details, and optional raw records
+
+**`summary`** `object`
+
+Overall `status` (`pass` | `warn` | `fail`) and `issues` list
+
+```json
+{
+  "domain": "cloudflare.com",
+  "mx": [{ "priority": 10, "exchange": "isaac.mx.cloudflare.net" }],
+  "spf": {
+    "status": "pass",
+    "record": "v=spf1 include:_spf.mx.cloudflare.net -all",
+    "detail": "SPF record present"
+  },
+  "dmarc": {
+    "status": "pass",
+    "policy": "reject",
+    "detail": "DMARC policy is reject"
+  },
+  "dkim": {
+    "status": "warn",
+    "selectorsChecked": ["google", "selector1", "selector2", "default", "k1"],
+    "found": [],
+    "detail": "No DKIM keys found for common selectors..."
+  },
+  "summary": {
+    "status": "warn",
+    "issues": ["No DKIM keys found for common selectors..."]
+  }
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `domain` (`INVALID_DOMAIN`)
+- `502` - DoH lookup failed (`DNS_ERROR`)
+
+## Use Cases
+
+- Verify email authentication before sending from a new domain
+- Spot missing SPF/DMARC during onboarding
+- Explain email auth posture to non-DNS experts
+- Complement raw DNS dumps with actionable analysis
+
+## Limitations
+
+- DKIM selectors are not enumerated exhaustively; only common ones are probed
+- Does not validate live mail delivery or DKIM signatures on messages
+- Relies on public DoH answers; DNS TTL/caching may lag recent changes
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/email-auth-checker)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard. No bindings or secrets required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/check?domain=example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/email-auth-checker
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/check?domain=cloudflare.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[DNS over HTTPS](https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/)** - Cloudflare DoH JSON API
+
+## Next Steps
+
+<Cards>
+  <Card title="URL DNS Lookup" href="/docs/experiments/url-dns-lookup">
+    Dump all DNS record types for a hostname
+  </Card>
+  <Card title="DNS Propagation Checker" href="/docs/experiments/dns-propagation-checker">
+    Compare answers across multiple public resolvers
+  </Card>
+</Cards>

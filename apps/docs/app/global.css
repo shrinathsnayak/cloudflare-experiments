@@ -15,6 +15,14 @@
   --color-fd-primary-foreground: #ffffff;
 }
 
+/* Keep title + New badge on one row in the docs sidebar */
+#nd-sidebar a:has([data-status]),
+#nd-sidebar-mobile a:has([data-status]) {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .prose {
   font-family: var(--font-sans);
 }

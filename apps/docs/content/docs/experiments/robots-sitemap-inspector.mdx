@@ -1,0 +1,151 @@
+---
+title: "Robots Sitemap Inspector"
+description: "Parse robots.txt and linked sitemaps for any URL from the edge"
+icon: "Bot"
+status: new
+tags:
+  - scraping
+  - seo
+---
+
+Fetch and parse `robots.txt` plus linked sitemaps for SEO and AI-crawler debugging from Cloudflare's edge.
+
+## Features
+
+- Parses `User-agent`, `Allow`, `Disallow`, and `Sitemap` directives
+- Inspects up to 5 sitemap URLs from robots.txt
+- Distinguishes `urlset` vs `sitemapindex` and returns sample URLs
+- Stateless; no bindings required
+
+## API Reference
+
+### GET /inspect
+
+<TypeTable
+  type={{
+    url: {
+      description: "Any http or https URL. The origin's /robots.txt is fetched.",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/inspect?url=https://www.cloudflare.com"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+Input URL that was inspected
+
+**`robots`** `object`
+
+Parsed robots.txt: `present`, `url`, `groups`, `sitemaps`, optional `rawPreview` / `error`
+
+**`sitemaps`** `array`
+
+Per-sitemap results with `ok`, `type`, `urlCount`, `sampleUrls` or `childSitemaps`
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "robots": {
+    "present": true,
+    "url": "https://www.cloudflare.com/robots.txt",
+    "groups": [{ "userAgent": "*", "allow": [], "disallow": ["/cdn-cgi/"] }],
+    "sitemaps": ["https://www.cloudflare.com/sitemap.xml"]
+  },
+  "sitemaps": [
+    {
+      "url": "https://www.cloudflare.com/sitemap.xml",
+      "ok": true,
+      "type": "sitemapindex",
+      "urlCount": 3,
+      "childSitemaps": ["https://www.cloudflare.com/sitemap-0.xml"]
+    }
+  ]
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `502` - Unexpected fetch failure (`FETCH_ERROR`)
+
+Missing `robots.txt` (404) still returns `200` with `robots.present: false`.
+
+## Use Cases
+
+- Debug crawl rules before launching content
+- Verify sitemap discovery from robots.txt
+- Complement AI bot visibility checks with full robots/sitemap context
+- Audit SEO crawl configuration from the edge
+
+## Limitations
+
+- Fetches at most 5 sitemaps and samples a small set of URLs
+- Does not recursively expand every child sitemap in an index
+- Robots matching semantics are summarized, not a full crawler simulator
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/robots-sitemap-inspector)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard. No bindings or secrets required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/inspect?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/robots-sitemap-inspector
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/inspect?url=https://www.cloudflare.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Fetch robots.txt and sitemaps
+
+## Next Steps
+
+<Cards>
+  <Card title="AI Bot Visibility" href="/docs/experiments/ai-bot-visibility">
+    Check AI crawler allow/block configuration
+  </Card>
+  <Card title="Website Metadata Extractor" href="/docs/experiments/website-metadata-extractor">
+    Extract title, description, and Open Graph tags
+  </Card>
+</Cards>

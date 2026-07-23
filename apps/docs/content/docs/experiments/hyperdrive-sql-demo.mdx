@@ -1,0 +1,258 @@
+---
+title: "Hyperdrive SQL Demo"
+description: "Query PostgreSQL through Cloudflare Hyperdrive connection pooling from a Worker"
+icon: "Database"
+status: new
+tags:
+  - storage
+  - hyperdrive
+  - postgres
+---
+
+Connect to an existing PostgreSQL database through **Cloudflare Hyperdrive** and run safe read-only queries from the edge using Postgres.js.
+
+## Features
+
+- Hyperdrive binding with Postgres.js (`nodejs_compat`)
+- `GET /status` redacted connection metadata (host/db/user)
+- `GET /ping` database identity + latency
+- `POST /query` single read-only `SELECT` (max 50 rows)
+- Rejects write statements and multi-statement SQL
+
+## API Reference
+
+### GET /status
+
+Returns redacted Hyperdrive target metadata without exposing the password.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/status"
+```
+
+#### Success Response
+
+**`bound`** `boolean`
+
+Whether the Hyperdrive binding is present
+
+**`host`** `string`
+
+Database host (and port when present)
+
+**`database`** `string`
+
+Database name
+
+**`user`** `string`
+
+Database user
+
+```json
+{
+  "bound": true,
+  "host": "db.example.com:5432",
+  "database": "app",
+  "user": "alice"
+}
+```
+
+### GET /ping
+
+Runs `SELECT current_database(), current_user, version()` through Hyperdrive.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/ping"
+```
+
+#### Success Response
+
+**`ok`** `boolean`
+
+Always `true` on success
+
+**`database`** `string`
+
+Current database name
+
+**`user`** `string`
+
+Current database user
+
+**`serverVersion`** `string`
+
+Postgres `version()` string
+
+**`latencyMs`** `number`
+
+Round-trip query latency in milliseconds
+
+```json
+{
+  "ok": true,
+  "database": "app",
+  "user": "alice",
+  "serverVersion": "PostgreSQL 16.2 on x86_64-pc-linux-gnu",
+  "latencyMs": 18
+}
+```
+
+### POST /query
+
+Runs a single read-only `SELECT` and returns up to 50 rows.
+
+<TypeTable
+  type={{
+    sql: {
+      description: "A single SELECT statement (writes and multi-statements are rejected)",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/query" \
+  -H "content-type: application/json" \
+  -d '{"sql":"SELECT 1 AS ok"}'
+```
+
+#### Success Response
+
+**`sql`** `string`
+
+Validated SQL that was executed
+
+**`rowCount`** `number`
+
+Number of rows returned (capped at 50)
+
+**`rows`** `array`
+
+Result rows as JSON objects
+
+**`latencyMs`** `number`
+
+Query latency in milliseconds
+
+```json
+{
+  "sql": "SELECT 1 AS ok",
+  "rowCount": 1,
+  "rows": [{ "ok": 1 }],
+  "latencyMs": 12
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Invalid SQL: only a single read-only SELECT statement is allowed",
+  "code": "INVALID_SQL"
+}
+```
+
+#### Error Codes
+
+- `400` - Invalid or missing JSON body (`INVALID_BODY`)
+- `400` - SQL rejected by allowlist (`INVALID_SQL`)
+- `502` - Hyperdrive binding missing (`MISSING_BINDING`)
+- `502` - Database error (`DB_ERROR`)
+
+## Use Cases
+
+- Accelerate queries from Workers to regional Postgres
+- Prove Hyperdrive pooling/caching against an existing database
+- Build read-only edge SQL playgrounds
+- Teach `nodejs_compat` + Postgres.js patterns on Workers
+
+## Limitations
+
+- Requires a real Hyperdrive config and reachable Postgres database
+- Only single `SELECT` statements are allowed
+- Results are capped at 50 rows
+- Local development needs `localConnectionString` pointing at a reachable DB
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Create Hyperdrive
+
+    ```bash
+    npx wrangler hyperdrive create hyperdrive-sql-demo \
+      --connection-string="postgres://USER:PASSWORD@HOST:5432/DATABASE"
+    ```
+
+  </Step>
+
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/hyperdrive-sql-demo)
+
+    Paste the Hyperdrive `id` into `wrangler.json` under `hyperdrive[0].id`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/ping"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/hyperdrive-sql-demo
+npm install
+npm run dev
+```
+
+Set `hyperdrive[0].localConnectionString` in `wrangler.json` to a local or remote Postgres URL, then:
+
+```bash
+curl "http://localhost:8787/status"
+curl "http://localhost:8787/ping"
+curl -X POST "http://localhost:8787/query" \
+  -H "content-type: application/json" \
+  -d '{"sql":"SELECT 1 AS ok"}'
+```
+
+## Configuration
+
+| Binding / setting                        | Purpose                                 |
+| ---------------------------------------- | --------------------------------------- |
+| `HYPERDRIVE`                             | Hyperdrive binding (`connectionString`) |
+| `compatibility_flags: ["nodejs_compat"]` | Required for Postgres.js                |
+| `postgres` ^3.4.5                        | Postgres client dependency              |
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Hyperdrive](https://developers.cloudflare.com/hyperdrive/)** - Database connection pooling and caching
+- **[Node.js compatibility](https://developers.cloudflare.com/workers/runtime-apis/nodejs/)** - Postgres.js driver support
+
+## Next Steps
+
+<Cards>
+  <Card title="D1 SQL Playground" href="/docs/experiments/d1-sql-playground">
+    Run read-only SQL against edge SQLite (D1)
+  </Card>
+  <Card title="Presigned R2 Upload" href="/docs/experiments/presigned-r2-upload">
+    Another storage-oriented edge experiment
+  </Card>
+</Cards>

@@ -1,0 +1,179 @@
+---
+title: "RSS / Atom Feed Parser"
+description: "Parse RSS or Atom feeds into normalized JSON from the edge"
+icon: "Rss"
+status: new
+tags:
+  - scraping
+  - feeds
+---
+
+Fetch an RSS or Atom feed URL and return a normalized JSON representation of the channel and items from Cloudflare's edge.
+
+## Features
+
+- Supports RSS 2.0 and Atom
+- Normalizes title, link, id, published date, summary, and author
+- Caps results at 50 items
+- Stateless; no bindings required
+
+## API Reference
+
+### GET /parse
+
+Fetches the feed URL and returns a normalized channel + items payload.
+
+<TypeTable
+  type={{
+    url: {
+      description: "Feed URL (must be http or https)",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/parse?url=https://blog.cloudflare.com/rss/"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+Final feed URL after redirects
+
+**`format`** `string`
+
+`"rss"`, `"atom"`, or `"unknown"`
+
+**`title`** `string`
+
+Feed/channel title when present
+
+**`description`** `string`
+
+Feed description or Atom subtitle when present
+
+**`link`** `string`
+
+Feed homepage / self link when present
+
+**`itemCount`** `number`
+
+Number of items returned (max 50)
+
+**`items`** `array`
+
+Normalized items with `title`, optional `link`, `id`, `published`, `summary`, `author`
+
+```json
+{
+  "url": "https://blog.cloudflare.com/rss/",
+  "format": "rss",
+  "title": "The Cloudflare Blog",
+  "description": "Cloudflare Blog",
+  "link": "https://blog.cloudflare.com/",
+  "itemCount": 2,
+  "items": [
+    {
+      "title": "Example post",
+      "link": "https://blog.cloudflare.com/example/",
+      "id": "https://blog.cloudflare.com/example/",
+      "published": "Mon, 01 Jan 2024 00:00:00 GMT",
+      "summary": "Post summary…"
+    }
+  ]
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "URL did not return a recognizable RSS or Atom feed",
+  "code": "NOT_FEED"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `400` - Response was not a recognizable feed (`NOT_FEED`)
+- `502` - Fetch failed (`FETCH_ERROR`)
+
+## Use Cases
+
+- Power newsletter or digest pipelines
+- Normalize third-party feeds for dashboards
+- Convert blog/changelog feeds into structured JSON APIs
+- Poll product update feeds from Workers cron jobs
+
+## Limitations
+
+- Heuristic XML parsing (not a full XML DOM)
+- Does not follow pagination or feed hubs
+- Large feeds are truncated to 50 items
+- Does not execute JavaScript-generated feeds
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rss-atom-feed-parser)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard. No bindings or secrets required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/parse?url=https://blog.cloudflare.com/rss/"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/rss-atom-feed-parser
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/parse?url=https://blog.cloudflare.com/rss/"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Feed retrieval from the edge
+
+## Next Steps
+
+<Cards>
+  <Card title="Website to llms.txt" href="/docs/experiments/website-to-llms-txt">
+    Convert webpage content into llms.txt for LLM consumption
+  </Card>
+  <Card title="JSON-LD Extractor" href="/docs/experiments/json-ld-extractor">
+    Extract Schema.org structured data from pages
+  </Card>
+</Cards>

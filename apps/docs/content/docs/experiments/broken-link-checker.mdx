@@ -1,0 +1,150 @@
+---
+title: "Broken Link Checker"
+description: "Extract links from a page and report HTTP status codes from the edge"
+icon: "Link"
+status: new
+tags:
+  - network
+  - scraping
+---
+
+Fetch a webpage, extract `a[href]` links, and probe each URL's HTTP status from Cloudflare's edge.
+
+## Features
+
+- Extracts absolute and same-origin relative links from HTML
+- Probes up to 25 links by default (max 50) with HEAD, falling back to GET
+- Runs probes concurrently (5 at a time) with per-link timeouts
+- Stateless; no bindings required
+
+## API Reference
+
+### GET /check
+
+<TypeTable
+  type={{
+    url: {
+      description: "The target page URL (must be http or https)",
+      type: "string",
+      required: true,
+    },
+    limit: {
+      description: "Max links to probe (default 25, max 50)",
+      type: "number",
+      required: false,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/check?url=https://www.cloudflare.com&limit=10"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+Final page URL after redirects
+
+**`checked`** `number`
+
+Number of links probed
+
+**`broken`** `number`
+
+Count of non-OK responses
+
+**`links`** `array`
+
+Per-link `{ href, statusCode, ok, error? }`
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "checked": 10,
+  "broken": 1,
+  "links": [
+    { "href": "https://www.cloudflare.com/", "statusCode": 200, "ok": true },
+    { "href": "https://www.cloudflare.com/missing", "statusCode": 404, "ok": false }
+  ]
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `400` - Response was not HTML (`NOT_HTML`)
+- `502` - Page fetch failed (`FETCH_ERROR`)
+
+## Use Cases
+
+- Find dead links before publishing content
+- Spot-check navigation and footer URLs
+- Complement link extraction tools with live status checks
+- Build simple site QA workflows on Workers
+
+## Limitations
+
+- Does not execute JavaScript; only links present in raw HTML
+- Caps probes (default 25) to stay under Worker time limits
+- Some origins block HEAD or bots; status codes may reflect bot filtering
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/broken-link-checker)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard. No bindings or secrets required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/check?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/broken-link-checker
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/check?url=https://www.cloudflare.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - Page fetch and link probes
+
+## Next Steps
+
+<Cards>
+  <Card title="Browser Links" href="/docs/experiments/browser-links">
+    Extract links from JavaScript-rendered pages
+  </Card>
+  <Card title="Is It Down" href="/docs/experiments/is-it-down">
+    Check if a single URL is reachable from the edge
+  </Card>
+</Cards>

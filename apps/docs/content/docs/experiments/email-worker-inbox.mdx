@@ -1,0 +1,203 @@
+---
+title: "Email Worker Inbox"
+description: "Receive inbound emails with Email Workers, store them in KV, and inspect over HTTP"
+icon: "Mail"
+status: new
+tags:
+  - email
+  - kv
+---
+
+Process inbound mail with the Cloudflare **Email Workers** `email` handler, parse MIME with `postal-mime`, store message summaries in **Workers KV**, and inspect them over HTTP.
+
+## Features
+
+- Inbound `email` handler with reject/store policy
+- Parses subject/body with `postal-mime`
+- `GET /inbox` and `GET /inbox/:id` for inspection
+- Stores up to 50 recent messages with a 7-day KV TTL
+- Local simulation via Wrangler’s `/cdn-cgi/handler/email` endpoint
+
+## API Reference
+
+### Email handler
+
+Configured in the Cloudflare dashboard under **Email Routing** → route an address to this Worker.
+
+The demo policy rejects:
+
+- senders from `spam.example` or `@spam.`
+- subjects containing `[spam]` or starting with `spam:`
+
+Rejected messages are still stored in KV with `rejected: true` so you can inspect them.
+
+### GET /inbox
+
+Lists recent stored messages (newest first, max 50).
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/inbox"
+```
+
+#### Success Response
+
+**`count`** `number`
+
+Number of stored messages returned
+
+**`messages`** `array`
+
+Message summaries with `id`, `from`, `to`, `subject`, `receivedAt`, optional `text` / `html`, and rejection fields
+
+```json
+{
+  "count": 1,
+  "messages": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "from": "sender@example.com",
+      "to": "inbox@example.com",
+      "subject": "Hello from Email Workers",
+      "receivedAt": "2026-07-23T12:00:00.000Z",
+      "text": "Hello from local email simulation.",
+      "messageId": "<test@example.com>",
+      "rejected": false
+    }
+  ]
+}
+```
+
+### GET /inbox/:id
+
+Returns one stored message by id.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/inbox/550e8400-e29b-41d4-a716-446655440000"
+```
+
+#### Success Response
+
+Same shape as a single object in `messages[]` above.
+
+#### Error Response
+
+```json
+{
+  "error": "Message not found",
+  "code": "NOT_FOUND"
+}
+```
+
+#### Error Codes
+
+- `404` - Message id not found (`NOT_FOUND`)
+- `400` - Missing message id (`MISSING_ID`)
+
+## Use Cases
+
+- Build `support@` / `hello@` edge inboxes
+- Prototype spam filters before forwarding
+- Capture inbound mail for webhook-style automation
+- Teach Email Workers + KV patterns end to end
+
+## Limitations
+
+- Requires Email Routing enabled on a Cloudflare zone
+- Stores truncated text/html previews (about 4KB each)
+- Messages expire after 7 days (KV TTL)
+- Does not forward or reply unless you extend the handler
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Create KV namespace
+
+    Create a KV namespace and set its id in `wrangler.json` for the `INBOX` binding.
+
+  </Step>
+
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/email-worker-inbox)
+
+  </Step>
+
+  <Step>
+
+### Route email and test
+
+    In Email Routing, send an address to this Worker, then inspect with:
+
+    ```bash
+    curl "https://your-worker.workers.dev/inbox"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/email-worker-inbox
+npm install
+npm run dev
+```
+
+Simulate an inbound email:
+
+```bash
+curl -X POST 'http://localhost:8787/cdn-cgi/handler/email?from=sender@example.com&to=inbox@example.com' \
+  --data-binary @- <<'EOF'
+From: sender@example.com
+To: inbox@example.com
+Subject: Testing Email Workers
+Message-ID: <test@example.com>
+Content-Type: text/plain
+
+Hello from local email simulation.
+EOF
+```
+
+Then inspect:
+
+```bash
+curl "http://localhost:8787/inbox"
+```
+
+<Callout>
+
+Local email simulation uses Wrangler’s `/cdn-cgi/handler/email` helper. Production delivery requires Email Routing configured on your zone.
+
+</Callout>
+
+## Configuration
+
+| Binding / dependency | Purpose                       |
+| -------------------- | ----------------------------- |
+| `INBOX` (KV)         | Stores message index + bodies |
+| `postal-mime`        | Parses inbound MIME messages  |
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Email Workers](https://developers.cloudflare.com/email-routing/email-workers/)** - Inbound email handler
+- **[Workers KV](https://developers.cloudflare.com/kv/)** - Message storage and TTL
+
+## Next Steps
+
+<Cards>
+  <Card title="Email Auth Checker" href="/docs/experiments/email-auth-checker">
+    Analyze SPF/DMARC/DKIM for a sending domain
+  </Card>
+  <Card title="Webhook Relay Inspector" href="/docs/experiments/webhook-relay-inspector">
+    Capture inbound HTTP webhooks for debugging
+  </Card>
+</Cards>

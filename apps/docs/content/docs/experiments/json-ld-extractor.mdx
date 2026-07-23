@@ -1,0 +1,175 @@
+---
+title: "JSON-LD Extractor"
+description: "Extract Schema.org JSON-LD structured data from any webpage at the edge"
+icon: "Braces"
+status: new
+tags:
+  - scraping
+  - seo
+---
+
+Fetch a webpage and extract `application/ld+json` structured data blocks for Schema.org / rich-results debugging from Cloudflare's edge.
+
+## Features
+
+- Parses all `script[type="application/ld+json"]` blocks
+- Collects `@type` values including nested `@graph`
+- Reports invalid JSON blocks without failing the whole response
+- Caps extraction at 25 script blocks
+- Stateless; no bindings required
+
+## API Reference
+
+### GET /extract
+
+Fetches HTML and returns parsed JSON-LD blocks plus discovered types.
+
+<TypeTable
+  type={{
+    url: {
+      description: "Page URL (must be http or https)",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/extract?url=https://www.cloudflare.com"
+```
+
+#### Success Response
+
+**`url`** `string`
+
+Final page URL after redirects
+
+**`count`** `number`
+
+Number of JSON-LD script blocks found
+
+**`types`** `string[]`
+
+Sorted unique `@type` values across all blocks (including `@graph`)
+
+**`blocks`** `array`
+
+Per-block results with `index`, `types`, `data`, and optional `parseError`
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "count": 2,
+  "types": ["Organization", "WebSite"],
+  "blocks": [
+    {
+      "index": 0,
+      "types": ["Organization"],
+      "data": {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Cloudflare"
+      }
+    },
+    {
+      "index": 1,
+      "types": ["WebSite"],
+      "data": {
+        "@context": "https://schema.org",
+        "@graph": [{ "@type": "WebSite", "name": "Cloudflare" }]
+      }
+    }
+  ]
+}
+```
+
+#### Error Response
+
+```json
+{
+  "error": "Expected HTML, got content-type: application/json",
+  "code": "NOT_HTML"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `400` - Response was not HTML (`NOT_HTML`)
+- `502` - Fetch failed (`FETCH_ERROR`)
+
+## Use Cases
+
+- Debug rich results / Schema.org markup
+- Inventory Organization, Product, Article entities on a site
+- Complement Open Graph previews with structured data
+- Build SEO auditing tools on Workers
+
+## Limitations
+
+- Does not execute JavaScript-injected JSON-LD
+- Caps extraction at 25 script blocks
+- Does not validate against Schema.org vocabularies
+- Invalid JSON blocks are reported via `parseError` rather than failing the request
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/json-ld-extractor)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Follow the deployment wizard. No bindings or secrets required.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/extract?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/json-ld-extractor
+npm install
+npm run dev
+```
+
+Test locally:
+
+```bash
+curl "http://localhost:8787/extract?url=https://www.cloudflare.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/)** - HTML retrieval from the edge
+
+## Next Steps
+
+<Cards>
+  <Card title="Social Preview Inspector" href="/docs/experiments/social-preview-inspector">
+    Preview Open Graph and Twitter cards
+  </Card>
+  <Card title="Website Metadata Extractor" href="/docs/experiments/website-metadata-extractor">
+    Extract title, description, and canonical URL
+  </Card>
+</Cards>
