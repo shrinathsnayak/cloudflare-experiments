@@ -1,9 +1,12 @@
 import { siteUrl } from "@/lib/shared";
 
-export const indexNowKeyLocation = `${siteUrl}/indexnow-key.txt`;
 export const indexNowEndpoint = "https://api.indexnow.org/indexnow";
 
 const MAX_URLS_PER_REQUEST = 10_000;
+
+export function indexNowKeyLocation(key: string): string {
+  return `${siteUrl}/${key}.txt`;
+}
 
 export function getIndexNowKey(): string {
   const key = process.env.INDEXNOW_KEY?.trim();
@@ -57,7 +60,7 @@ async function submitBatch(key: string, urlList: string[]): Promise<number> {
     body: JSON.stringify({
       host: new URL(siteUrl).host,
       key,
-      keyLocation: indexNowKeyLocation,
+      keyLocation: indexNowKeyLocation(key),
       urlList,
     }),
   });

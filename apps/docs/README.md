@@ -44,10 +44,10 @@ Search engines (Bing, Yandex, Naver, and others) are notified of URL changes via
 
 Env vars (see `.env.example`):
 
-| Variable                  | Where                            | Purpose                                                      |
-| ------------------------- | -------------------------------- | ------------------------------------------------------------ |
-| `INDEXNOW_KEY`            | Vercel Production + `.env.local` | Ownership key served at `/indexnow-key.txt`                  |
-| `INDEXNOW_WEBHOOK_SECRET` | Vercel Production + `.env.local` | Auth for `POST /api/indexnow` (Vercel webhook HMAC + Bearer) |
+| Variable                  | Where                            | Purpose                                                       |
+| ------------------------- | -------------------------------- | ------------------------------------------------------------- |
+| `INDEXNOW_KEY`            | Vercel Production + `.env.local` | Ownership key served at `/{INDEXNOW_KEY}.txt` (Bing Option 1) |
+| `INDEXNOW_WEBHOOK_SECRET` | Vercel Production + `.env.local` | Auth for `POST /api/indexnow` (Vercel webhook HMAC + Bearer)  |
 
 ### Automatic (recommended): Vercel webhook
 
