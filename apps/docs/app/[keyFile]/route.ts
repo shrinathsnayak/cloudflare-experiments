@@ -1,6 +1,4 @@
-import { NextResponse } from "next/server";
-
-export const dynamic = "force-dynamic";
+import { connection, NextResponse } from "next/server";
 
 type RouteContext = {
   params: Promise<{ keyFile: string }>;
@@ -12,6 +10,8 @@ type RouteContext = {
  * Body must be exactly the key — no extra whitespace.
  */
 export async function GET(_request: Request, context: RouteContext) {
+  await connection();
+
   const { keyFile } = await context.params;
   const key = process.env.INDEXNOW_KEY?.trim();
 

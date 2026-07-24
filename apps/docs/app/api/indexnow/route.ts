@@ -1,8 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { NextResponse } from "next/server";
+import { connection, NextResponse } from "next/server";
 import { submitUrlsToIndexNow } from "@/lib/indexnow";
-
-export const dynamic = "force-dynamic";
 
 type VercelWebhookEvent = {
   type?: string;
@@ -52,6 +50,8 @@ function isMainBranch(event: VercelWebhookEvent): boolean {
 }
 
 export async function POST(request: Request) {
+  await connection();
+
   const secret = getWebhookSecret();
   if (!secret) {
     return NextResponse.json(
