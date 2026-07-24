@@ -2,6 +2,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { submitUrlsToIndexNow } from "@/lib/indexnow";
 
+export const dynamic = "force-dynamic";
+
 type VercelWebhookEvent = {
   type?: string;
   payload?: {
