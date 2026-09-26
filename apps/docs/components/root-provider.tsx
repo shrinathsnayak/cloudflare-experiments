@@ -1,5 +1,7 @@
 "use client";
 
+import { DocsSearchDialog } from "@/components/search-dialog";
+import { searchTags } from "@/lib/search-tags";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import type { ReactNode } from "react";
 
@@ -13,8 +15,11 @@ const theme = {
 };
 
 const search = {
+  SearchDialog: DocsSearchDialog,
   options: {
     api: "/api/search",
+    tags: searchTags,
+    allowClear: true,
   },
 };
 

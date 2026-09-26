@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "lint:links": "npm run lint:links --workspace=docs"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
