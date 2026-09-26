@@ -1,12 +1,15 @@
-import { getLLMText, getPageMarkdownUrl, source } from "@/lib/source";
+import { docsLlms, source } from "@/lib/source";
 import { notFound } from "next/navigation";
 
 export async function GET(_req: Request, { params }: RouteContext<"/llms.mdx/[[...slug]]">) {
   const { slug } = await params;
-  const page = source.getPage(slug?.slice(0, -1));
+  // remove the appended "content.md", `/docs/index.md` is rewritten to the root page
+  const slugs = slug?.slice(0, -1) ?? [];
+  if (slugs.at(-1) === "index") slugs.pop();
+  const page = source.getPage(slugs);
   if (!page) notFound();
 
-  return new Response(await getLLMText(page), {
+  return new Response(await docsLlms.page(page), {
     headers: {
       "Content-Type": "text/markdown",
     },
@@ -14,7 +17,8 @@ export async function GET(_req: Request, { params }: RouteContext<"/llms.mdx/[[.
 }
 
 export function generateStaticParams() {
-  return source.getPages().map((page) => ({
-    slug: getPageMarkdownUrl(page).segments,
+  return source.generateParams().map((item) => ({
+    ...item,
+    slug: [...item.slug, "content.md"],
   }));
 }

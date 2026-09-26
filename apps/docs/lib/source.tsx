@@ -1,5 +1,5 @@
 import { docs } from "collections/server";
-import { loader } from "fumadocs-core/source";
+import { llms, loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/lucide-icons";
 import { statusBadgesPlugin } from "fumadocs-core/source/plugins/status-badges";
 import { cache } from "react";
@@ -16,6 +16,12 @@ export const source = loader({
       renderBadge: (status) => <SidebarStatusBadge status={status} />,
     }),
   ],
+});
+
+export const docsLlms = llms(source, {
+  renderPage: async (page) => `# ${page.data.title} (${page.url})
+
+${await page.data.getText("processed")}`,
 });
 
 export const getCachedPage = cache((slug?: string[]) => source.getPage(slug));
@@ -36,12 +42,4 @@ export function getPageMarkdownUrl(page: (typeof source)["$inferPage"]) {
     segments,
     url: `${docsContentRoute}/${segments.join("/")}`,
   };
-}
-
-export async function getLLMText(page: (typeof source)["$inferPage"]) {
-  const processed = await page.data.getText("processed");
-
-  return `# ${page.data.title} (${page.url})
-
-${processed}`;
 }

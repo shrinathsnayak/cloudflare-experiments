@@ -47,6 +47,14 @@ const config = {
       { source: "/reference/:path*", destination: "/docs/reference/:path*", permanent: true },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/docs/:slug*.md",
+        destination: "/llms.mdx/:slug*/content.md",
+      },
+    ];
+  },
 };
 
 export default withTraksProxy({

@@ -54,6 +54,12 @@ export const homeLayoutOptions: BaseLayoutProps = {
       url: docsRoute,
       active: "nested-url",
     },
+    {
+      type: "main",
+      text: "Self-Hosted",
+      url: `${docsRoute}/self-hosted`,
+      active: "url",
+    },
     portfolioLink,
   ],
 };
