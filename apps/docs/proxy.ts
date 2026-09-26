@@ -11,6 +11,11 @@ const { rewrite: rewriteSuffix } = rewritePath(
   `${docsContentRoute}{/*path}/content.md`
 );
 
+/** Only negotiate markdown on docs routes — keep sitemap/robots off the proxy path. */
+export const config = {
+  matcher: [`${docsRoute}`, `${docsRoute}/:path*`],
+};
+
 export default function proxy(request: NextRequest) {
   const result = rewriteSuffix(request.nextUrl.pathname);
   if (result) {
