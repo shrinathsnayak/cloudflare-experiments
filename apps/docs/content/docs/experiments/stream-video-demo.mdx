@@ -1,0 +1,150 @@
+---
+title: "Stream Video Demo"
+description: "Create Stream direct upload URLs and signed playback tokens"
+icon: "Video"
+tags:
+  - media
+  - stream
+bindings:
+  - STREAM
+status: new
+---
+
+Create **Cloudflare Stream** direct upload URLs and signed playback tokens from a Worker via the Stream binding. Locally (or without a live binding) endpoints return demo values with `mode: "demo"`.
+
+## Features
+
+- Direct creator upload URL via `env.STREAM.createDirectUpload`
+- Signed playback token via `env.STREAM.video(uid).generateToken`
+- Demo mode when the Stream binding is unavailable
+
+## API Reference
+
+### POST /upload-url
+
+Create a one-time direct upload URL.
+
+**Body** (optional JSON)
+
+| Field                | Required | Description                                         |
+| -------------------- | -------- | --------------------------------------------------- |
+| `maxDurationSeconds` | No       | Max video length in seconds (1–21600, default 3600) |
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/upload-url" \
+  -H "Content-Type: application/json" \
+  -d '{"maxDurationSeconds": 600}'
+```
+
+#### Success Response
+
+```json
+{
+  "uploadURL": "https://upload.cloudflarestream.com/...",
+  "uid": "video-uid",
+  "mode": "live",
+  "maxDurationSeconds": 600
+}
+```
+
+#### Error Codes
+
+- `400` - Invalid JSON / duration (`INVALID_BODY`)
+- `502` - Stream API failure (`STREAM_ERROR`)
+
+### GET /playback-token
+
+Generate a signed playback token for a video UID.
+
+**`uid`** `string` (required)
+
+Stream video UID.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/playback-token?uid=VIDEO_UID"
+```
+
+#### Success Response
+
+```json
+{
+  "token": "signed-playback-token",
+  "uid": "VIDEO_UID",
+  "playbackUrl": "https://videodelivery.net/signed-playback-token/manifest/video.m3u8",
+  "mode": "live"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing uid (`INVALID_UID`)
+- `502` - Stream API failure (`STREAM_ERROR`)
+
+## Use Cases
+
+- Let end users upload video without exposing Stream API tokens
+- Issue short-lived playback tokens for private videos
+- Prototype creator-upload + secure viewing flows on Workers
+
+## Limitations
+
+- Requires Stream enabled on the account for live mode
+- Basic POST uploads are limited to ~200 MB (use tus via REST for larger files)
+- Demo mode returns placeholder URLs/tokens
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/stream-video-demo)
+
+  </Step>
+
+  <Step>
+
+### Enable Stream
+
+    Ensure Stream is available on your Cloudflare account. The Worker binds `STREAM` via `wrangler.json`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/upload-url"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/stream-video-demo
+npm install
+npm run dev
+```
+
+Without a live Stream binding, responses include `"mode": "demo"`.
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Stream binding** `STREAM`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Stream](https://developers.cloudflare.com/stream/)** - Video upload, storage, and playback
+- **[Direct creator uploads](https://developers.cloudflare.com/stream/uploading-videos/direct-creator-uploads/)** - One-time upload URLs
+- **[Signed URLs](https://developers.cloudflare.com/stream/viewing-videos/securing-your-stream/)** - Tokenized playback

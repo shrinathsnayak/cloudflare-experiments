@@ -1,0 +1,149 @@
+---
+title: "Browser Markdown Scrape"
+description: "URL to Markdown and CSS scrape via Browser Rendering quickAction"
+icon: "FileText"
+tags:
+  - browser
+  - markdown
+  - scrape
+bindings:
+  - BROWSER
+status: new
+---
+
+Convert a URL to Markdown and scrape CSS selectors using Cloudflare Browser Rendering **quickAction** (REST-style binding — not Puppeteer).
+
+## Features
+
+- `GET /markdown?url=` → page Markdown via `quickAction("markdown")`
+- `GET /scrape?url=&selector=` → structured elements via `quickAction("scrape")`
+- HTTP/HTTPS URL validation only
+
+## API Reference
+
+### GET /markdown
+
+**`url`** `string` (required)
+
+Target page (`http://` or `https://`).
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/markdown?url=https://example.com"
+```
+
+#### Success Response
+
+```json
+{
+  "url": "https://example.com/",
+  "markdown": "# Example Domain\n\n..."
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or non-http(s) url (`INVALID_URL`)
+- `502` - quickAction failure (`MARKDOWN_ERROR`)
+
+### GET /scrape
+
+**`url`** `string` (required)
+
+Target page.
+
+**`selector`** `string` (required)
+
+CSS selector (sent as one scrape element).
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/scrape?url=https://example.com&selector=h1"
+```
+
+#### Success Response
+
+```json
+{
+  "url": "https://example.com/",
+  "results": [
+    {
+      "selector": "h1",
+      "results": [{ "text": "Example Domain", "html": "Example Domain" }]
+    }
+  ]
+}
+```
+
+#### Error Codes
+
+- `400` - Invalid url (`INVALID_URL`)
+- `400` - Missing selector (`MISSING_SELECTOR`)
+- `502` - quickAction failure (`SCRAPE_ERROR`)
+
+## Use Cases
+
+- Normalize pages to Markdown for RAG / LLM pipelines
+- Extract specific DOM fields without writing Puppeteer scripts
+- Compare quickAction REST bindings vs Puppeteer-based experiments
+
+## Limitations
+
+- Requires Browser Rendering (often `wrangler dev --remote` locally)
+- Single CSS selector per scrape request
+- JS-heavy SPAs may need advanced goto options (not exposed in this demo)
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-markdown-scrape)
+
+  </Step>
+
+  <Step>
+
+### Confirm browser binding
+
+    `wrangler.json` declares `"browser": { "binding": "BROWSER" }`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/markdown?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/browser-markdown-scrape
+npm install
+npm run dev -- --remote
+```
+
+```bash
+curl "http://localhost:8787/markdown?url=https://example.com"
+```
+
+## Configuration
+
+- **Browser binding** `BROWSER` — uses `quickAction("markdown" | "scrape", …)`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless browser at the edge
+- **[Markdown endpoint](https://developers.cloudflare.com/browser-rendering/rest-api/markdown-endpoint/)** - URL → Markdown quick action
+- **[Scrape endpoint](https://developers.cloudflare.com/browser-rendering/rest-api/scrape-endpoint/)** - CSS selector scrape quick action

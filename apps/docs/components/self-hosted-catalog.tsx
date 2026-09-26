@@ -16,7 +16,7 @@ function Badge({ children, tone = "muted" }: { children: ReactNode; tone?: "mute
       className={cn(
         "inline-flex shrink-0 items-center rounded-md border px-2 py-0.5 font-mono text-[11px] leading-none",
         tone === "muted" &&
-        "border-fd-border bg-fd-secondary text-fd-muted-foreground no-underline",
+          "border-fd-border bg-fd-secondary text-fd-muted-foreground no-underline",
         tone === "brand" && "border-brand/30 bg-brand/10 text-brand no-underline"
       )}
     >

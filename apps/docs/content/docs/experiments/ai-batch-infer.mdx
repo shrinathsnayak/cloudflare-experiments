@@ -1,0 +1,142 @@
+---
+title: "AI Batch Infer"
+description: "Workers AI async batch embeddings with queueRequest and poll"
+icon: "Layers"
+tags:
+  - ai
+  - batch
+  - embeddings
+bindings:
+  - AI
+status: new
+---
+
+Submit a batch of Workers AI embedding inferences with `queueRequest: true`, then poll by `request_id` via the Asynchronous Batch API. Without an AI binding, routes return demo queued/poll responses.
+
+## Features
+
+- Queue embedding batches (`POST /batch`)
+- Poll results by `request_id` (`GET /batch/:requestId`)
+- Configurable model via `MODEL` var (default `@cf/baai/bge-m3`)
+
+## API Reference
+
+### POST /batch
+
+**Body**
+
+```json
+{
+  "texts": ["first phrase", "second phrase"]
+}
+```
+
+| Field   | Required | Description                                 |
+| ------- | -------- | ------------------------------------------- |
+| `texts` | Yes      | 1–20 non-empty strings, max 2000 chars each |
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/batch" \
+  -H "Content-Type: application/json" \
+  -d '{"texts":["Cloudflare Workers","edge compute"]}'
+```
+
+#### Success Response
+
+```json
+{
+  "status": "queued",
+  "model": "@cf/baai/bge-m3",
+  "request_id": "000-000-000",
+  "mode": "live"
+}
+```
+
+#### Error Codes
+
+- `400` - Invalid body (`INVALID_BODY`)
+- `502` - Batch submit failure (`BATCH_ERROR`)
+
+### GET /batch/:requestId
+
+Poll status/results for a queued batch.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/batch/000-000-000"
+```
+
+While processing, the API may return `queued` or `running`. When complete, the response includes per-item results.
+
+#### Error Codes
+
+- `400` - Invalid id (`INVALID_REQUEST_ID`)
+- `502` - Poll failure (`BATCH_ERROR`)
+
+## Use Cases
+
+- Offline embedding of large document sets
+- Batch summarization / classification without interactive latency
+- Avoid capacity errors by queueing inference for eventual completion
+
+## Limitations
+
+- Total batch payload must stay under ~10 MB (Workers AI limit)
+- Needs a batch-capable model and account AI access for live mode
+- Demo mode returns placeholder embeddings
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-batch-infer)
+
+  </Step>
+
+  <Step>
+
+### Confirm AI binding
+
+    `wrangler.json` declares `ai.binding: "AI"` and `vars.MODEL` (default `@cf/baai/bge-m3`).
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/batch" \
+      -H "Content-Type: application/json" \
+      -d '{"texts":["hello","world"]}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/ai-batch-infer
+npm install
+npm run dev
+```
+
+Workers AI batch typically needs remote AI / account access.
+
+## Configuration
+
+- **Workers AI binding** `AI`
+- **Var** `MODEL` — batch embedding model id
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Inference at the edge
+- **[Asynchronous Batch API](https://developers.cloudflare.com/workers-ai/features/batch-api/)** - `queueRequest` + poll by `request_id`

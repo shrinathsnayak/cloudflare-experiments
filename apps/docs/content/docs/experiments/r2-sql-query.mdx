@@ -1,0 +1,144 @@
+---
+title: "R2 SQL Query"
+description: "Query Apache Iceberg tables via the R2 SQL HTTP API"
+icon: "Database"
+tags:
+  - storage
+  - sql
+  - r2
+bindings: []
+status: new
+---
+
+Query **Apache Iceberg** tables managed by R2 Data Catalog using the **R2 SQL HTTP API**. There is no Workers binding — this experiment uses account secrets and `fetch`. Without credentials it returns sample rows with `mode: "demo"`.
+
+## Features
+
+- `SELECT` / `SHOW` only (mutating SQL rejected)
+- Live queries against R2 SQL, or demo rows when secrets are missing
+- Per-request warehouse override
+
+## API Reference
+
+### GET /query
+
+Run a read-only SQL query.
+
+**`q`** / **`query`** `string` (required)
+
+SQL statement (`SELECT` or `SHOW`, max 4000 characters).
+
+**`warehouse`** `string` (optional)
+
+Override the warehouse / bucket name (defaults to `WAREHOUSE` var).
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/query?q=SELECT%20*%20FROM%20default.events%20LIMIT%2010"
+```
+
+#### Success Response (demo)
+
+```json
+{
+  "mode": "demo",
+  "query": "SELECT * FROM default.events LIMIT 10",
+  "warehouse": "demo-warehouse",
+  "rows": [],
+  "note": "Configure CLOUDFLARE_ACCOUNT_ID and R2_SQL_AUTH_TOKEN for live R2 SQL queries"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or oversized query (`INVALID_QUERY`)
+- `400` - Non-read-only SQL (`FORBIDDEN_SQL`)
+- `502` - Upstream R2 SQL failure (`QUERY_ERROR`)
+
+### POST /query
+
+Same behavior with a JSON body:
+
+```json
+{
+  "query": "SELECT * FROM default.ecommerce LIMIT 10",
+  "warehouse": "optional-override"
+}
+```
+
+## Use Cases
+
+- Explore Iceberg tables written by Cloudflare Pipelines
+- Prototype analytics over R2 Data Catalog without a separate warehouse
+- Pair with Event Pipeline for ingest → query demos
+- Validate SELECT/SHOW guardrails for public query APIs
+
+## Limitations
+
+- Requires account ID + R2 SQL API token for live queries
+- Only `SELECT` and `SHOW` are allowed
+- No Workers binding — uses the HTTP API
+- Demo mode returns sample rows, not real catalog data
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-sql-query)
+
+  </Step>
+
+  <Step>
+
+### Configure secrets and warehouse
+
+    Enable R2 Data Catalog on a bucket, create a token with R2 SQL + catalog + storage read, then set:
+
+    ```bash
+    npx wrangler secret put CLOUDFLARE_ACCOUNT_ID
+    npx wrangler secret put R2_SQL_AUTH_TOKEN
+    ```
+
+    Set `WAREHOUSE` in `wrangler.json` `vars` to your bucket/warehouse name.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/query?q=SHOW%20TABLES"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/r2-sql-query
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/query?q=SELECT%201"
+```
+
+Without secrets, responses use `mode: "demo"`.
+
+## Configuration
+
+- **Secrets** `CLOUDFLARE_ACCOUNT_ID`, `R2_SQL_AUTH_TOKEN`
+- **Var** `WAREHOUSE` (or `R2_BUCKET_NAME`) — default `demo-warehouse`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[R2 SQL](https://developers.cloudflare.com/r2-sql/)** - Serverless SQL over Iceberg tables
+- **[R2 Data Catalog](https://developers.cloudflare.com/r2/data-catalog/)** - Managed Apache Iceberg catalog

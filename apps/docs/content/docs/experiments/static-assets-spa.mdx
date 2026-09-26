@@ -1,0 +1,128 @@
+---
+title: "Static Assets SPA"
+description: "Workers Static Assets with ASSETS binding and run_worker_first"
+icon: "Layout"
+tags:
+  - assets
+  - spa
+bindings:
+  - ASSETS
+status: new
+---
+
+Serve a static SPA from Workers **Static Assets** while `/api/*` routes run on the Worker first via `run_worker_first`. Uses the `ASSETS` binding for programmatic asset fetches.
+
+## Features
+
+- Static files from `./public` with SPA `not_found_handling`
+- `run_worker_first: ["/api/*"]` so API hits the Worker before assets
+- `GET /api/hello` and `GET /api/info` JSON endpoints
+- Catch-all can proxy to `env.ASSETS.fetch` when the Worker handles non-API paths
+
+## API Reference
+
+### GET /api/hello
+
+Returns a hello payload from Worker code.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/api/hello"
+```
+
+#### Success Response
+
+```json
+{
+  "message": "Hello from the Worker",
+  "servedBy": "worker"
+}
+```
+
+### GET /api/info
+
+App metadata including whether the `ASSETS` binding is present.
+
+```json
+{
+  "name": "static-assets-spa",
+  "description": "Workers Static Assets SPA with ASSETS binding and run_worker_first for API routes",
+  "assetsBinding": true
+}
+```
+
+### GET /
+
+In unit tests (no assets runtime), returns JSON app info. In production, `/` is typically served as `public/index.html` because only `/api/*` uses `run_worker_first`.
+
+## Use Cases
+
+- Ship a small SPA + JSON API as one Worker
+- Authenticate or rewrite API routes while keeping static files edge-cached
+- Learn `ASSETS` binding and `run_worker_first` routing
+
+## Limitations
+
+- Only one assets directory per Worker
+- Smoke tests call the Worker fetch handler directly (JSON `/`), which differs from production asset-first `/`
+- SPA client must call same-origin `/api/*` routes
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/static-assets-spa)
+
+  </Step>
+
+  <Step>
+
+### Confirm assets config
+
+    `wrangler.json` includes `assets.directory`, `binding: "ASSETS"`, `not_found_handling: "single-page-application"`, and `run_worker_first: ["/api/*"]`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    Open the Worker URL for the SPA, or:
+
+    ```bash
+    curl "https://your-worker.workers.dev/api/hello"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/static-assets-spa
+npm install
+npm run dev
+```
+
+Open the local URL to load the SPA; it fetches `/api/hello`.
+
+## Configuration
+
+```json
+"assets": {
+  "directory": "./public",
+  "binding": "ASSETS",
+  "not_found_handling": "single-page-application",
+  "run_worker_first": ["/api/*"]
+}
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Static Assets](https://developers.cloudflare.com/workers/static-assets/)** - Globally cached frontend files
+- **[Assets binding](https://developers.cloudflare.com/workers/static-assets/binding/)** - `env.ASSETS.fetch` and `run_worker_first`

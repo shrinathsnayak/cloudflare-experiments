@@ -44,7 +44,7 @@ Every experiment demonstrates **one specific Cloudflare capability**, including:
 cloudflare-experiments/
 ├── apps/
 │   ├── docs/                 # Fumadocs documentation site (cloudflare-experiments.com)
-│   └── experiments/          # 85 independently deployable Worker experiments
+│   └── experiments/          # 90 independently deployable Worker experiments
 ├── turbo.json
 ├── .cursor/                  # Agent rules and skills
 ├── README.md
@@ -57,7 +57,7 @@ This is a **Turborepo** monorepo. Each experiment lives under [`apps/experiments
 
 ## Experiments
 
-There are **85** experiments, grouped the same way as the [docs sidebar](https://cloudflare-experiments.com/docs). Each row links to the source and a one-click Cloudflare deploy.
+There are **90** experiments, grouped the same way as the [docs sidebar](https://cloudflare-experiments.com/docs). Each row links to the source and a one-click Cloudflare deploy.
 
 ### AI & Machine Learning
 
@@ -77,6 +77,7 @@ There are **85** experiments, grouped the same way as the [docs sidebar](https:/
 | [AI Gateway Dashboard](apps/experiments/ai-gateway-dashboard/)             | Workers AI through AI Gateway with cache and latency metadata                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-gateway-dashboard)       |
 | [Chat Agent](apps/experiments/chat-agent/)                                 | Durable AI chat agent with SQLite-backed Durable Objects and optional Workers AI          | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/chat-agent)                 |
 | [AI Search Demo](apps/experiments/ai-search-demo/)                         | Query Cloudflare AI Search (managed RAG) from a Worker                                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-search-demo)             |
+| [AI Batch Infer](apps/experiments/ai-batch-infer/)                         | Queue Workers AI embedding batches with `queueRequest` and poll by `request_id`           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-batch-infer)             |
 
 ### Web Scraping & Parsing
 
@@ -96,15 +97,16 @@ There are **85** experiments, grouped the same way as the [docs sidebar](https:/
 
 ### Browser Rendering
 
-| Experiment                                                       | Description                                                                     | Deploy                                                                                                                                                         |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Screenshot API](apps/experiments/screenshot-api/)               | Capture screenshots of any website from the edge (Browser Rendering)            | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/screenshot-api)        |
-| [PDF API](apps/experiments/pdf-api/)                             | Generate PDF documents from any webpage using Browser Rendering                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/pdf-api)               |
-| [Page Metrics](apps/experiments/page-metrics/)                   | Collect Puppeteer page load metrics (DOM nodes, script duration, heap)          | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/page-metrics)          |
-| [Rendered Text](apps/experiments/rendered-text/)                 | Extract JavaScript-rendered visible text from any webpage                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rendered-text)         |
-| [Browser Links](apps/experiments/browser-links/)                 | Extract unique links from JavaScript-rendered pages                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-links)         |
-| [Browser CDP Inspect](apps/experiments/browser-cdp-inspect/)     | Browser Rendering inspection — title, cookies, performance via Puppeteer        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-cdp-inspect)   |
-| [Readability Extractor](apps/experiments/readability-extractor/) | Extract clean article content with Browser Rendering and readability heuristics | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/readability-extractor) |
+| Experiment                                                           | Description                                                                     | Deploy                                                                                                                                                           |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Screenshot API](apps/experiments/screenshot-api/)                   | Capture screenshots of any website from the edge (Browser Rendering)            | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/screenshot-api)          |
+| [PDF API](apps/experiments/pdf-api/)                                 | Generate PDF documents from any webpage using Browser Rendering                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/pdf-api)                 |
+| [Page Metrics](apps/experiments/page-metrics/)                       | Collect Puppeteer page load metrics (DOM nodes, script duration, heap)          | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/page-metrics)            |
+| [Rendered Text](apps/experiments/rendered-text/)                     | Extract JavaScript-rendered visible text from any webpage                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rendered-text)           |
+| [Browser Links](apps/experiments/browser-links/)                     | Extract unique links from JavaScript-rendered pages                             | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-links)           |
+| [Browser CDP Inspect](apps/experiments/browser-cdp-inspect/)         | Browser Rendering inspection — title, cookies, performance via Puppeteer        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-cdp-inspect)     |
+| [Readability Extractor](apps/experiments/readability-extractor/)     | Extract clean article content with Browser Rendering and readability heuristics | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/readability-extractor)   |
+| [Browser Markdown Scrape](apps/experiments/browser-markdown-scrape/) | URL → Markdown and CSS scrape via Browser Rendering quickAction                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-markdown-scrape) |
 
 ### Network & Monitoring
 
@@ -142,6 +144,8 @@ There are **85** experiments, grouped the same way as the [docs sidebar](https:/
 | [Secrets Store Demo](apps/experiments/secrets-store-demo/)                 | Read account-scoped secrets from Cloudflare Secrets Store                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/secrets-store-demo)         |
 | [Tail Logger](apps/experiments/tail-logger/)                               | Tail Worker that stores recent traces from another Worker in KV                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/tail-logger)                |
 | [WebRTC Relay](apps/experiments/webrtc-relay/)                             | Issue Cloudflare Realtime TURN credentials for WebRTC (demo mode without secrets) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/webrtc-relay)               |
+| [Stream Video Demo](apps/experiments/stream-video-demo/)                   | Create Stream direct upload URLs and signed playback tokens                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/stream-video-demo)          |
+| [Static Assets SPA](apps/experiments/static-assets-spa/)                   | Workers Static Assets SPA with ASSETS binding and run_worker_first for /api       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/static-assets-spa)          |
 
 ### Compute & Isolation
 
@@ -166,6 +170,7 @@ There are **85** experiments, grouped the same way as the [docs sidebar](https:/
 | [Hyperdrive SQL Demo](apps/experiments/hyperdrive-sql-demo/) | Query PostgreSQL through Cloudflare Hyperdrive connection pooling      | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/hyperdrive-sql-demo) |
 | [Event Pipeline](apps/experiments/event-pipeline/)           | Ingest events into Cloudflare Pipelines (stream to R2/Iceberg)         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/event-pipeline)      |
 | [Artifact Workspace](apps/experiments/artifact-workspace/)   | Store versioned filesystem artifacts (Artifacts-style workspace on R2) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/artifact-workspace)  |
+| [R2 SQL Query](apps/experiments/r2-sql-query/)               | Query Apache Iceberg tables via the R2 SQL HTTP API                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-sql-query)        |
 
 ### Stateful & Async
 

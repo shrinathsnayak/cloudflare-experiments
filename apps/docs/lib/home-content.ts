@@ -33,7 +33,7 @@ export type HomeCategory = {
 };
 
 export const homeStats = [
-  { value: "85", label: "Experiments" },
+  { value: "90", label: "Experiments" },
   { value: "8", label: "Categories" },
   { value: "30+", label: "Cloudflare products" },
   { value: "MIT", label: "Open source" },
@@ -111,6 +111,24 @@ export const featuredExperiments: HomeExperiment[] = [
     slug: "ai-search-demo",
     title: "AI Search Demo",
     description: "Query managed RAG with Cloudflare AI Search",
+    status: "new",
+  },
+  {
+    slug: "r2-sql-query",
+    title: "R2 SQL Query",
+    description: "Query Iceberg tables via R2 SQL",
+    status: "new",
+  },
+  {
+    slug: "stream-video-demo",
+    title: "Stream Video Demo",
+    description: "Stream upload URLs and signed playback tokens",
+    status: "new",
+  },
+  {
+    slug: "static-assets-spa",
+    title: "Static Assets SPA",
+    description: "SPA + API with Static Assets and run_worker_first",
     status: "new",
   },
   {
@@ -219,6 +237,8 @@ export const cloudflareBindings = [
   "SECRETS",
   "DISPATCHER",
   "CONTAINER",
+  "STREAM",
+  "ASSETS",
 ] as const;
 
 export const homeCategories: HomeCategory[] = [
@@ -298,6 +318,12 @@ export const homeCategories: HomeCategory[] = [
         slug: "ai-search-demo",
         title: "AI Search Demo",
         description: "Managed RAG via Cloudflare AI Search",
+        status: "new",
+      },
+      {
+        slug: "ai-batch-infer",
+        title: "AI Batch Infer",
+        description: "Async batch embeddings with queueRequest",
         status: "new",
       },
     ],
@@ -386,6 +412,12 @@ export const homeCategories: HomeCategory[] = [
         slug: "readability-extractor",
         title: "Readability Extractor",
         description: "Clean article body via Browser Rendering",
+      },
+      {
+        slug: "browser-markdown-scrape",
+        title: "Browser Markdown Scrape",
+        description: "Markdown + CSS scrape via quickAction",
+        status: "new",
       },
     ],
   },
@@ -515,6 +547,18 @@ export const homeCategories: HomeCategory[] = [
         description: "Realtime TURN credentials for WebRTC",
         status: "new",
       },
+      {
+        slug: "stream-video-demo",
+        title: "Stream Video Demo",
+        description: "Direct upload URLs and signed playback tokens",
+        status: "new",
+      },
+      {
+        slug: "static-assets-spa",
+        title: "Static Assets SPA",
+        description: "SPA with ASSETS binding and run_worker_first",
+        status: "new",
+      },
     ],
   },
   {
@@ -593,6 +637,12 @@ export const homeCategories: HomeCategory[] = [
         slug: "artifact-workspace",
         title: "Artifact Workspace",
         description: "Artifacts-style file workspace on R2",
+        status: "new",
+      },
+      {
+        slug: "r2-sql-query",
+        title: "R2 SQL Query",
+        description: "SQL over Iceberg via R2 SQL HTTP API",
         status: "new",
       },
     ],
