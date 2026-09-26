@@ -52,19 +52,26 @@ function assertSameHost(urls: string[]): void {
 }
 
 async function submitBatch(key: string, urlList: string[]): Promise<number> {
-  const res = await fetch(indexNowEndpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({
-      host: new URL(siteUrl).host,
-      key,
-      keyLocation: indexNowKeyLocation(key),
-      urlList,
-    }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(indexNowEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify({
+        host: new URL(siteUrl).host,
+        key,
+        keyLocation: indexNowKeyLocation(key),
+        urlList,
+      }),
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "network error";
+    throw new Error(`IndexNow request failed: ${message}`);
+  }
 
   if (res.status !== 200 && res.status !== 202) {
-    const body = await res.text();
+    const body = await res.text().catch(() => "");
     throw new Error(`IndexNow HTTP ${res.status}${body ? `: ${body}` : ""}`);
   }
 

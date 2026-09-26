@@ -68,3 +68,17 @@ curl -X POST https://cloudflare-experiments.com/api/indexnow \
   -H "Authorization: Bearer $INDEXNOW_WEBHOOK_SECRET" \
   -H "Content-Type: application/json"
 ```
+
+Optional body to submit specific URLs only:
+
+```bash
+curl -X POST https://cloudflare-experiments.com/api/indexnow \
+  -H "Authorization: Bearer $INDEXNOW_WEBHOOK_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"urls":["https://cloudflare-experiments.com/docs/experiments/static-assets-spa"]}'
+```
+
+Success: `{ "ok": true, "submitted": N, "statuses": [200|202] }`.  
+Upstream IndexNow failures return **422** with `{ "error": "...", "code": "INDEXNOW_ERROR" }` (not 502 — edge proxies often rewrite origin 502 bodies).
+
+If IndexNow returns `UserForbiddedToAccessSite` (403), the key file is missing or Bing cannot verify the host. Confirm `https://cloudflare-experiments.com/$INDEXNOW_KEY.txt` returns only the key, then verify the site in [Bing Webmaster Tools](https://www.bing.com/webmasters) (DNS or XML file — avoid “import from Google” alone).

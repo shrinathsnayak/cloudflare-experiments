@@ -122,7 +122,9 @@ export async function POST(request: Request) {
     const result = await submitUrlsToIndexNow(urls);
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
+    // Use 422 (not 502): Cloudflare/edge often replaces origin 502 bodies with a
+    // generic "error code: 502", which hides the IndexNow error from curl.
     const message = err instanceof Error ? err.message : "IndexNow submit failed";
-    return NextResponse.json({ error: message, code: "INDEXNOW_ERROR" }, { status: 502 });
+    return NextResponse.json({ error: message, code: "INDEXNOW_ERROR" }, { status: 422 });
   }
 }
