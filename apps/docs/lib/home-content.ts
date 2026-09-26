@@ -511,6 +511,11 @@ export const repoStructure = [
 export const docLinks = [
   { title: "Quick Start", href: "quickstart", description: "Install, dev, and deploy" },
   { title: "Philosophy", href: "philosophy", description: "Why this project exists" },
+  {
+    title: "Self-Hosted",
+    href: "self-hosted",
+    description: "SaaS replacements on your Cloudflare account",
+  },
   { title: "Adding Experiments", href: "adding-experiments", description: "Scaffold a new Worker" },
   {
     title: "Code Standards",

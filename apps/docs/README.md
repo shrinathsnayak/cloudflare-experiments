@@ -28,6 +28,7 @@ npm start
 
 - MDX pages live in `content/docs/`
 - Sidebar navigation is defined in `content/docs/meta.json`
+- The Self-Hosted page fetches catalog data from [awesome-cloudflare-selfhosted](https://github.com/theoephraim/awesome-cloudflare-selfhosted) and caches it for about a day via Next.js `"use cache"`
 - Mintlify content can be re-imported from the [docs repo](https://github.com/shrinathsnayak/docs) with:
 
 ```bash
@@ -51,7 +52,7 @@ Env vars (see `.env.example`):
 
 ### Automatic (recommended): Vercel webhook
 
-After merge → production deploy succeeds, Vercel calls your own API — no GitHub Actions.
+After merge → production deploy succeeds, Vercel calls your own API - no GitHub Actions.
 
 1. Deploy with `INDEXNOW_KEY` and `INDEXNOW_WEBHOOK_SECRET` set in Vercel
 2. Vercel → **Settings → Webhooks** (team or project) → create webhook:

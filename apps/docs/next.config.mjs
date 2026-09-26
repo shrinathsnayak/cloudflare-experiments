@@ -10,6 +10,7 @@ const monorepoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "..
 const legacyDocRedirects = [
   "quickstart",
   "philosophy",
+  "self-hosted",
   "contributing",
   "adding-experiments",
   "code-standards",

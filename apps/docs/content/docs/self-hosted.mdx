@@ -1,0 +1,17 @@
+---
+title: "Self-Hosted"
+description: "Open-source apps that replace SaaS products, running in your own Cloudflare account"
+status: new
+---
+
+A curated catalog of deployable, self-hosted apps for Cloudflare - booking pages, analytics, inboxes, link shorteners, and more - drawn from [awesome-cloudflare-selfhosted](https://github.com/theoephraim/awesome-cloudflare-selfhosted).
+
+Each project is meant to replace a SaaS product while running in **your own Cloudflare account** (Workers, D1, R2, Durable Objects, and related bindings).
+
+Use the sidebar to jump between categories — each card links to the project on GitHub.
+
+<SelfHostedCatalog />
+
+## How updates work
+
+Catalog data is fetched from the upstream `data/entries` and `data/categories` folders on GitHub and cached by Next.js for about a day (`cacheLife("days")`). No manual sync step is required — a new deploy or cache expiry picks up upstream changes.

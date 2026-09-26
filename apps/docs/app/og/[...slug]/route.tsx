@@ -5,9 +5,22 @@ import { appName } from "@/lib/shared";
 import { ImageResponse } from "next/og";
 import { notFound } from "next/navigation";
 
+/**
+ * `getPageImage()` appends `image.png`. Strip that (or legacy `image`) so
+ * `/og/self-hosted` and `/og/self-hosted/image.png` both resolve the same page.
+ */
+function pageSlugsFromOgParams(slug: string[]): string[] {
+  if (slug.length === 0) return slug;
+  const last = slug[slug.length - 1]!;
+  if (last === "image.png" || last === "image" || /\.png$/i.test(last)) {
+    return slug.slice(0, -1);
+  }
+  return slug;
+}
+
 export async function GET(_req: Request, { params }: RouteContext<"/og/[...slug]">) {
   const { slug } = await params;
-  const page = source.getPage(slug.slice(0, -1));
+  const page = source.getPage(pageSlugsFromOgParams(slug));
   if (!page) notFound();
 
   const title = page.data.title;
@@ -16,7 +29,7 @@ export async function GET(_req: Request, { params }: RouteContext<"/og/[...slug]
 
   return new ImageResponse(
     <OgImage title={title} description={description} site={appName} logoSrc={logoSrc} />,
-    await getOgImageOptions(title, description, appName)
+    await getOgImageOptions(title, description, appName),
   );
 }
 

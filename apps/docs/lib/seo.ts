@@ -14,14 +14,22 @@ import {
 type DocsPage = ReturnType<(typeof source)["getPage"]>;
 
 function absoluteUrl(path: string): string {
-  return new URL(path, siteUrl).href;
+  return new URL(path, getMetadataBase()).href;
+}
+
+/** Prefer env override; use localhost in dev so new pages' OG URLs resolve locally. */
+export function getMetadataBase(): URL {
+  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (fromEnv) return new URL(fromEnv);
+  if (process.env.NODE_ENV === "development") return new URL("http://localhost:3000");
+  return new URL(siteUrl);
 }
 
 export function createRootMetadata(): Metadata {
   const ogImage = "/opengraph-image";
 
   return {
-    metadataBase: new URL(siteUrl),
+    metadataBase: getMetadataBase(),
     title: {
       default: appName,
       template: `%s | ${appName}`,
