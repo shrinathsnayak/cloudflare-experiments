@@ -1,0 +1,146 @@
+---
+title: "Tail Logger"
+description: "Tail Worker that stores recent traces from another Worker in KV"
+icon: "ScrollText"
+tags:
+  - tail
+  - kv
+bindings:
+  - KV
+status: new
+---
+
+A **Tail Worker** that receives `TraceItem` batches from producer Workers, keeps the last 50 events in **Workers KV**, and exposes them over HTTP for inspection.
+
+## Features
+
+- `tail` handler - receives TraceItem batches and stores key `recent`
+- `GET /logs` - read recent events
+- `DELETE /logs` - clear stored events
+
+## API Reference
+
+### GET /logs
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/logs"
+```
+
+#### Success Response
+
+```json
+{
+  "events": [
+    {
+      "scriptName": "my-producer",
+      "outcome": "ok",
+      "eventTimestamp": 1710000000000,
+      "logs": ["request handled"]
+    }
+  ],
+  "count": 1
+}
+```
+
+### DELETE /logs
+
+#### Example Request
+
+```bash
+curl -X DELETE "https://your-worker.workers.dev/logs"
+```
+
+#### Success Response
+
+```json
+{
+  "cleared": true
+}
+```
+
+## Configuring a producer
+
+In the **producer** Worker's `wrangler.json`, add this Worker as a tail consumer:
+
+```json
+{
+  "name": "my-producer",
+  "tail_consumers": [{ "service": "tail-logger" }]
+}
+```
+
+Deploy `tail-logger` first, then the producer. When the producer handles requests, its traces are delivered to this Worker's `tail` handler.
+
+## Use Cases
+
+- Learn Tail Workers / `tail_consumers` wiring
+- Debug producer Workers without streaming `wrangler tail` locally
+- Keep a short rolling window of outcomes and console logs
+- Teach observability patterns across Workers
+
+## Limitations
+
+- Stores only the last 50 events in a single KV key
+- Tail delivery from another Worker typically requires deployed Workers
+- No filtering UI - raw recent events only
+- No authentication on `/logs`
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/tail-logger)
+
+  </Step>
+
+  <Step>
+
+### Configure KV and producers
+
+    Create a KV namespace and bind it as `TAIL_LOGS`. Deploy this Worker, then add `"tail_consumers": [{ "service": "tail-logger" }]` to producer Workers.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    Trigger the producer, then:
+
+    ```bash
+    curl "https://your-worker.workers.dev/logs"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/tail-logger
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/logs"
+```
+
+Tail delivery from another Worker typically requires deployed Workers; unit tests call the `tail` export directly with mock events.
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **KV namespace** `TAIL_LOGS`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Tail Workers](https://developers.cloudflare.com/workers/observability/logs/tail-workers/)** - Consume traces from other Workers
+- **[Workers KV](https://developers.cloudflare.com/kv/)** - Rolling store for recent events

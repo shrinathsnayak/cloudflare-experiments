@@ -1,0 +1,143 @@
+---
+title: "Event Pipeline"
+description: "Ingest events into Cloudflare Pipelines (stream to R2/Iceberg)"
+icon: "Split"
+tags:
+  - pipelines
+  - r2
+bindings:
+  - Pipelines
+  - R2
+status: new
+---
+
+Ingest events into [Cloudflare Pipelines](https://developers.cloudflare.com/pipelines/) for streaming to R2/Iceberg. When the Pipelines binding is unavailable, events append as JSON Lines to an R2 bucket.
+
+## Features
+
+- `POST /events` - one event, an array (max 100), or `{ "events": [...] }`
+- `GET /events/sample` - example schema and accepted body shapes
+- `PIPELINE` binding for Cloudflare Pipelines; `EVENTS` R2 bucket for fallback
+
+## API Reference
+
+### POST /events
+
+Accepts any of:
+
+- A single event object
+- An array of event objects (max 100)
+- `{ "events": [ ... ] }`
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/events" \
+  -H "Content-Type: application/json" \
+  -d '{"events":[{"type":"page_view","timestamp":"2026-01-15T12:00:00.000Z","userId":"user_123","properties":{"path":"/home"}}]}'
+```
+
+#### Success Response
+
+```json
+{
+  "ok": true,
+  "count": 1,
+  "transport": "pipeline"
+}
+```
+
+`transport` is `"pipeline"` when `PIPELINE` is bound, otherwise `"r2"` (appends to `events/YYYY-MM-DD.jsonl`).
+
+### GET /events/sample
+
+Returns an example event schema and accepted request shapes.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/events/sample"
+```
+
+#### Error Codes
+
+- `400` - Invalid JSON, non-object events, or empty batch (`INVALID_BODY`)
+- `400` - More than 100 events (`TOO_MANY_EVENTS`)
+- `502` - Pipeline or R2 write failed (`PIPELINE_ERROR`)
+
+## Use Cases
+
+- Learn Cloudflare Pipelines ingestion from Workers
+- Stream analytics or product events toward R2/Iceberg
+- Fall back to R2 JSONL when Pipelines is unavailable locally
+- Prototype high-volume event APIs before adding auth
+
+## Limitations
+
+- Max 100 events per request
+- Requires a dashboard Pipeline and/or R2 bucket matching wrangler names
+- No schema validation beyond “JSON object(s)”
+- R2 fallback is append-only JSONL, not a query API
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/event-pipeline)
+
+  </Step>
+
+  <Step>
+
+### Configure Pipelines and R2
+
+    1. Create a Pipeline named `events-pipeline` (or update `wrangler.json`)
+    2. Create an R2 bucket `event-pipeline-events` for the fallback path
+    3. Confirm bindings: `PIPELINE` → pipeline name, `EVENTS` → bucket
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/events" \
+      -H "Content-Type: application/json" \
+      -d '{"type":"page_view","timestamp":"2026-01-15T12:00:00.000Z"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/event-pipeline
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/events" \
+  -H "Content-Type: application/json" \
+  -d '{"type":"page_view","timestamp":"2026-01-15T12:00:00.000Z"}'
+```
+
+Without a Pipelines binding, `wrangler dev` uses the R2 fallback when `EVENTS` is available.
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Pipelines binding** `PIPELINE` → `events-pipeline`
+- **R2 bucket** `EVENTS` → `event-pipeline-events`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Pipelines](https://developers.cloudflare.com/pipelines/)** - Stream events to R2/Iceberg
+- **[R2](https://developers.cloudflare.com/r2/)** - JSONL fallback storage

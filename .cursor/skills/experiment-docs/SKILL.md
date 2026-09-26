@@ -85,9 +85,12 @@ Edit `apps/docs/content/docs/meta.json`:
 - Categories (use existing separators only):
   - `---AI & Machine Learning---`
   - `---Web Scraping & Parsing---`
-  - `---Browser & Screenshots---`
+  - `---Browser Rendering---`
   - `---Network & Monitoring---`
+  - `---Edge Platform---`
+  - `---Compute & Isolation---`
   - `---Storage & Data---`
+  - `---Stateful & Async---`
 - Pick category from primary binding/capability (see table in [reference/experiment-docs](/reference/experiment-docs))
 
 ### 4. Update repo indexes

@@ -1,0 +1,23 @@
+{
+  "name": "user-script-dispatcher",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "kv_namespaces": [
+    {
+      "binding": "SCRIPTS",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "dispatch_namespaces": [
+    {
+      "binding": "DISPATCHER",
+      "namespace": "demo-customers"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

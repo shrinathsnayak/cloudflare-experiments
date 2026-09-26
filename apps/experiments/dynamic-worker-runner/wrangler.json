@@ -1,0 +1,16 @@
+{
+  "name": "dynamic-worker-runner",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "worker_loaders": [
+    {
+      "binding": "LOADER"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

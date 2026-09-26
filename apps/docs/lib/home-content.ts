@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
+  Boxes,
   BrainCircuit,
   Camera,
   Clock,
@@ -19,6 +20,8 @@ export type HomeExperiment = {
   slug: string;
   title: string;
   description: string;
+  /** Optional homepage/sidebar status badge, e.g. "new". */
+  status?: string;
 };
 
 export type HomeCategory = {
@@ -30,9 +33,9 @@ export type HomeCategory = {
 };
 
 export const homeStats = [
-  { value: "60+", label: "Experiments" },
-  { value: "7", label: "Categories" },
-  { value: "15+", label: "Cloudflare products" },
+  { value: "85", label: "Experiments" },
+  { value: "8", label: "Categories" },
+  { value: "30+", label: "Cloudflare products" },
   { value: "MIT", label: "Open source" },
 ] as const;
 
@@ -64,7 +67,7 @@ export const homeWorkflow = [
     step: "01",
     title: "Pick an experiment",
     description:
-      "Browse by category - AI, scraping, monitoring, storage - or search docs by binding name like d1 or r2.",
+      "Browse by category - AI, scraping, compute, storage - or search docs by binding name like d1 or r2.",
   },
   {
     step: "02",
@@ -93,39 +96,46 @@ export const featuredExperiments: HomeExperiment[] = [
     description: "Summarize any webpage with Workers AI",
   },
   {
-    slug: "screenshot-api",
-    title: "Screenshot API",
-    description: "Capture PNG screenshots via Browser Rendering",
+    slug: "container-echo",
+    title: "Container Echo",
+    description: "Echo a payload via Cloudflare Containers",
+    status: "new",
   },
   {
-    slug: "social-preview-inspector",
-    title: "Social Preview Inspector",
-    description: "Validate Twitter, Open Graph, and Google snippets",
+    slug: "dynamic-worker-runner",
+    title: "Dynamic Worker Runner",
+    description: "Run sandboxed JS with the Worker Loader API",
+    status: "new",
   },
   {
-    slug: "d1-sql-playground",
-    title: "D1 SQL Playground",
-    description: "Read-only SQL over a seeded edge database",
+    slug: "ai-search-demo",
+    title: "AI Search Demo",
+    description: "Query managed RAG with Cloudflare AI Search",
+    status: "new",
   },
   {
-    slug: "rag-mini-search",
-    title: "RAG Mini Search",
-    description: "Vectorize retrieval + Workers AI grounded Q&A",
+    slug: "flagship-rollout",
+    title: "Flagship Rollout",
+    description: "Evaluate edge feature flags with Flagship",
+    status: "new",
   },
   {
-    slug: "uptime-monitor-alerts",
-    title: "Uptime Monitor Alerts",
-    description: "Cron checks, D1 history, email on downtime",
+    slug: "do-sqlite-notes",
+    title: "DO SQLite Notes",
+    description: "Per-user notes with SQLite-backed Durable Objects",
+    status: "new",
   },
   {
-    slug: "webhook-relay-inspector",
-    title: "Webhook Relay Inspector",
-    description: "Capture inbound webhooks in a Durable Object session",
+    slug: "chat-agent",
+    title: "Chat Agent",
+    description: "Durable chat agent with optional Workers AI",
+    status: "new",
   },
   {
-    slug: "dns-propagation-checker",
-    title: "DNS Propagation Checker",
-    description: "Compare Cloudflare, Google, and Quad9 resolver answers",
+    slug: "code-sandbox",
+    title: "Code Sandbox",
+    description: "Isolated code execution with the Sandbox SDK",
+    status: "new",
   },
 ];
 
@@ -203,6 +213,12 @@ export const cloudflareBindings = [
   "WORKFLOW",
   "ANALYTICS",
   "RATE_LIMITER",
+  "LOADER",
+  "FLAGS",
+  "PIPELINE",
+  "SECRETS",
+  "DISPATCHER",
+  "CONTAINER",
 ] as const;
 
 export const homeCategories: HomeCategory[] = [
@@ -272,6 +288,18 @@ export const homeCategories: HomeCategory[] = [
         title: "AI Gateway Dashboard",
         description: "Gateway cache and latency metadata",
       },
+      {
+        slug: "chat-agent",
+        title: "Chat Agent",
+        description: "Durable DO chat with optional Workers AI",
+        status: "new",
+      },
+      {
+        slug: "ai-search-demo",
+        title: "AI Search Demo",
+        description: "Managed RAG via Cloudflare AI Search",
+        status: "new",
+      },
     ],
   },
   {
@@ -316,9 +344,24 @@ export const homeCategories: HomeCategory[] = [
         description: "Twitter, OG, Google previews",
       },
       {
-        slug: "readability-extractor",
-        title: "Readability Extractor",
-        description: "Clean article body extraction",
+        slug: "robots-sitemap-inspector",
+        title: "Robots Sitemap Inspector",
+        description: "Parse robots.txt and sitemaps",
+      },
+      {
+        slug: "rss-atom-feed-parser",
+        title: "RSS / Atom Feed Parser",
+        description: "Normalize feeds to JSON",
+      },
+      {
+        slug: "json-ld-extractor",
+        title: "JSON-LD Extractor",
+        description: "Schema.org structured data",
+      },
+      {
+        slug: "html-to-markdown",
+        title: "HTML to Markdown",
+        description: "Convert pages to Markdown",
       },
     ],
   },
@@ -333,6 +376,17 @@ export const homeCategories: HomeCategory[] = [
       { slug: "page-metrics", title: "Page Metrics", description: "Load timing and heap stats" },
       { slug: "rendered-text", title: "Rendered Text", description: "JS-rendered visible text" },
       { slug: "browser-links", title: "Browser Links", description: "Links from rendered pages" },
+      {
+        slug: "browser-cdp-inspect",
+        title: "Browser CDP Inspect",
+        description: "Title, cookies, and performance via Puppeteer",
+        status: "new",
+      },
+      {
+        slug: "readability-extractor",
+        title: "Readability Extractor",
+        description: "Clean article body via Browser Rendering",
+      },
     ],
   },
   {
@@ -348,9 +402,9 @@ export const homeCategories: HomeCategory[] = [
         description: "A, AAAA, MX, TXT, and more",
       },
       {
-        slug: "dns-propagation-checker",
-        title: "DNS Propagation Checker",
-        description: "Multi-resolver comparison",
+        slug: "email-auth-checker",
+        title: "Email Auth Checker",
+        description: "SPF, DMARC, and DKIM via DoH",
       },
       {
         slug: "edge-redirect-simulator",
@@ -364,6 +418,11 @@ export const homeCategories: HomeCategory[] = [
         description: "Inspect response headers",
       },
       {
+        slug: "security-headers-grader",
+        title: "Security Headers Grader",
+        description: "HSTS, CSP, and related grades",
+      },
+      {
         slug: "ssl-certificate-inspector",
         title: "SSL Certificate Inspector",
         description: "TLS cert metadata",
@@ -372,6 +431,11 @@ export const homeCategories: HomeCategory[] = [
         slug: "multi-pop-latency-map",
         title: "Multi-PoP Latency Map",
         description: "Latency and serving colo",
+      },
+      {
+        slug: "dns-propagation-checker",
+        title: "DNS Propagation Checker",
+        description: "Multi-resolver comparison",
       },
       {
         slug: "website-change-tracker",
@@ -388,12 +452,23 @@ export const homeCategories: HomeCategory[] = [
         title: "CORS Preflight Tester",
         description: "Simulate OPTIONS preflight",
       },
+      {
+        slug: "broken-link-checker",
+        title: "Broken Link Checker",
+        description: "Link status codes from the edge",
+      },
+      {
+        slug: "smart-placement-probe",
+        title: "Smart Placement Probe",
+        description: "Origin latency with Smart Placement",
+        status: "new",
+      },
     ],
   },
   {
     id: "edge",
     title: "Edge Platform",
-    description: "Web Crypto, caching, WebSockets, auth helpers, and platform APIs.",
+    description: "Cache, crypto, auth helpers, feature flags, Realtime, and platform APIs.",
     icon: ShieldCheck,
     experiments: [
       { slug: "edge-cache", title: "Edge Cache", description: "Workers Cache API HIT/MISS" },
@@ -416,12 +491,68 @@ export const homeCategories: HomeCategory[] = [
         title: "Webhook Signature Verifier",
         description: "HMAC timing-safe verify",
       },
+      {
+        slug: "flagship-rollout",
+        title: "Flagship Rollout",
+        description: "Edge feature flags via Flagship",
+        status: "new",
+      },
+      {
+        slug: "secrets-store-demo",
+        title: "Secrets Store Demo",
+        description: "Account-scoped Secrets Store binding",
+        status: "new",
+      },
+      {
+        slug: "tail-logger",
+        title: "Tail Logger",
+        description: "Tail Worker traces stored in KV",
+        status: "new",
+      },
+      {
+        slug: "webrtc-relay",
+        title: "WebRTC Relay",
+        description: "Realtime TURN credentials for WebRTC",
+        status: "new",
+      },
+    ],
+  },
+  {
+    id: "compute",
+    title: "Compute & Isolation",
+    description: "Containers, Sandbox SDK, Dynamic Workers, and Workers for Platforms dispatch.",
+    icon: Boxes,
+    experiments: [
+      {
+        slug: "dynamic-worker-runner",
+        title: "Dynamic Worker Runner",
+        description: "Sandboxed JS via Worker Loader",
+        status: "new",
+      },
+      {
+        slug: "container-echo",
+        title: "Container Echo",
+        description: "Echo payloads via Cloudflare Containers",
+        status: "new",
+      },
+      {
+        slug: "code-sandbox",
+        title: "Code Sandbox",
+        description: "Isolated JS execution with Sandbox SDK",
+        status: "new",
+      },
+      {
+        slug: "user-script-dispatcher",
+        title: "User Script Dispatcher",
+        description: "Workers for Platforms style dispatch",
+        status: "new",
+      },
     ],
   },
   {
     id: "storage",
     title: "Storage & Data",
-    description: "R2, D1, KV, Vectorize, and mock API patterns.",
+    description: "R2, D1, KV, Vectorize, Hyperdrive, Pipelines, and mock API patterns.",
     icon: HardDrive,
     experiments: [
       { slug: "r2-storage", title: "R2 Storage", description: "List, get, put, delete objects" },
@@ -447,18 +578,41 @@ export const homeCategories: HomeCategory[] = [
         title: "API Mock Server",
         description: "KV-backed mock endpoints",
       },
+      {
+        slug: "hyperdrive-sql-demo",
+        title: "Hyperdrive SQL Demo",
+        description: "PostgreSQL via Hyperdrive pooling",
+      },
+      {
+        slug: "event-pipeline",
+        title: "Event Pipeline",
+        description: "Pipelines ingest with R2 fallback",
+        status: "new",
+      },
+      {
+        slug: "artifact-workspace",
+        title: "Artifact Workspace",
+        description: "Artifacts-style file workspace on R2",
+        status: "new",
+      },
     ],
   },
   {
     id: "stateful",
     title: "Stateful & Async",
-    description: "Durable Objects, Cron, Queues, Workflows, and Analytics Engine.",
+    description: "Durable Objects, Cron, Queues, Workflows, Email, and Analytics Engine.",
     icon: Zap,
     experiments: [
       {
         slug: "durable-counter",
         title: "Durable Counter",
         description: "Globally consistent counter",
+      },
+      {
+        slug: "do-sqlite-notes",
+        title: "DO SQLite Notes",
+        description: "Per-user notes with DO sql.exec",
+        status: "new",
       },
       {
         slug: "cron-heartbeat",
@@ -495,6 +649,17 @@ export const homeCategories: HomeCategory[] = [
         slug: "webhook-relay-inspector",
         title: "Webhook Relay Inspector",
         description: "Inbound webhook capture",
+      },
+      {
+        slug: "email-worker-inbox",
+        title: "Email Worker Inbox",
+        description: "Inbound Email Workers + KV inspect",
+      },
+      {
+        slug: "transactional-email",
+        title: "Transactional Email",
+        description: "Send mail via Email Service binding",
+        status: "new",
       },
     ],
   },

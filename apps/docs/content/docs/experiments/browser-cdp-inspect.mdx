@@ -1,0 +1,121 @@
+---
+title: "Browser CDP Inspect"
+description: "Browser Rendering inspection - title, cookies, and performance via Puppeteer"
+icon: "ScanSearch"
+tags:
+  - browser
+bindings:
+  - Browser Rendering
+status: new
+---
+
+Browser Rendering inspection beyond screenshots - navigate with **@cloudflare/puppeteer** and return title, cookies, document metadata, and performance timing.
+
+## API Reference
+
+### GET /inspect
+
+**`url`** `string` (required)
+
+`http://` or `https://` target.
+
+Navigation timeout: 20s. Uses `waitUntil: "domcontentloaded"` to stay under the Worker request budget.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/inspect?url=https://example.com"
+```
+
+#### Success Response
+
+```json
+{
+  "title": "Example Domain",
+  "url": "https://example.com/",
+  "cookiesCount": 0,
+  "documentTitle": "Example Domain",
+  "performance": { "domContentLoaded": 120.5 },
+  "userAgent": "..."
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or non-http(s) url (`INVALID_URL`)
+- `502` - Browser launch or navigation failure (`INSPECT_ERROR`)
+
+## Use Cases
+
+- Inspect rendered page metadata without capturing a screenshot
+- Count cookies and read document title after JS load
+- Collect basic performance timing from Puppeteer/CDP
+- Debug SPA shells that need a real browser, not raw HTML fetch
+
+## Limitations
+
+- Browser Rendering requires remote mode (`wrangler dev --remote`) or a deployed Worker
+- 20s navigation timeout; `domcontentloaded` only (not full network idle)
+- Returns a subset of CDP data - not a full DevTools dump
+- Subject to Browser Rendering quotas and concurrency limits
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-cdp-inspect)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Ensure Browser Rendering is enabled for your account. `wrangler.json` binds `BROWSER` and uses `nodejs_compat_v2`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/inspect?url=https://www.cloudflare.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/browser-cdp-inspect
+npm install
+npm run dev
+```
+
+For Browser Rendering locally, prefer remote mode:
+
+```bash
+npx wrangler dev --remote
+```
+
+```bash
+curl "http://localhost:8787/inspect?url=https://example.com"
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Browser binding** `BROWSER`
+- **Compatibility flag** `nodejs_compat_v2`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless browser at the edge
+- **[@cloudflare/puppeteer](https://developers.cloudflare.com/browser-rendering/puppeteer/)** - Puppeteer/CDP control

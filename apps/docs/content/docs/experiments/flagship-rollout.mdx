@@ -1,0 +1,128 @@
+---
+title: "Flagship Rollout"
+description: "Evaluate Cloudflare Flagship feature flags at the edge"
+icon: "Flag"
+tags:
+  - feature-flags
+bindings:
+  - Flagship
+status: new
+---
+
+Evaluate **Cloudflare Flagship** feature flags at the edge via a Workers binding. Returns boolean values or detailed evaluation metadata for targeting experiments.
+
+## API Reference
+
+### GET /flags/:key
+
+Evaluate a boolean flag.
+
+**`key`** `string` (required, path)
+
+Flag key.
+
+**`userId`** `string` (optional)
+
+Targeting context attribute.
+
+**`default`** `string` (optional)
+
+Fallback boolean as `true` or `false` (default `false`).
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/flags/new-checkout?userId=user-42&default=false"
+```
+
+#### Success Response
+
+```json
+{
+  "flagKey": "new-checkout",
+  "value": true,
+  "context": { "userId": "user-42" }
+}
+```
+
+### GET /flags/:key/details
+
+Same query params. Returns evaluation details (`variant`, `reason`, `errorCode`, etc.).
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/flags/new-checkout/details?userId=user-42"
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid flag key (`INVALID_FLAG_KEY`)
+- `502` - Flag evaluation failure (`FLAG_ERROR`)
+
+## Use Cases
+
+- Learn Flagship Workers bindings and targeting context
+- Gate features by user id at the edge
+- Inspect evaluation reason / variant for debugging rollouts
+- Prototype A/B or percentage rollouts before wiring into an app
+
+## Limitations
+
+- Requires a real Flagship `app_id` in `wrangler.json`
+- Demo evaluates boolean flags only
+- Local `wrangler dev` talks to the live Flagship app for that `app_id`
+- No dashboard UI in this Worker - evaluation API only
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/flagship-rollout)
+
+  </Step>
+
+  <Step>
+
+### Configure Flagship
+
+    Create a Flagship app in the Cloudflare dashboard and set `app_id` on the `FLAGS` binding in `wrangler.json`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/flags/new-checkout?userId=user-42"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/flagship-rollout
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/flags/new-checkout?userId=user-42&default=false"
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Flagship binding** `FLAGS` with `app_id`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Flagship](https://developers.cloudflare.com/flagship/)** - Feature flags at the edge

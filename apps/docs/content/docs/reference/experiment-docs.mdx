@@ -161,13 +161,16 @@ External images (e.g. deploy button SVG) use plain `<img>` / markdown image synt
 
 Add new pages under the matching separator in `meta.json`:
 
-| Separator                      | Use for                                            |
-| ------------------------------ | -------------------------------------------------- |
-| `---AI & Machine Learning---`  | Workers AI, LLM summarization, AI proxies          |
-| `---Web Scraping & Parsing---` | HTML fetch/parse, metadata, llms.txt, dependencies |
-| `---Browser & Screenshots---`  | Browser Rendering binding                          |
-| `---Network & Monitoring---`   | DNS, uptime, redirects, geolocation, `request.cf`  |
-| `---Storage & Data---`         | R2, D1, KV, link shorteners                        |
+| Separator                      | Use for                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------ |
+| `---AI & Machine Learning---`  | Workers AI, LLM summarization, AI proxies, RAG, Agents                   |
+| `---Web Scraping & Parsing---` | HTML fetch/parse, metadata, llms.txt, feeds, structured data             |
+| `---Browser Rendering---`      | Browser Rendering / Puppeteer binding                                    |
+| `---Network & Monitoring---`   | DNS, uptime, redirects, geolocation, `request.cf`, probes                |
+| `---Edge Platform---`          | Cache, crypto, auth helpers, flags, Secrets Store, Tail, Realtime        |
+| `---Compute & Isolation---`    | Containers, Sandbox SDK, Dynamic Workers (Loader), Workers for Platforms |
+| `---Storage & Data---`         | R2, D1, KV, Vectorize, Hyperdrive, Pipelines                             |
+| `---Stateful & Async---`       | Durable Objects, Cron, Queues, Workflows, Email, Analytics Engine        |
 
 If an experiment spans categories, pick the **primary** capability shown in its README and issue proposal.
 

@@ -1,0 +1,181 @@
+---
+title: "Artifact Workspace"
+description: "Store versioned filesystem artifacts (Artifacts-style workspace on R2)"
+icon: "FolderOpen"
+tags:
+  - r2
+  - artifacts
+bindings:
+  - R2
+status: new
+---
+
+Artifacts-style versioned filesystem workspace. Cloudflare Artifacts bindings are still evolving, so this experiment uses an **R2 bucket** behind a typed `ArtifactStore` interface until a stable Artifacts binding is available.
+
+## Features
+
+- `PUT /files?path=` - store text content
+- `GET /files?path=` - read file content
+- `GET /files/list?prefix=` - list paths
+- `DELETE /files?path=` - delete a file
+
+## API Reference
+
+### Path rules
+
+- Max length 256
+- Allowed characters: alphanumeric, `/`, `_`, `-`, `.`
+- No `..` segments
+
+### PUT /files
+
+Store text content at a path. Body is raw text.
+
+**`path`** `string` (required)
+
+#### Example Request
+
+```bash
+curl -X PUT "https://your-worker.workers.dev/files?path=notes/hello.txt" \
+  -H "Content-Type: text/plain" \
+  -d "hello world"
+```
+
+#### Success Response
+
+```json
+{
+  "path": "notes/hello.txt",
+  "stored": true
+}
+```
+
+### GET /files
+
+Returns the file body as `text/plain`, or `404` if missing.
+
+**`path`** `string` (required)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/files?path=notes/hello.txt"
+```
+
+### GET /files/list
+
+List stored paths, optionally filtered by prefix.
+
+**`prefix`** `string` (optional)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/files/list?prefix=notes/"
+```
+
+#### Success Response
+
+```json
+{
+  "files": [{ "path": "notes/hello.txt" }],
+  "prefix": "notes/"
+}
+```
+
+### DELETE /files
+
+**`path`** `string` (required)
+
+#### Example Request
+
+```bash
+curl -X DELETE "https://your-worker.workers.dev/files?path=notes/hello.txt"
+```
+
+#### Success Response
+
+```json
+{
+  "path": "notes/hello.txt",
+  "deleted": true
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid path/prefix (`INVALID_PATH`)
+- `404` - File does not exist (`NOT_FOUND`)
+
+## Use Cases
+
+- Learn Artifacts-style workspace patterns on Workers
+- Store generated code, reports, or build outputs at the edge
+- Swap R2 for a future native Artifacts binding via `ArtifactStore`
+- Prototype multi-tenant file APIs with path prefixes
+
+## Limitations
+
+- Uses R2 as a stand-in; not the final Artifacts product API
+- Text bodies only in this demo
+- Path validation rejects `..` and unusual characters
+- No authentication or per-user isolation beyond path conventions
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/artifact-workspace)
+
+  </Step>
+
+  <Step>
+
+### Configure R2
+
+    Create the R2 bucket `artifact-workspace` (or update `wrangler.json`) and bind it as `ARTIFACTS`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X PUT "https://your-worker.workers.dev/files?path=notes/hello.txt" \
+      -H "Content-Type: text/plain" \
+      -d "hello world"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/artifact-workspace
+npm install
+npm run dev
+```
+
+```bash
+curl -X PUT "http://localhost:8787/files?path=notes/hello.txt" \
+  -H "Content-Type: text/plain" \
+  -d "hello world"
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **R2 bucket** `ARTIFACTS` → `artifact-workspace`
+
+When a stable Artifacts binding lands, the intended shape is `artifacts: [{ binding: "ARTIFACTS", name: "workspace" }]`. The `ArtifactStore` interface isolates route code from the backend.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[R2](https://developers.cloudflare.com/r2/)** - Object storage standing in for Artifacts

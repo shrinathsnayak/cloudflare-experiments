@@ -1,0 +1,17 @@
+{
+  "name": "tail-logger",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "kv_namespaces": [
+    {
+      "binding": "TAIL_LOGS",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

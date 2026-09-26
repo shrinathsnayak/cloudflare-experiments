@@ -1,0 +1,25 @@
+{
+  "name": "do-sqlite-notes",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "NOTES",
+        "class_name": "NotesDO"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["NotesDO"]
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

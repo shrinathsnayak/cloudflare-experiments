@@ -1,0 +1,165 @@
+---
+title: "User Script Dispatcher"
+description: "Workers for Platforms style dispatch via DispatchNamespace or KV handlers"
+icon: "Waypoints"
+tags:
+  - platforms
+  - kv
+bindings:
+  - KV
+  - Dispatch Namespace
+status: new
+---
+
+Workers for Platforms style **dispatch** - register customers and run tenant response handlers via a `DispatchNamespace` binding, with a KV fallback for local demos. Stored scripts return a fixed JSON response (safe demo - no dynamic JS eval).
+
+## API Reference
+
+### POST /scripts
+
+Store a JSON response handler.
+
+**`name`** `string` (required)
+
+Tenant/script name (`a-zA-Z0-9_-`).
+
+**`response`** `object` (required)
+
+JSON object returned on KV dispatch. Max serialized size: 10,000 bytes.
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/scripts" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"tenant-a","response":{"hello":"world"}}'
+```
+
+### GET /scripts
+
+**`name`** `string` (required)
+
+Returns `{ name, updatedAt, hasResponse }`.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/scripts?name=tenant-a"
+```
+
+### POST /dispatch/:name
+
+- If `DISPATCHER` is bound: forwards the request to `env.DISPATCHER.get(name).fetch(request)`.
+- If `DISPATCHER.get` throws: `{ error, code: "DISPATCH_ERROR" }` (502).
+- Without `DISPATCHER` (or when using the KV path): returns the stored KV `response` object.
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/dispatch/tenant-a"
+```
+
+### POST /register
+
+Record a customer name in KV for listing.
+
+**`name`** `string` (required)
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/register" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"tenant-a"}'
+```
+
+### GET /customers
+
+Returns `{ customers: string[] }`.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/customers"
+```
+
+#### Error Codes
+
+- `400` - Invalid name, response, body, or oversized script (`INVALID_NAME`, `INVALID_RESPONSE`, `INVALID_BODY`, `SCRIPT_TOO_LARGE`)
+- `404` - Script not found (`NOT_FOUND`)
+- `502` - Dispatch namespace failure (`DISPATCH_ERROR`)
+
+## Use Cases
+
+- Learn Workers for Platforms dispatch namespace patterns
+- Prototype multi-tenant routing with a KV fallback
+- Register and list customers before wiring real scripts
+- Teach safe demos that avoid eval while showing dispatch shape
+
+## Limitations
+
+- KV path returns a stored JSON object - no dynamic JS execution
+- Dispatch namespace (`demo-customers`) may require Workers for Platforms
+- Script payload capped at 10,000 bytes
+- No authentication on register/dispatch endpoints
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/user-script-dispatcher)
+
+  </Step>
+
+  <Step>
+
+### Configure KV and dispatch namespace
+
+    Create a KV namespace bound as `SCRIPTS`. For production dispatch, create a dispatch namespace matching `demo-customers` in `wrangler.json`. Local/KV fallback works without the paid feature.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/scripts" \
+      -H "Content-Type: application/json" \
+      -d '{"name":"tenant-a","response":{"hello":"world"}}'
+    curl -X POST "https://your-worker.workers.dev/dispatch/tenant-a"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/user-script-dispatcher
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/scripts" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"tenant-a","response":{"hello":"world"}}'
+curl -X POST "http://localhost:8787/dispatch/tenant-a"
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **KV namespace** `SCRIPTS`
+- **Dispatch namespace** `DISPATCHER` → `demo-customers`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers KV](https://developers.cloudflare.com/kv/)** - Script metadata and KV fallback responses
+- **[Workers for Platforms](https://developers.cloudflare.com/cloudflare-for-platforms/workers-for-platforms/)** - Optional `dispatch_namespaces` binding

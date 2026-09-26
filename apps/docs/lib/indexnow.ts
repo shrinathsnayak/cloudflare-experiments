@@ -14,9 +14,7 @@ export function getIndexNowKey(): string {
     throw new Error("INDEXNOW_KEY is not set");
   }
   if (key.length < 8 || key.length > 128 || !/^[A-Za-z0-9-]+$/.test(key)) {
-    throw new Error(
-      "INDEXNOW_KEY must be 8–128 characters (letters, numbers, dashes only)"
-    );
+    throw new Error("INDEXNOW_KEY must be 8–128 characters (letters, numbers, dashes only)");
   }
   return key;
 }
@@ -78,9 +76,7 @@ export type IndexNowSubmitResult = {
   statuses: number[];
 };
 
-export async function submitUrlsToIndexNow(
-  urls?: string[]
-): Promise<IndexNowSubmitResult> {
+export async function submitUrlsToIndexNow(urls?: string[]): Promise<IndexNowSubmitResult> {
   const key = getIndexNowKey();
   const urlList = urls && urls.length > 0 ? urls : await fetchSitemapUrls();
   assertSameHost(urlList);

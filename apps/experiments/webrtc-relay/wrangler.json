@@ -1,0 +1,14 @@
+{
+  "name": "webrtc-relay",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "vars": {
+    "REALTIME_APP_ID": ""
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

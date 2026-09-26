@@ -1,0 +1,130 @@
+---
+title: "WebRTC Relay"
+description: "Issue Cloudflare Realtime TURN credentials for WebRTC (demo mode without secrets)"
+icon: "Radio"
+tags:
+  - webrtc
+  - realtime
+status: new
+---
+
+Issue **Cloudflare Realtime TURN** credentials for WebRTC. Without secrets configured, endpoints return safe demo credentials so tests and local demos still work.
+
+## API Reference
+
+### GET /turn-credentials
+
+### GET /ice-servers
+
+Both routes return the same shape.
+
+**`ttl`** `number` (optional)
+
+Credential lifetime in seconds (60–86400, default 86400).
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/turn-credentials?ttl=3600"
+curl "https://your-worker.workers.dev/ice-servers"
+```
+
+#### Success Response (demo mode)
+
+Returned when `REALTIME_APP_ID` or `TURN_API_TOKEN` is missing:
+
+```json
+{
+  "iceServers": [
+    {
+      "urls": ["turn:turn.cloudflare.com:3478?transport=udp"],
+      "username": "demo",
+      "credential": "demo"
+    }
+  ],
+  "ttl": 86400,
+  "mode": "demo",
+  "note": "Configure REALTIME_APP_ID and TURN_API_TOKEN for real credentials"
+}
+```
+
+#### Success Response (live mode)
+
+Calls `POST https://rtc.live.cloudflare.com/v1/turn/keys/${REALTIME_APP_ID}/credentials/generate-ice-servers` with `Authorization: Bearer ${TURN_API_TOKEN}`.
+
+#### Error Codes
+
+- `400` - Invalid ttl (`INVALID_TTL`)
+- `502` - Realtime TURN API failure (`TURN_API_ERROR`)
+
+## Use Cases
+
+- Learn Cloudflare Realtime TURN credential issuance
+- Bootstrap WebRTC ICE servers from a Worker API
+- Demo clients safely when secrets are not yet configured
+- Centralize TURN TTL and key rotation behind one endpoint
+
+## Limitations
+
+- Demo credentials are not usable for real peer connections
+- Requires a TURN key from the Realtime dashboard for live mode
+- TTL clamped to 60–86400 seconds
+- No STUN-only path in this experiment beyond what the API returns
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/webrtc-relay)
+
+  </Step>
+
+  <Step>
+
+### Configure Realtime TURN
+
+    1. Create a TURN key in the [Cloudflare Realtime dashboard](https://developers.cloudflare.com/realtime/turn/)
+    2. Set `REALTIME_APP_ID` in `wrangler.json` `vars` (or as a secret)
+    3. Run `npx wrangler secret put TURN_API_TOKEN`
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/turn-credentials?ttl=3600"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/webrtc-relay
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/turn-credentials?ttl=3600"
+```
+
+Without secrets, endpoints return demo credentials (safe for tests).
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Var** `REALTIME_APP_ID` (TURN key id)
+- **Secret** `TURN_API_TOKEN` (set via `wrangler secret put`)
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Cloudflare Realtime TURN](https://developers.cloudflare.com/realtime/turn/)** - ICE / TURN credentials for WebRTC

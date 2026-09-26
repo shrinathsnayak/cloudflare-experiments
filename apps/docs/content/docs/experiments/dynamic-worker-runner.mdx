@@ -1,0 +1,115 @@
+---
+title: "Dynamic Worker Runner"
+description: "Execute untrusted JavaScript via Dynamic Workers with no network access"
+icon: "CodeXml"
+tags:
+  - dynamic-workers
+bindings:
+  - Worker Loader
+status: new
+---
+
+Run untrusted JavaScript as an **ES module Worker** using the **Worker Loader** API. Loaded workers run with `globalOutbound: null` so they cannot make network requests.
+
+## API Reference
+
+### POST /run
+
+Execute a Worker module string and return its HTTP response status and body.
+
+**`code`** `string` (required)
+
+Full ES module that exports `default { fetch }`. Max length 10,000 characters.
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/run" \
+  -H "Content-Type: application/json" \
+  -d '{"code":"export default { async fetch() { return Response.json({ hello: \"world\" }); } }"}'
+```
+
+#### Success Response
+
+```json
+{
+  "status": 200,
+  "body": { "hello": "world" }
+}
+```
+
+#### Error Codes
+
+- `400` - Missing, empty, or too-long code (`INVALID_CODE`)
+- `502` - Loader or isolate failure (`RUN_ERROR`)
+
+## Use Cases
+
+- Learn Dynamic Workers / Worker Loader patterns safely
+- Sandbox plugin or customer code without outbound network
+- Prototype multi-tenant execution before Workers for Platforms
+- Teach isolate isolation and `globalOutbound` restrictions
+
+## Limitations
+
+- Code must be a complete ES module with `default { fetch }`
+- Max code length 10,000 characters
+- No outbound network from the loaded worker
+- Dynamic Workers / Worker Loader may require account entitlements
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/dynamic-worker-runner)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Ensure your account supports Worker Loaders. `wrangler.json` binds `LOADER` via `worker_loaders`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/run" \
+      -H "Content-Type: application/json" \
+      -d '{"code":"export default { async fetch() { return Response.json({ ok: true }); } }"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/dynamic-worker-runner
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/run" \
+  -H "Content-Type: application/json" \
+  -d '{"code":"export default { async fetch() { return Response.json({ hello: \"world\" }); } }"}'
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Worker Loader binding** `LOADER`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Dynamic Workers / Worker Loaders](https://developers.cloudflare.com/workers/runtime-apis/bindings/worker-loader/)** - Load and run module code at request time

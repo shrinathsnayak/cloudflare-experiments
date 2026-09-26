@@ -1,0 +1,158 @@
+---
+title: "Chat Agent"
+description: "Durable AI chat agent with SQLite-backed Durable Objects and optional Workers AI"
+icon: "MessagesSquare"
+tags:
+  - ai
+  - durable-objects
+bindings:
+  - AI
+  - DO
+status: new
+---
+
+Minimal durable AI chat agent using a **SQLite-backed Durable Object**. Workers AI is optional - without an AI binding the agent echoes `agent: <message>`.
+
+## Features
+
+- Per-session chat history in Durable Object SQLite
+- `POST /chat` for request/response turns
+- `GET /chat` for history
+- WebSocket upgrade on `GET /ws` for realtime updates
+- Optional Workers AI replies when the `AI` binding is available
+
+## API Reference
+
+### POST /chat
+
+Send a user message and receive the updated message list (including the assistant reply).
+
+**`sessionId`** `string` (required)
+
+Session id (letters, numbers, `_`, `-`).
+
+**`message`** `string` (required)
+
+User message (max 4,000 characters).
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/chat" \
+  -H "Content-Type: application/json" \
+  -d '{"sessionId":"demo","message":"Hello"}'
+```
+
+#### Success Response
+
+```json
+{
+  "sessionId": "demo",
+  "messages": [
+    { "role": "user", "content": "Hello" },
+    { "role": "assistant", "content": "agent: Hello" }
+  ]
+}
+```
+
+### GET /chat
+
+Return chat history for a session.
+
+**`sessionId`** `string` (required)
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/chat?sessionId=demo"
+```
+
+### GET /ws
+
+WebSocket upgrade for realtime message updates. Send `{ "message": "..." }` over the socket; receive `{ "type": "messages", "messages": [...] }`.
+
+**`sessionId`** `string` (required)
+
+Requires `Upgrade: websocket`.
+
+#### Error Codes
+
+- `400` - Invalid session, message, body, or missing WebSocket upgrade (`INVALID_SESSION`, `INVALID_MESSAGE`, `INVALID_BODY`, `EXPECTED_WEBSOCKET`)
+- `502` - Chat or Durable Object failure (`CHAT_ERROR`)
+
+## Use Cases
+
+- Learn Agents / Durable Object chat session patterns
+- Prototype multi-turn AI assistants with persistent history
+- Add WebSocket streaming alongside HTTP chat APIs
+- Compare stub echo replies vs Workers AI generation
+
+## Limitations
+
+- Without Workers AI, replies use the stub format `agent: <message>`
+- Message max 4,000 characters; no auth on sessions
+- Demo is single-agent per session id, not multi-user rooms
+- WebSocket clients must send JSON `{ "message": "..." }`
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/chat-agent)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Wrangler binds `CHAT_AGENT` to class `ChatAgent` (SQLite migration `v1`) and `AI` for Workers AI.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/chat" \
+      -H "Content-Type: application/json" \
+      -d '{"sessionId":"demo","message":"Hello"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/chat-agent
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/chat" \
+  -H "Content-Type: application/json" \
+  -d '{"sessionId":"demo","message":"Hello"}'
+```
+
+AI replies require a Workers AI binding. Without it, replies use the stub format.
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Durable Object binding** `CHAT_AGENT` → `ChatAgent`
+- **Migration** `v1` with `new_sqlite_classes: ["ChatAgent"]`
+- **Workers AI binding** `AI`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** - SQLite-backed chat sessions
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Optional model replies
+- **[WebSockets](https://developers.cloudflare.com/workers/runtime-apis/websockets/)** - Realtime `/ws` upgrades

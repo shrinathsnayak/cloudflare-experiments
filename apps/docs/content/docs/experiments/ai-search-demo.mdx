@@ -1,0 +1,118 @@
+---
+title: "AI Search Demo"
+description: "Query Cloudflare AI Search (managed RAG) from a Worker"
+icon: "Search"
+tags:
+  - ai
+  - rag
+bindings:
+  - AI
+status: new
+---
+
+Query **Cloudflare AI Search** (managed RAG, formerly AutoRAG) from a Worker via the Workers AI binding using `env.AI.autorag(name).aiSearch({ query })`.
+
+## API Reference
+
+### GET /search
+
+Run a natural-language search against your AI Search instance.
+
+**`q`** `string` (required)
+
+Natural language query.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/search?q=What%20is%20Workers%20AI"
+```
+
+#### Success Response
+
+```json
+{
+  "answer": "Generated answer from AI Search",
+  "results": [],
+  "query": "What is Workers AI",
+  "instance": "demo-index"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or empty `q` (`INVALID_QUERY`)
+- `502` - AI Search / AutoRAG failure (`SEARCH_ERROR`)
+
+## Use Cases
+
+- Learn managed RAG via AI Search from a Worker
+- Prototype Q&A over indexed docs without building Vectorize yourself
+- Compare AutoRAG-style search with a custom RAG Mini Search experiment
+- Demo grounded answers with retrieval metadata
+
+## Limitations
+
+- Requires a configured AI Search instance and indexed data source
+- Uses the legacy `AI.autorag(...).aiSearch` API; newer projects may prefer dedicated `ai_search` bindings
+- Remote/account access is typically needed for real searches
+- No auth on the public `/search` endpoint
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-search-demo)
+
+  </Step>
+
+  <Step>
+
+### Configure AI Search
+
+    Create an AI Search instance in the dashboard, index your data, and set `INSTANCE_NAME` in `wrangler.json` `vars` (default: `demo-index`).
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/search?q=hello"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/ai-search-demo
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/search?q=hello"
+```
+
+AI Search typically requires a remote instance (`wrangler` may need remote AI / account access).
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Workers AI binding** `AI`
+- **Var** `INSTANCE_NAME` (AI Search / AutoRAG instance name)
+
+See [AI Search Workers binding docs](https://developers.cloudflare.com/ai-search/api/search/workers-binding/) for the newer dedicated binding shape.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Binding used to call AI Search
+- **[AI Search](https://developers.cloudflare.com/ai-search/)** - Managed RAG over your indexed data

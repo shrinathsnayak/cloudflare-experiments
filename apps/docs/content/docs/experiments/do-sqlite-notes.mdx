@@ -1,0 +1,159 @@
+---
+title: "DO SQLite Notes"
+description: "Per-user notes stored in SQLite-backed Durable Objects via sql.exec"
+icon: "Database"
+tags:
+  - durable-objects
+  - sqlite
+bindings:
+  - DO
+status: new
+---
+
+Store and retrieve per-user notes in **SQLite-backed Durable Objects**. Each `userId` maps to its own Durable Object stub; notes live in a `notes` table via `storage.sql.exec`.
+
+## API Reference
+
+### POST /notes
+
+Create or update a note for a user.
+
+**`userId`** `string` (required)
+
+User identifier (letters, numbers, `_`, `-`).
+
+**`id`** `string` (required)
+
+Note identifier (letters, numbers, `_`, `-`).
+
+**`content`** `string` (required)
+
+Note body (max 4,000 characters).
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/notes" \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"alice","id":"n1","content":"Hello"}'
+```
+
+#### Success Response
+
+```json
+{
+  "userId": "alice",
+  "id": "n1",
+  "content": "Hello",
+  "updatedAt": "2025-06-20T12:00:00.000Z"
+}
+```
+
+### GET /notes
+
+Fetch one note (`?userId=&id=`) or list all notes for a user (`?userId=`).
+
+**`userId`** `string` (required)
+
+**`id`** `string` (optional)
+
+When present, returns a single note; otherwise returns `{ userId, notes }`.
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/notes?userId=alice"
+curl "https://your-worker.workers.dev/notes?userId=alice&id=n1"
+```
+
+### DELETE /notes
+
+Delete a note by user and id.
+
+**`userId`** `string` (required)
+
+**`id`** `string` (required)
+
+#### Example Request
+
+```bash
+curl -X DELETE "https://your-worker.workers.dev/notes?userId=alice&id=n1"
+```
+
+#### Error Codes
+
+- `400` - Invalid userId, id, content, or body (`INVALID_USER_ID`, `INVALID_ID`, `INVALID_CONTENT`, `INVALID_BODY`)
+- `404` - Note not found (`NOT_FOUND`)
+
+## Use Cases
+
+- Learn SQLite storage inside Durable Objects (`new_sqlite_classes`)
+- Per-tenant or per-user isolated state without a shared D1 database
+- Prototype note or config APIs with strong consistency per user
+- Compare DO SQLite vs Workers KV for structured records
+
+## Limitations
+
+- Note IDs and userIds are capped to alphanumeric plus `_` / `-`
+- Content max 4,000 characters
+- No authentication; any client can read or write by userId
+- Requires a Durable Objects binding and SQLite migration
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/do-sqlite-notes)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Wrangler creates the `NOTES` Durable Object binding and applies the `v1` SQLite migration for `NotesDO`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/notes" \
+      -H "Content-Type: application/json" \
+      -d '{"userId":"alice","id":"n1","content":"Hello"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/do-sqlite-notes
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/notes" \
+  -H "Content-Type: application/json" \
+  -d '{"userId":"alice","id":"n1","content":"Hello"}'
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Durable Object binding** `NOTES` → class `NotesDO`
+- **Migration** `v1` with `new_sqlite_classes: ["NotesDO"]`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** - Per-user stub with SQLite storage
+- **[SQLite in Durable Objects](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/)** - `storage.sql.exec` for the notes table

@@ -7,7 +7,7 @@ type RouteContext = {
 /**
  * IndexNow ownership verification (Bing Option 1):
  * https://cloudflare-experiments.com/{INDEXNOW_KEY}.txt
- * Body must be exactly the key — no extra whitespace.
+ * Body must be exactly the key - no extra whitespace.
  */
 export async function GET(_request: Request, context: RouteContext) {
   await connection();

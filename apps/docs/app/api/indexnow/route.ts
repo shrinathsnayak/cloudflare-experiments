@@ -75,7 +75,10 @@ export async function POST(request: Request) {
     try {
       event = JSON.parse(rawBody) as VercelWebhookEvent;
     } catch {
-      return NextResponse.json({ error: "Invalid JSON body", code: "INVALID_BODY" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid JSON body", code: "INVALID_BODY" },
+        { status: 400 }
+      );
     }
 
     if (event.type && event.type !== "deployment.succeeded") {

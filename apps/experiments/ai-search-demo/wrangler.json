@@ -1,0 +1,17 @@
+{
+  "name": "ai-search-demo",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "ai": {
+    "binding": "AI"
+  },
+  "vars": {
+    "INSTANCE_NAME": "demo-index"
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

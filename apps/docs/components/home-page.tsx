@@ -11,7 +11,16 @@ import {
   repoStructure,
   type HomeExperiment,
 } from "@/lib/home-content";
-import { appName, docsRoute, gitConfig, githubCloneUrl, githubRepoUrl, heroDescription, heroTitle } from "@/lib/shared";
+import { SidebarStatusBadge } from "@/components/sidebar-status-badge";
+import {
+  appName,
+  docsRoute,
+  gitConfig,
+  githubCloneUrl,
+  githubRepoUrl,
+  heroDescription,
+  heroTitle,
+} from "@/lib/shared";
 import {
   ArrowRight,
   BookOpen,
@@ -32,8 +41,14 @@ const homeInteractiveCardClass =
 
 function HoverRevealArrow({ size = "sm" }: { size?: "sm" | "md" }) {
   const iconSize = size === "sm" ? "size-3.5" : "size-4";
-  const hoverWidth = size === "sm" ? "group-hover:w-3.5 group-focus-visible:w-3.5" : "group-hover:w-4 group-focus-visible:w-4";
-  const hoverMargin = size === "sm" ? "group-hover:ml-1.5 group-focus-visible:ml-1.5" : "group-hover:ml-1.5 group-focus-visible:ml-1.5";
+  const hoverWidth =
+    size === "sm"
+      ? "group-hover:w-3.5 group-focus-visible:w-3.5"
+      : "group-hover:w-4 group-focus-visible:w-4";
+  const hoverMargin =
+    size === "sm"
+      ? "group-hover:ml-1.5 group-focus-visible:ml-1.5"
+      : "group-hover:ml-1.5 group-focus-visible:ml-1.5";
 
   return (
     <ArrowRight
@@ -78,12 +93,10 @@ function SectionHeading({
 
 function ExperimentCard({ experiment }: { experiment: HomeExperiment }) {
   return (
-    <Link
-      href={experimentHref(experiment.slug)}
-      className={homeInteractiveCardClass}
-    >
-      <span className="inline-flex items-center font-medium group-hover:text-brand group-focus-visible:text-brand">
+    <Link href={experimentHref(experiment.slug)} className={homeInteractiveCardClass}>
+      <span className="inline-flex items-center gap-2 font-medium group-hover:text-brand group-focus-visible:text-brand">
         {experiment.title}
+        {experiment.status ? <SidebarStatusBadge status={experiment.status} /> : null}
         <HoverRevealArrow />
       </span>
       <span className="mt-1 text-sm text-fd-muted-foreground">{experiment.description}</span>
@@ -245,11 +258,7 @@ curl "http://localhost:8787/summary?url=https://example.com"`}</code>
           />
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {platformCapabilities.map(({ icon: Icon, title, description, href }) => (
-              <Link
-                key={title}
-                href={docHref(href)}
-                className={`${homeInteractiveCardClass} p-5`}
-              >
+              <Link key={title} href={docHref(href)} className={`${homeInteractiveCardClass} p-5`}>
                 <span className="flex size-10 items-center justify-center rounded-lg bg-brand/10 text-brand">
                   <Icon className="size-5" />
                 </span>

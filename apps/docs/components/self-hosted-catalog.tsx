@@ -106,7 +106,7 @@ function CategoryGroup({
   );
 }
 
-/** Presentational catalog — pass preloaded data to avoid a second fetch. */
+/** Presentational catalog - pass preloaded data to avoid a second fetch. */
 export function SelfHostedCatalogView({ catalog }: { catalog: SelfHostedCatalogData }) {
   const { source, syncedAt } = catalog;
   const groups = groupSelfHostedEntries(catalog);
@@ -136,7 +136,7 @@ export function SelfHostedCatalogView({ catalog }: { catalog: SelfHostedCatalogD
   );
 }
 
-/** MDX fallback — fetches once (deduped via React.cache + `"use cache"`). */
+/** MDX fallback - fetches once (deduped via React.cache + `"use cache"`). */
 export async function SelfHostedCatalog() {
   return <SelfHostedCatalogView catalog={await getSelfHostedCatalog()} />;
 }

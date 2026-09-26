@@ -1,0 +1,32 @@
+{
+  "name": "container-echo",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "containers": [
+    {
+      "class_name": "EchoContainer",
+      "image": "./Dockerfile",
+      "max_instances": 2
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ECHO",
+        "class_name": "EchoContainer"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["EchoContainer"]
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

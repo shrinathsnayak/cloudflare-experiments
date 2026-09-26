@@ -1,0 +1,17 @@
+{
+  "name": "flagship-rollout",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "flagship": [
+    {
+      "binding": "FLAGS",
+      "app_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

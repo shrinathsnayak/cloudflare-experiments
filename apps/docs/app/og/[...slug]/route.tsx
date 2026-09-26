@@ -29,7 +29,7 @@ export async function GET(_req: Request, { params }: RouteContext<"/og/[...slug]
 
   return new ImageResponse(
     <OgImage title={title} description={description} site={appName} logoSrc={logoSrc} />,
-    await getOgImageOptions(title, description, appName),
+    await getOgImageOptions(title, description, appName)
   );
 }
 

@@ -1,0 +1,132 @@
+---
+title: "Transactional Email"
+description: "Send transactional email via the Cloudflare Email Service binding"
+icon: "Send"
+tags:
+  - email
+bindings:
+  - Email Sending
+status: new
+---
+
+Send transactional email via the Cloudflare **Email Service** `send_email` binding (`EMAIL`). Pair with [Email Worker Inbox](/experiments/email-worker-inbox) for the receive side.
+
+## API Reference
+
+### POST /send
+
+Send an email. Provide `text` and/or `html` body content.
+
+**`to`** `string` (required)
+
+Recipient email address.
+
+**`subject`** `string` (required)
+
+Subject line.
+
+**`text`** `string` (optional)
+
+Plain-text body (at least one of `text` or `html` required).
+
+**`html`** `string` (optional)
+
+HTML body (at least one of `text` or `html` required).
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/send" \
+  -H "Content-Type: application/json" \
+  -d '{"to":"user@example.com","subject":"Welcome","text":"Thanks for signing up."}'
+```
+
+#### Success Response
+
+```json
+{
+  "sent": true,
+  "to": "user@example.com",
+  "subject": "Welcome",
+  "messageId": "..."
+}
+```
+
+#### Error Codes
+
+- `400` - Invalid to, subject, body, or JSON (`INVALID_TO`, `INVALID_SUBJECT`, `MISSING_BODY`, `INVALID_BODY`)
+- `502` - Email send failure (`SEND_ERROR`)
+
+## Use Cases
+
+- Learn the Email Sending / `send_email` binding
+- Transactional welcome, reset, and notification emails
+- Restrict destinations with `destination_address` during demos
+- Pair with Email Worker Inbox for end-to-end mail experiments
+
+## Limitations
+
+- Requires onboarding a sending domain (`wrangler email sending enable`)
+- `FROM_EMAIL` must be on that domain
+- Optional `destination_address` on the binding can lock recipients for demos
+- No queueing or retry UI in this minimal experiment
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/transactional-email)
+
+  </Step>
+
+  <Step>
+
+### Configure Email Sending
+
+    1. Onboard a sending domain: `npx wrangler email sending enable yourdomain.com`
+    2. Set `FROM_EMAIL` in `wrangler.json` `vars` to an address on that domain
+    3. Optionally restrict destinations with `destination_address` on the `EMAIL` binding
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/send" \
+      -H "Content-Type: application/json" \
+      -d '{"to":"user@example.com","subject":"Welcome","text":"Thanks for signing up."}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/transactional-email
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/send" \
+  -H "Content-Type: application/json" \
+  -d '{"to":"user@example.com","subject":"Welcome","text":"Thanks for signing up."}'
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **`send_email` binding** `EMAIL` (optional `destination_address`)
+- **Var** `FROM_EMAIL`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Email Sending](https://developers.cloudflare.com/email-routing/email-workers/send-email/)** - `send_email` binding for outbound mail

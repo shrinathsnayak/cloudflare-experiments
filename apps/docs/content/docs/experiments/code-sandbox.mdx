@@ -1,0 +1,130 @@
+---
+title: "Code Sandbox"
+description: "Run a JavaScript snippet in an isolated Sandbox SDK container"
+icon: "Terminal"
+tags:
+  - sandbox
+  - containers
+bindings:
+  - Sandbox
+  - Containers
+status: new
+---
+
+Run a JavaScript snippet in an isolated environment using the **Cloudflare Sandbox SDK** (`@cloudflare/sandbox`) backed by Containers and a Durable Object.
+
+## API Reference
+
+### POST /exec
+
+Execute code and return stdout, stderr, and exit code.
+
+**`language`** `string` (required)
+
+Currently only `javascript` is supported.
+
+**`code`** `string` (required)
+
+Snippet to run. Max length 5,000 characters.
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/exec" \
+  -H "Content-Type: application/json" \
+  -d '{"language":"javascript","code":"console.log(2 + 2)"}'
+```
+
+#### Success Response
+
+```json
+{
+  "stdout": "4\n",
+  "stderr": "",
+  "exitCode": 0
+}
+```
+
+#### Error Codes
+
+- `400` - Invalid body, language, or code (`INVALID_BODY`, `INVALID_LANGUAGE`, `INVALID_CODE`)
+- `502` - Sandbox execution failure (`EXEC_ERROR`)
+
+## Use Cases
+
+- Learn Sandbox SDK `getSandbox` + `exec` patterns
+- Safely evaluate untrusted JavaScript snippets at the edge
+- Prototype coding tutors or REPL APIs
+- Compare Sandbox containers vs Dynamic Workers isolation
+
+## Limitations
+
+- Only `javascript` is supported in this demo
+- Code max length 5,000 characters
+- Docker required for local `wrangler dev` / deploy
+- Container `max_instances` is 1 (`lite` instance type)
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/code-sandbox)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    Wrangler builds the sandbox image, registers the `Sandbox` Durable Object, and enables `nodejs_compat`.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/exec" \
+      -H "Content-Type: application/json" \
+      -d '{"language":"javascript","code":"console.log(2 + 2)"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+Docker must be running for container image builds.
+
+```bash
+cd apps/experiments/code-sandbox
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/exec" \
+  -H "Content-Type: application/json" \
+  -d '{"language":"javascript","code":"console.log(2 + 2)"}'
+```
+
+Unit tests mock the sandbox client so Docker is not required for `npm run test`.
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Container** `Sandbox` from `./Dockerfile` (`instance_type: lite`)
+- **Durable Object binding** `Sandbox` → class `Sandbox`
+- **Compatibility flag** `nodejs_compat`
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Sandbox SDK](https://developers.cloudflare.com/sandbox/)** - Isolated code execution
+- **[Containers](https://developers.cloudflare.com/containers/)** - Official sandbox image
+- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** - Sandbox class binding
