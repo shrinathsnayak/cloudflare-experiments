@@ -60,6 +60,14 @@ Docs are **not** generated automatically on deploy. When you add or change an ex
 
   <Step>
 
+### Note it on What's New
+
+    Add a short dated bullet to [What's New](/changelog) (newest first) when shipping a new experiment or a user-facing API/docs change.
+
+  </Step>
+
+  <Step>
+
 ### Update root README (new experiments only)
 
     Add a row to the experiments table in the root `README.md` with name, description, and deploy link.
@@ -218,6 +226,7 @@ Before merging:
 - [ ] Response JSON matches TypeScript types
 - [ ] Binding setup matches `wrangler.json` and `src/types/env.d.ts`
 - [ ] Page entry exists in `meta.json`
+- [ ] New experiment or notable user-facing change listed on [What's New](/changelog)
 - [ ] Deploy URL uses `apps/experiments/<name>`
 - [ ] `apps/docs` build passes
 
@@ -227,7 +236,7 @@ The **`experiment-docs`** skill (`.cursor/skills/experiment-docs/SKILL.md`) inst
 
 - Run the scaffold script
 - Follow the template at `.cursor/skills/experiment-docs/template.mdx`
-- Update `meta.json` and README
+- Update `meta.json`, README, and [What's New](/changelog)
 - Verify the docs build
 
 Invoke it when adding or updating experiment documentation.

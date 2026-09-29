@@ -25,6 +25,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const markdownUrl = getPageMarkdownUrl(page).url;
   const githubUrl = githubDocsBlobUrl(page.path);
   const isSelfHosted = page.slugs.length === 1 && page.slugs[0] === "self-hosted";
+  const isChangelog = page.slugs.length === 1 && page.slugs[0] === "changelog";
 
   // Cheap sync branch before any self-hosted catalog work (async-cheap-condition-before-await).
   if (isSelfHosted) {
@@ -56,10 +57,12 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
       <DocsPage toc={page.data.toc} full={page.data.full} tableOfContent={{ enabled: true }}>
         <DocsTitle>{page.data.title}</DocsTitle>
         <DocsDescription>{page.data.description}</DocsDescription>
-        <div className="flex flex-row flex-wrap items-center gap-2 not-prose">
-          <MarkdownCopyButton markdownUrl={markdownUrl} />
-          <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubUrl} />
-        </div>
+        {!isChangelog ? (
+          <div className="flex flex-row flex-wrap items-center gap-2 not-prose">
+            <MarkdownCopyButton markdownUrl={markdownUrl} />
+            <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubUrl} />
+          </div>
+        ) : null}
         <DocsBody>
           <MDX
             components={getMDXComponents({

@@ -39,6 +39,12 @@ export const docsLayoutOptions: BaseLayoutProps = {
       url: homeRoute,
       active: "url",
     },
+    {
+      type: "main",
+      text: "What's New",
+      url: `${docsRoute}/changelog`,
+      active: "url",
+    },
     portfolioLink,
   ],
 };
@@ -58,6 +64,12 @@ export const homeLayoutOptions: BaseLayoutProps = {
       type: "main",
       text: "Self-Hosted",
       url: `${docsRoute}/self-hosted`,
+      active: "url",
+    },
+    {
+      type: "main",
+      text: "What's New",
+      url: `${docsRoute}/changelog`,
       active: "url",
     },
     portfolioLink,

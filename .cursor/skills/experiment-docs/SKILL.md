@@ -183,6 +183,7 @@ Before finishing:
 - [ ] Local dev port is `8787` (Wrangler default)
 - [ ] Deploy button URL uses `apps/experiments/<name>` path
 - [ ] Page listed in `meta.json` under correct category
+- [ ] New experiment (or notable user-facing change) listed in `apps/docs/content/docs/changelog.mdx`
 - [ ] No Mintlify-only syntax (`<ParamField>`, `<Icon>`, etc.)
 - [ ] `npm run build` in `apps/docs` succeeds
 

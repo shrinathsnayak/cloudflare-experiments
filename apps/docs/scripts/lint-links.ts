@@ -18,6 +18,7 @@ const legacyTopLevelRedirects = new Set([
   "quickstart",
   "philosophy",
   "self-hosted",
+  "changelog",
   "contributing",
   "adding-experiments",
   "code-standards",
