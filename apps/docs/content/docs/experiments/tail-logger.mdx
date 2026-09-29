@@ -87,6 +87,19 @@ Deploy `tail-logger` first, then the producer. When the producer handles request
 - No filtering UI - raw recent events only
 - No authentication on `/logs`
 
+## Use in your project
+
+<UseInYourProject
+  experiment="tail-logger"
+  bindings={["KV"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/logs.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

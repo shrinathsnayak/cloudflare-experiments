@@ -96,6 +96,19 @@ When verification fails:
 - Server-side verification only; does not render the Turnstile widget
 - Turnstile tokens are single-use and expire quickly
 
+## Use in your project
+
+<UseInYourProject
+  experiment="turnstile-verify"
+  platform={["Fetch API"]}
+  files={[
+    "src/lib/token.ts",
+    "src/lib/verify.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

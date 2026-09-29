@@ -58,6 +58,19 @@ Delete a mock by slug.
 - No authentication on config endpoints
 - Mocks are global to the namespace; not multi-tenant
 
+## Use in your project
+
+<UseInYourProject
+  experiment="api-mock-server"
+  bindings={["KV"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/mock.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

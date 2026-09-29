@@ -57,6 +57,18 @@ curl -X POST "https://your-worker.workers.dev/counter/reset"
 - Requires a Durable Objects binding and migration
 - No authentication; any client can increment or read the counter
 
+## Use in your project
+
+<UseInYourProject
+  experiment="durable-counter"
+  bindings={["Durable Objects"]}
+  platform={["Fetch API","Durable Objects"]}
+  files={[
+    "src/lib/counter.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

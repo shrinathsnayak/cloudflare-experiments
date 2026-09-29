@@ -520,6 +520,19 @@ curl "https://your-worker.workers.dev/list?delimiter=/&public=true"
 - Requires R2 bucket bindings and optional public URL configuration
 - Not a multipart upload or large-file streaming demo
 
+## Use in your project
+
+<UseInYourProject
+  experiment="r2-storage"
+  bindings={["R2"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/bucket.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-storage)

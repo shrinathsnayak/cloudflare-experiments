@@ -52,6 +52,20 @@ curl -X POST "https://your-worker.workers.dev/generate" \
 - Cache metadata depends on gateway configuration
 - Text generation only; fixed default model
 
+## Use in your project
+
+<UseInYourProject
+  experiment="ai-gateway-dashboard"
+  bindings={["Workers AI (AI binding)"]}
+  platform={["Workers AI"]}
+  files={[
+    "src/lib/generate.ts",
+    "src/lib/validate.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

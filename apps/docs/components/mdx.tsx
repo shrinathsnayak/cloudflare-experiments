@@ -1,4 +1,5 @@
 import { SelfHostedCatalog } from "@/components/self-hosted-catalog";
+import { UseInYourProject } from "@/components/use-in-your-project";
 import defaultMdxComponents from "fumadocs-ui/mdx";
 import { Accordion, Accordions } from "fumadocs-ui/components/accordion";
 import {
@@ -66,6 +67,7 @@ export function getMDXComponents(components?: MDXComponents) {
     Tab,
     Tabs,
     TypeTable,
+    UseInYourProject,
     img: MdxImage,
     ...components,
   } satisfies MDXComponents;

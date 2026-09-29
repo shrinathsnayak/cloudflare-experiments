@@ -96,6 +96,18 @@ curl "https://your-worker.workers.dev/playback-token?uid=VIDEO_UID"
 - Basic POST uploads are limited to ~200 MB (use tus via REST for larger files)
 - Demo mode returns placeholder URLs/tokens
 
+## Use in your project
+
+<UseInYourProject
+  experiment="stream-video-demo"
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/stream.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

@@ -59,6 +59,20 @@ curl "https://your-worker.workers.dev/check?domain=example.com&type=A"
 - Single record type per request
 - Resolver errors return partial results rather than failing the whole request
 
+## Use in your project
+
+<UseInYourProject
+  experiment="dns-propagation-checker"
+  platform={["Fetch API"]}
+  files={[
+    "src/lib/doh.ts",
+    "src/lib/record-type.ts",
+    "src/lib/url.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

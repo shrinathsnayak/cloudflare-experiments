@@ -62,6 +62,19 @@ curl "https://your-worker.workers.dev/probe?url=https://example.com"
 - `cf.colo` may be empty in local `wrangler dev`
 - No control plane API to force a specific colo
 
+## Use in your project
+
+<UseInYourProject
+  experiment="smart-placement-probe"
+  platform={["request.cf","Fetch API"]}
+  files={[
+    "src/lib/probe.ts",
+    "src/lib/url.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

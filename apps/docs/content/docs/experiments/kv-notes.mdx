@@ -84,6 +84,19 @@ Delete a note by id.
 - No authentication; any client can read, write, or delete by ID
 - KV is eventually consistent across edge locations
 
+## Use in your project
+
+<UseInYourProject
+  experiment="kv-notes"
+  bindings={["KV"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/note.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

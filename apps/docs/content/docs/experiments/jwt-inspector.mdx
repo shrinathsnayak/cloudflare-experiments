@@ -164,6 +164,17 @@ curl -X POST "https://your-worker.workers.dev/issue" \
 - RS256 verification requires PEM public key in request body
 - No support for JWKS fetching or exotic algorithms
 
+## Use in your project
+
+<UseInYourProject
+  experiment="jwt-inspector"
+  platform={["Web Crypto"]}
+  files={[
+    "src/lib/jwt.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

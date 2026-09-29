@@ -113,6 +113,20 @@ Status may stay `queued` or `processing` briefly until the queue consumer runs. 
 - Failure rate is deterministic per job id + attempt (demo only)
 - Requires KV namespace and Queue configured in `wrangler.json`
 
+## Use in your project
+
+<UseInYourProject
+  experiment="queue-job-visualizer"
+  bindings={["KV","Queues"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/jobs.ts",
+    "src/lib/process.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

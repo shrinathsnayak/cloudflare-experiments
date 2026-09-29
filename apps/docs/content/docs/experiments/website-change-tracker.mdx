@@ -55,6 +55,23 @@ Return snapshot history with content hashes and diff summaries.
 - Diff summary is line-based heuristic, not semantic
 - 30-minute cron interval; not real-time
 
+## Use in your project
+
+<UseInYourProject
+  experiment="website-change-tracker"
+  bindings={["D1","R2","Browser Rendering"]}
+  platform={["Web Crypto"]}
+  files={[
+    "src/lib/browser.ts",
+    "src/lib/diff.ts",
+    "src/lib/hash.ts",
+    "src/lib/track.ts",
+    "src/lib/url.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

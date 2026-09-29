@@ -460,6 +460,23 @@ app.get("/site-check", async (c) => {
 - **Limited crawlers**: Only checks 14 known AI crawlers (list can be extended)
 - **No sitemap parsing**: Only checks individual URLs, not entire sitemaps
 
+## Use in your project
+
+<UseInYourProject
+  experiment="ai-bot-visibility"
+  platform={["Fetch API"]}
+  files={[
+    "src/lib/fetch.ts",
+    "src/lib/page-signals.ts",
+    "src/lib/robots.ts",
+    "src/lib/url.ts",
+    "src/lib/visibility.ts",
+    "src/constants/crawlers.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

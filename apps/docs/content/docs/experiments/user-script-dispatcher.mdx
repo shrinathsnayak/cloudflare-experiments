@@ -103,6 +103,19 @@ curl "https://your-worker.workers.dev/customers"
 - Script payload capped at 10,000 bytes
 - No authentication on register/dispatch endpoints
 
+## Use in your project
+
+<UseInYourProject
+  experiment="user-script-dispatcher"
+  bindings={["KV"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/script.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

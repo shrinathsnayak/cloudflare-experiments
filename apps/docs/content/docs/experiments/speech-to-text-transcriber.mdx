@@ -62,6 +62,20 @@ curl -X POST "https://your-worker.workers.dev/transcribe" \
 - No chunking for long recordings; split large files client-side
 - Requires Workers AI enabled on your Cloudflare account
 
+## Use in your project
+
+<UseInYourProject
+  experiment="speech-to-text-transcriber"
+  bindings={["Workers AI (AI binding)"]}
+  platform={["Workers AI"]}
+  files={[
+    "src/lib/audio.ts",
+    "src/lib/transcribe.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

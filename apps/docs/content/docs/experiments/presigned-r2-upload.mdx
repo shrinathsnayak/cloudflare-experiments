@@ -88,6 +88,20 @@ Returns an HTML demo page with presign + direct PUT upload flow.
 - Signed `Content-Type` must match the client PUT header exactly
 - Documented max size 5 MB (enforced at presign documentation level)
 
+## Use in your project
+
+<UseInYourProject
+  experiment="presigned-r2-upload"
+  bindings={["R2"]}
+  platform={["Fetch API"]}
+  files={[
+    "src/lib/demo-page.ts",
+    "src/lib/presign.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

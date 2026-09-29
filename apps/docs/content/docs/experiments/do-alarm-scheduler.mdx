@@ -115,6 +115,18 @@ curl "https://your-worker.workers.dev/status/550e8400-e29b-41d4-a716-44665544000
 - No push notification when alarm fires; client must poll
 - One alarm per Durable Object instance (one schedule id)
 
+## Use in your project
+
+<UseInYourProject
+  experiment="do-alarm-scheduler"
+  bindings={["Durable Objects"]}
+  platform={["Durable Objects"]}
+  files={[
+    "src/lib/schedule.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

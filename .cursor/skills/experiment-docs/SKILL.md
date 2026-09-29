@@ -35,13 +35,45 @@ Every experiment doc uses these **H2 headings in this order** (skip sections tha
 3. _Optional middle sections_ — e.g. Implementation Details, Technical Details, Monitored AI Crawlers, Architecture, Setup (complex workers only)
 4. **Use Cases** — 3–5 bullets
 5. **Limitations** — constraints and caveats
-6. **Deployment** — `<Steps>` with deploy button, deploy notes, test curl
-7. **Local Development** — install, dev, local test curl
-8. **Configuration** — wrangler bindings, secrets, dependencies (when relevant)
-9. **Cloudflare Features Used** — linked bullets to Cloudflare docs
-10. **Next Steps** — optional `<Cards>` linking related docs
+6. **Use in your project** — optional `<UseInYourProject>` paste recipe (small lib cores only; see below)
+7. **Deployment** — `<Steps>` with deploy button, deploy notes, test curl
+8. **Local Development** — install, dev, local test curl
+9. **Configuration** — wrangler bindings, secrets, dependencies (when relevant)
+10. **Cloudflare Features Used** — linked bullets to Cloudflare docs
+11. **Next Steps** — optional `<Cards>` linking related docs
 
 Rename legacy headings when editing: `API Endpoint(s)` → **API Reference**, `Setup & Deployment` / `Deploy` → **Deployment**, `Run locally` → **Local Development**.
+
+### Use in your project (optional)
+
+Add this section when the experiment has a **small, pasteable core** under `src/lib/` (e.g. a helper that does not need a full Worker scaffold). Use the `<UseInYourProject>` MDX component:
+
+```mdx
+## Use in your project
+
+<UseInYourProject
+  experiment="crypto-hash"
+  dependencies={[]}
+  bindings={[]}
+  platform={["Web Crypto (`crypto.subtle`)"]}
+  files={["src/lib/hash.ts", "src/constants/algorithms.ts", "examples/usage.ts"]}
+/>
+```
+
+Props:
+
+| Prop             | Purpose                                                                         |
+| ---------------- | ------------------------------------------------------------------------------- |
+| `experiment`     | Folder name under `apps/experiments/`                                           |
+| `dependencies`   | npm packages for the pasteable core (omit / `[]` if none)                       |
+| `bindings`       | Wrangler bindings / resources to create (`[]` → shows "None")                   |
+| `platform`       | Runtime APIs (Cache API, `request.cf`, Workers AI, …)                           |
+| `files`          | Paths relative to the experiment root — **loaded from disk** into filename tabs |
+| `installCommand` | Optional override for the install line                                          |
+
+**Never paste source into MDX.** Put pasteable files under the experiment (e.g. `src/lib/*.ts`, `examples/usage.ts`) and list their paths in `files`. Docs rebuild picks up edits automatically. Keep `examples/` out of the Worker `main` entry (and usually out of `tsconfig` `include`) so it is docs-only.
+
+Reference pilots: [Crypto Hash](/experiments/crypto-hash), [Where Am I?](/experiments/whereami), [Edge Cache](/experiments/edge-cache).
 
 ## Workflow: new experiment
 
@@ -69,6 +101,7 @@ Required sections (in order):
 | API Reference            | One `### METHOD /path` per route; params, examples, errors                |
 | Use Cases                | 3–5 bullet points                                                         |
 | Limitations              | Timeouts, size limits, local vs deployed behavior                         |
+| Use in your project      | Optional: `<UseInYourProject>` + core snippet + wire-up (small lib only)  |
 | Deployment               | `<Steps>` with deploy button, deploy note, test curl                      |
 | Local Development        | `cd apps/experiments/<name>`, install, dev, test curl                     |
 | Configuration            | Optional: `wrangler.json` bindings, secrets, dependencies                 |
@@ -134,7 +167,7 @@ Confirm: OG image generates, sidebar link works, code blocks render with Google 
 The target URL (http or https only).
 ```
 
-- **Components**: `Callout`, `Steps`/`Step`, `Cards`/`Card`, `Accordions`/`Accordion` - see `apps/docs/components/mdx.tsx`
+- **Components**: `Callout`, `Steps`/`Step`, `Cards`/`Card`, `Accordions`/`Accordion`, `UseInYourProject`, `File`/`Files`/`Folder` - see `apps/docs/components/mdx.tsx`
 - **External images**: plain markdown `![...](https://...)` (deploy button SVG); do not use paths that break `next/image`
 - **Links**: prefer `/...` for internal pages (no `/docs` prefix); full URLs for Cloudflare developer docs
 - **Code citations in prose**: use repo paths like `src/routes/check.ts` without line numbers unless referencing a specific implementation walkthrough

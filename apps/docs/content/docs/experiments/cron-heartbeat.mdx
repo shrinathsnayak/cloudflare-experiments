@@ -65,6 +65,19 @@ Before the first cron fires, `lastRun` and `lastCron` are `null` and `runCount` 
 - Stores last-run metadata in KV only; not a full job scheduler
 - Demonstration worker; no alerting or retry logic on failed runs
 
+## Use in your project
+
+<UseInYourProject
+  experiment="cron-heartbeat"
+  bindings={["KV"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/status.ts",
+    "src/constants/keys.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

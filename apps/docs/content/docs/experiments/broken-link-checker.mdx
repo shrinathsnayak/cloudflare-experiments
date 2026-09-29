@@ -90,6 +90,21 @@ Per-link `{ href, statusCode, ok, error? }`
 - Caps probes (default 25) to stay under Worker time limits
 - Some origins block HEAD or bots; status codes may reflect bot filtering
 
+## Use in your project
+
+<UseInYourProject
+  experiment="broken-link-checker"
+  platform={["Fetch API"]}
+  files={[
+    "src/lib/check.ts",
+    "src/lib/extract.ts",
+    "src/lib/probe.ts",
+    "src/lib/url.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

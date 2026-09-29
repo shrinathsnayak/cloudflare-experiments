@@ -101,6 +101,19 @@ curl "https://your-worker.workers.dev/status?key=demo-client"
 - KV usage counters are for demo visualization only (not authoritative)
 - Configured limit: 10 requests per 60 seconds (see `wrangler.json`)
 
+## Use in your project
+
+<UseInYourProject
+  experiment="rate-limiter-demo"
+  bindings={["KV","Rate Limiting"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/usage.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

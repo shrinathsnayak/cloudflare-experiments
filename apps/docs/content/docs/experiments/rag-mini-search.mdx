@@ -94,6 +94,21 @@ curl -X POST "https://your-worker.workers.dev/ask" \
 - Must call `POST /seed` before `POST /ask`
 - Requires Vectorize index `rag-mini-search` and Workers AI
 
+## Use in your project
+
+<UseInYourProject
+  experiment="rag-mini-search"
+  bindings={["Workers AI (AI binding)","Vectorize"]}
+  platform={["Workers AI"]}
+  files={[
+    "src/lib/rag.ts",
+    "src/lib/vectorize.ts",
+    "src/constants/defaults.ts",
+    "src/constants/docs.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

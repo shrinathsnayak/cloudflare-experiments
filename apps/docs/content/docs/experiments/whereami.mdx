@@ -101,6 +101,19 @@ See the [Cloudflare request.cf documentation](https://developers.cloudflare.com/
 - Local development returns minimal or empty `cf` data
 - Available fields vary by request path and Cloudflare detection capabilities
 
+## Use in your project
+
+<UseInYourProject
+  experiment="whereami"
+  platform={["request.cf"]}
+  files={["src/lib/cf.ts", "examples/usage.ts"]}
+>
+
+- Full `cf` fields appear only on Cloudflare's edge. Local `wrangler dev` often returns `{}`.
+- Pick the fields you need (`country`, `colo`, `asn`, …) instead of returning the whole object in production.
+
+</UseInYourProject>
+
 ## Deployment
 
 <Steps>

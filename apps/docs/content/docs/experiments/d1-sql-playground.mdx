@@ -98,6 +98,20 @@ SELECT p.name, e.name FROM products p JOIN experiments e ON p.category LIKE '%' 
 - Column types are inferred from the first result row (empty results return no column metadata)
 - Requires D1 migrations before first use (local and remote)
 
+## Use in your project
+
+<UseInYourProject
+  experiment="d1-sql-playground"
+  bindings={["D1"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/query.ts",
+    "src/lib/sql.ts",
+    "src/constants/sql.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

@@ -57,6 +57,18 @@ curl -X POST "https://your-worker.workers.dev/run" \
 - No outbound network from the loaded worker
 - Dynamic Workers / Worker Loader may require account entitlements
 
+## Use in your project
+
+<UseInYourProject
+  experiment="dynamic-worker-runner"
+  platform={["Web Crypto","Fetch API"]}
+  files={[
+    "src/lib/runner.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

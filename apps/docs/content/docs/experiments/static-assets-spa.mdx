@@ -68,6 +68,20 @@ In unit tests (no assets runtime), returns JSON app info. In production, `/` is 
 - Smoke tests call the Worker fetch handler directly (JSON `/`), which differs from production asset-first `/`
 - SPA client must call same-origin `/api/*` routes
 
+## Use in your project
+
+<UseInYourProject
+  experiment="static-assets-spa"
+  bindings={["ASSETS (Static Assets)"]}
+  platform={["Workers Static Assets", "Fetch API"]}
+  files={[
+    "src/index.ts",
+    "src/routes/api.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

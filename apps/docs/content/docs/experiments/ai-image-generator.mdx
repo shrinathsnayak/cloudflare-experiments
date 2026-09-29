@@ -77,6 +77,20 @@ Content-Type: image/png
 - Returns a single PNG per request; no async jobs or storage
 - Public endpoint with no authentication or rate limiting
 
+## Use in your project
+
+<UseInYourProject
+  experiment="ai-image-generator"
+  bindings={["Workers AI (AI binding)"]}
+  platform={["Workers AI"]}
+  files={[
+    "src/lib/generate.ts",
+    "src/lib/prompt.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

@@ -110,6 +110,21 @@ Same shape as a single object in `messages[]` above.
 - Messages expire after 7 days (KV TTL)
 - Does not forward or reply unless you extend the handler
 
+## Use in your project
+
+<UseInYourProject
+  experiment="email-worker-inbox"
+  bindings={["KV"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/email-handler.ts",
+    "src/lib/inbox.ts",
+    "src/lib/policy.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

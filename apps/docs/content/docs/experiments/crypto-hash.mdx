@@ -83,6 +83,18 @@ Length of the input text in characters
 - No HMAC, salting, or keyed hashing in this experiment
 - Input size is limited by Worker memory and request limits
 
+## Use in your project
+
+<UseInYourProject
+  experiment="crypto-hash"
+  platform={["Web Crypto (`crypto.subtle`)"]}
+  files={[
+    "src/lib/hash.ts",
+    "src/constants/algorithms.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

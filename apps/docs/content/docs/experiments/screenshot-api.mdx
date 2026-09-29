@@ -87,6 +87,19 @@ The API uses the following configuration:
 - 20-second navigation timeout; `networkidle0` may fail on busy sites
 - Local development needs `npx wrangler dev --remote`
 
+## Use in your project
+
+<UseInYourProject
+  experiment="screenshot-api"
+  bindings={["Browser Rendering"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/url.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

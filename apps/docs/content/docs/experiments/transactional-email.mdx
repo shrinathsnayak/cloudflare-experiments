@@ -71,6 +71,19 @@ curl -X POST "https://your-worker.workers.dev/send" \
 - Optional `destination_address` on the binding can lock recipients for demos
 - No queueing or retry UI in this minimal experiment
 
+## Use in your project
+
+<UseInYourProject
+  experiment="transactional-email"
+  bindings={["Email"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/email.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

@@ -121,6 +121,19 @@ curl -X DELETE "https://your-worker.workers.dev/files?path=notes/hello.txt"
 - Path validation rejects `..` and unusual characters
 - No authentication or per-user isolation beyond path conventions
 
+## Use in your project
+
+<UseInYourProject
+  experiment="artifact-workspace"
+  bindings={["R2"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/artifacts.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

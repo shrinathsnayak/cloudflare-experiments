@@ -74,6 +74,18 @@ curl "https://your-worker.workers.dev/flags/new-checkout/details?userId=user-42"
 - Local `wrangler dev` talks to the live Flagship app for that `app_id`
 - No dashboard UI in this Worker - evaluation API only
 
+## Use in your project
+
+<UseInYourProject
+  experiment="flagship-rollout"
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/flags.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

@@ -145,6 +145,23 @@ Matching documents, each with `id`, `score`, and `text`
 - Requires Workers AI and Vectorize bindings
 - Semantic search over the demo corpus only; not a production RAG pipeline
 
+## Use in your project
+
+<UseInYourProject
+  experiment="vectorize-search"
+  bindings={["Workers AI (AI binding)","Vectorize"]}
+  platform={["Workers AI"]}
+  files={[
+    "src/lib/embed.ts",
+    "src/lib/id.ts",
+    "src/lib/text.ts",
+    "src/lib/topk.ts",
+    "src/lib/vectorize.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

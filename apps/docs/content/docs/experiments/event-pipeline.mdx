@@ -79,6 +79,19 @@ curl "https://your-worker.workers.dev/events/sample"
 - No schema validation beyond “JSON object(s)”
 - R2 fallback is append-only JSONL, not a query API
 
+## Use in your project
+
+<UseInYourProject
+  experiment="event-pipeline"
+  bindings={["R2"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/events.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

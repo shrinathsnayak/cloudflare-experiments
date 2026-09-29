@@ -94,6 +94,19 @@ Requires `Upgrade: websocket`.
 - Demo is single-agent per session id, not multi-user rooms
 - WebSocket clients must send JSON `{ "message": "..." }`
 
+## Use in your project
+
+<UseInYourProject
+  experiment="chat-agent"
+  bindings={["Workers AI (AI binding)","Durable Objects"]}
+  platform={["WebSockets","Fetch API","Workers AI","Durable Objects"]}
+  files={[
+    "src/lib/chat.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

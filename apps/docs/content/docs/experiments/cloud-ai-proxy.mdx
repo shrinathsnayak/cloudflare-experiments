@@ -110,6 +110,20 @@ curl "https://your-worker.workers.dev/chat?model=@cf/meta/llama-3.1-8b-instruct-
 - `max_tokens` is capped at 4096
 - Text generation only; no streaming responses or tool calling
 
+## Use in your project
+
+<UseInYourProject
+  experiment="cloud-ai-proxy"
+  bindings={["Workers AI (AI binding)"]}
+  platform={["Workers AI"]}
+  files={[
+    "src/lib/chat.ts",
+    "src/lib/validate.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

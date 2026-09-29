@@ -71,6 +71,18 @@ Calls `POST https://rtc.live.cloudflare.com/v1/turn/keys/${REALTIME_APP_ID}/cred
 - TTL clamped to 60–86400 seconds
 - No STUN-only path in this experiment beyond what the API returns
 
+## Use in your project
+
+<UseInYourProject
+  experiment="webrtc-relay"
+  platform={["Fetch API"]}
+  files={[
+    "src/lib/turn.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

@@ -54,6 +54,17 @@ When the request is not a WebSocket upgrade, the worker returns HTTP 426:
 - No authentication or explicit message size limits in this demo
 - WebSocket connections are subject to Worker CPU and duration limits
 
+## Use in your project
+
+<UseInYourProject
+  experiment="websocket-echo"
+  platform={["WebSockets"]}
+  files={[
+    "src/lib/websocket.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

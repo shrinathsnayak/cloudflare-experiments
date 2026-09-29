@@ -100,6 +100,20 @@ Overall `status` (`pass` | `warn` | `fail`) and `issues` list
 - Does not validate live mail delivery or DKIM signatures on messages
 - Relies on public DoH answers; DNS TTL/caching may lag recent changes
 
+## Use in your project
+
+<UseInYourProject
+  experiment="email-auth-checker"
+  platform={["Fetch API"]}
+  files={[
+    "src/lib/analyze.ts",
+    "src/lib/doh.ts",
+    "src/lib/domain.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

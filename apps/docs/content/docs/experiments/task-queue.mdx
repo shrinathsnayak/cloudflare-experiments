@@ -88,6 +88,20 @@ curl "https://your-worker.workers.dev/stats"
 - Message length is capped
 - Requires Queue and KV bindings; not a stateless Worker
 
+## Use in your project
+
+<UseInYourProject
+  experiment="task-queue"
+  bindings={["KV","Queues"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/message.ts",
+    "src/lib/stats.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

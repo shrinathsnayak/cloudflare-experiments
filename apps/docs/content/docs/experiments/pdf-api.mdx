@@ -70,6 +70,20 @@ Cache-Control: public, max-age=60
 - Navigation timeout; complex or infinite-scroll pages may fail
 - Fixed viewport; no PDF margin, format, or page-size options
 
+## Use in your project
+
+<UseInYourProject
+  experiment="pdf-api"
+  bindings={["Browser Rendering"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/browser.ts",
+    "src/lib/url.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>

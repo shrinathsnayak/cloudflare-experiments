@@ -117,11 +117,33 @@ Add when they help readers:
 | **Implementation details** | AI pipelines, multi-step fetch/parse flows           |
 | **Configuration**          | Bindings, secrets, D1 schema SQL                     |
 | **Limitations**            | Timeouts, size caps, local vs production differences |
+| **Use in your project**    | Small pasteable `src/lib/` core (see below)          |
 | **Next steps**             | `<Cards>` to related experiments or Cloudflare docs  |
+
+### Use in your project
+
+For experiments with a **small, self-contained core** (helpers in `src/lib/`, few or no bindings), add a paste recipe between **Limitations** and **Deployment** using `<UseInYourProject>`:
+
+```mdx
+## Use in your project
+
+<UseInYourProject
+  experiment="whereami"
+  platform={["request.cf"]}
+  files={["src/lib/cf.ts", "examples/usage.ts"]}
+/>
+```
+
+The component loads each path in `files` from `apps/experiments/<name>/` at build time and renders **filename tabs**. Put wire-up snippets in `examples/usage.ts` (docs-only; keep it out of wrangler `main`). **Do not paste source into MDX** — edit the real files so docs stay in sync.
+
+Pilots: [Crypto Hash](/experiments/crypto-hash), [Where Am I?](/experiments/whereami), [Edge Cache](/experiments/edge-cache).
+
+Skip this section when the useful unit is the whole Worker (many bindings, Durable Objects, multi-route apps). Deploy remains the primary path.
 
 ### Reference examples
 
 - **Simple** (single route, no bindings): [Is It Down?](/experiments/is-it-down), [Where Am I?](/experiments/whereami)
+- **Paste recipe**: [Crypto Hash](/experiments/crypto-hash), [Edge Cache](/experiments/edge-cache)
 - **Full** (AI, config, implementation walkthrough): [AI Website Summary](/experiments/ai-website-summary)
 
 ## MDX conventions
@@ -154,6 +176,8 @@ Registered in `apps/docs/components/mdx.tsx`:
 - `Steps` / `Step` - numbered procedures
 - `Cards` / `Card` - related links
 - `Accordions` / `Accordion` - collapsible detail
+- `UseInYourProject` - paste recipe checklist (deps, bindings, files, snippets)
+- `File` / `Files` / `Folder` - folder trees
 
 External images (e.g. deploy button SVG) use plain `<img>` / markdown image syntax.
 

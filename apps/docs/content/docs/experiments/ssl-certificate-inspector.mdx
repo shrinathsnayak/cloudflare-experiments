@@ -82,6 +82,18 @@ Workers cannot perform arbitrary live TLS certificate handshakes for any domain.
 - crt.sh availability and freshness affect results
 - `tlsVersion` on the Worker request reflects the Worker's outbound fetch, not the target's full chain
 
+## Use in your project
+
+<UseInYourProject
+  experiment="ssl-certificate-inspector"
+  platform={["request.cf","Fetch API"]}
+  files={[
+    "src/lib/cert.ts",
+    "src/lib/domain.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
 ## Deployment
 
 <Steps>
