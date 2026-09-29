@@ -9,7 +9,7 @@ export const experimentDocsMeta: Record<
   "ai-bot-visibility": { icon: "Bot", tags: ["ai", "seo"], bindings: [] },
   "cloud-ai-proxy": { icon: "Cpu", tags: ["ai", "workers-ai"], bindings: ["AI"] },
   "text-translator": { icon: "Languages", tags: ["ai", "workers-ai"], bindings: ["AI"] },
-  "sentiment-analyzer": { icon: "Smile", tags: ["ai", "workers-ai"], bindings: ["AI"] },
+  "sentiment-analyzer": { icon: "FaceSlightlySmiling", tags: ["ai", "workers-ai"], bindings: ["AI"] },
   "text-similarity": { icon: "GitCompareArrows", tags: ["ai", "embeddings"], bindings: ["AI"] },
   "ai-image-generator": { icon: "Image", tags: ["ai", "workers-ai"], bindings: ["AI"] },
   "website-metadata-extractor": { icon: "FileSearch", tags: ["scraping"], bindings: [] },
