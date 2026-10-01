@@ -1,0 +1,247 @@
+---
+title: "Image Converter"
+description: "Convert, resize, and watermark images to WebP, AVIF, JPEG, or PNG with the Cloudflare Images binding, stripping GPS metadata"
+icon: "FileImage"
+tags:
+  - edge
+  - images
+bindings:
+  - IMAGES
+status: new
+---
+
+Convert uploaded or remote images to **WebP, AVIF, JPEG, or PNG**, resize them, and overlay a watermark with the Cloudflare [Images binding](https://developers.cloudflare.com/images/transform-images/bindings/) (`env.IMAGES`). Unlike [Image Resizer](/experiments/image-resizer) (`fetch` + `cf.image`), the binding works on raw bytes, so images don't need a public URL and no zone-level setup is required.
+
+## Features
+
+- **POST /convert** - convert an uploaded image (max 10 MB)
+- **GET /convert?url=** - convert a remote image
+- **POST /watermark** - draw a remote PNG bottom-right at 0.6 opacity
+- **POST /info** - format, file size, and dimensions (free `info()` call)
+- **Size headers** - original vs output bytes and percent saved on every conversion
+- **Metadata stripped** - re-encoding drops EXIF GPS location and camera details
+
+## API Reference
+
+All conversion routes (`/convert`, `/watermark`) accept these query parameters:
+
+<TypeTable
+  type={{
+    format: {
+      description: "Output format: `webp` (default), `avif`, `jpeg` (or `jpg`), `png`",
+      type: "string",
+    },
+    quality: {
+      description: "Integer 1–100. Applies to JPEG, WebP, and AVIF; ignored for PNG",
+      type: "number",
+    },
+    width: {
+      description: "Target width in pixels (1–4096)",
+      type: "number",
+    },
+    height: {
+      description: "Target height in pixels (1–4096)",
+      type: "number",
+    },
+    fit: {
+      description:
+        "`scale-down`, `contain`, `cover`, `crop`, `pad`, or `squeeze`. Requires `width` and/or `height`",
+      type: "string",
+    },
+  }}
+/>
+
+Successful conversions return the image bytes with:
+
+```http
+Content-Type: image/webp
+X-Original-Format: image/jpeg
+X-Original-Size: 47707
+X-Output-Size: 4264
+X-Size-Saved-Percent: 91.1
+```
+
+### POST /convert
+
+Request body: raw image bytes with an `image/*` `Content-Type` (max 10 MB).
+
+```bash
+curl -X POST "https://your-worker.workers.dev/convert?format=webp&quality=70&width=800" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary @photo.jpg \
+  --output photo.webp
+```
+
+### GET /convert
+
+Fetches a remote image (must respond with `image/*`, max 10 MB) and converts it.
+
+<TypeTable
+  type={{
+    url: {
+      description: "Source image URL (`http://` or `https://`)",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+```bash
+curl "https://your-worker.workers.dev/convert?url=https://example.com/photo.jpg&format=avif&width=600" \
+  --output photo.avif
+```
+
+### POST /watermark
+
+Converts the uploaded image and draws a remote overlay 16 px from the bottom-right corner at 0.6 opacity. Use a transparent PNG smaller than the base image.
+
+<TypeTable
+  type={{
+    watermarkUrl: {
+      description: "Overlay image URL (`http://` or `https://`, max 10 MB)",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+```bash
+curl -X POST "https://your-worker.workers.dev/watermark?watermarkUrl=https://example.com/logo.png&format=jpeg" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary @photo.jpg \
+  --output watermarked.jpg
+```
+
+### POST /info
+
+Returns metadata from `env.IMAGES.info()`. For SVG input, `width` and `height` are `null`.
+
+```bash
+curl -X POST "https://your-worker.workers.dev/info" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary @photo.jpg
+```
+
+```json
+{ "format": "image/jpeg", "fileSize": 47707, "width": 1600, "height": 1000 }
+```
+
+#### Error Codes
+
+- `400` - Unknown `format` (`INVALID_FORMAT`), `quality` not 1–100 (`INVALID_QUALITY`), `width`/`height` out of range or `fit` without either (`INVALID_DIMENSIONS`), unknown `fit` (`INVALID_FIT`), missing or invalid `url`/`watermarkUrl` (`INVALID_URL`), empty body (`MISSING_IMAGE`)
+- `413` - Image over 10 MB (`PAYLOAD_TOO_LARGE`)
+- `415` - Not `image/*`, or the binding can't decode it (ImagesError 9412) (`UNSUPPORTED_MEDIA_TYPE`)
+- `502` - Remote image or watermark fetch failed (`FETCH_ERROR`), Images binding transform failed (`IMAGES_ERROR`)
+
+## Implementation Details
+
+The chain in `src/lib/images.ts`:
+
+```ts
+env.IMAGES.input(stream)
+  .transform({ width, height, fit }) // only when width/height given
+  .draw(overlayStream, { opacity: 0.6, bottom: 16, right: 16 }) // /watermark only
+  .output({ format: "image/webp", quality });
+```
+
+**Metadata and privacy.** Re-encoding drops invisible EXIF metadata such as GPS coordinates, camera make/model, and timestamps, which makes the output safer to share. Per the [Images metadata docs](https://developers.cloudflare.com/images/transform-images/transform-via-url/#metadata), WebP and PNG output always discards metadata, and JPEG output keeps only the EXIF copyright tag by default. The binding's `output()` has no `metadata` option, so that default applies. Color profiles and EXIF rotation are baked into the pixels.
+
+## Use Cases
+
+- Shrink photos to WebP/AVIF before storing them in R2
+- Strip GPS location from user uploads before publishing
+- Brand images with a logo watermark on upload
+- Learn the Images binding API (`input`, `transform`, `draw`, `output`, `info`)
+
+## Limitations
+
+- Images binding calls are billed as unique transformations (`info()` is free)
+- 10 MB input cap in this experiment (the binding itself accepts up to 20 MB)
+- Text watermarks are not exposed; only image overlays via `watermarkUrl`
+- Responses are not cached (`Cache-Control: no-store`)
+- `wrangler dev` uses a low-fidelity local Images implementation (resize, rotate, format only); use `--remote` to test watermarks
+
+## Use in your project
+
+<UseInYourProject
+  experiment="image-converter"
+  bindings={["Images"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/images.ts",
+    "src/lib/input.ts",
+    "src/lib/params.ts",
+    "src/types/image.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/image-converter)
+
+  </Step>
+
+  <Step>
+
+### Images binding
+
+    `wrangler.json` declares `"images": { "binding": "IMAGES" }`. Images must be available on your account. See [Images pricing](https://developers.cloudflare.com/images/pricing/).
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/convert?format=webp" \
+      -H "Content-Type: image/jpeg" \
+      --data-binary @photo.jpg \
+      --output photo.webp
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/image-converter
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/info" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary @photo.jpg
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **`images` binding** `IMAGES` (typed as `ImagesBinding`)
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Images binding](https://developers.cloudflare.com/images/transform-images/bindings/)** - `input()`, `transform()`, `draw()`, `output()`, and `info()` on raw image bytes
+
+## Next Steps
+
+<Cards>
+  <Card title="Image Resizer" href="/experiments/image-resizer">
+    URL-based resizing with `fetch` and `cf.image`
+  </Card>
+  <Card title="Presigned R2 Upload" href="/experiments/presigned-r2-upload">
+    Upload images directly to R2 from the browser
+  </Card>
+</Cards>

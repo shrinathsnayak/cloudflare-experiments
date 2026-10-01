@@ -1,0 +1,30 @@
+{
+  "name": "domain-expiry-reminder",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "triggers": {
+    "crons": ["0 9 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "domain-expiry-reminder-db",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
+  ],
+  "vars": {
+    "ALERT_FROM_EMAIL": "reminders@example.com"
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

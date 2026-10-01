@@ -43,18 +43,11 @@ body {
 }
 
 html {
+  scroll-behavior: smooth;
   scrollbar-gutter: stable;
 }
 
-.home-catalog-category {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 400px;
-}
-
-.self-hosted-category {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 320px;
-}
+/* content-visibility on categories breaks TOC scrollspy for nested headings */
 
 html > body[data-scroll-locked] {
   margin-right: 0px !important;

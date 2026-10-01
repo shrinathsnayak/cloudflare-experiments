@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/api/"],
     },
-    // Absolute HTTPS URL only — Google ignores Host; do not emit Host with a scheme.
+    // Absolute HTTPS URL only - Google ignores Host; do not emit Host with a scheme.
     sitemap: `${siteUrl}/sitemap.xml`,
   };
 }

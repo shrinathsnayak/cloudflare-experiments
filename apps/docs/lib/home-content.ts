@@ -1,16 +1,16 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
+  BookOpen,
   Boxes,
-  BrainCircuit,
   Camera,
-  Clock,
   Code,
-  Database,
   FileCode,
-  Globe,
   HardDrive,
   Layers,
+  PlusCircle,
+  Rocket,
+  Server,
   ShieldCheck,
   Sparkles,
   Zap,
@@ -29,15 +29,13 @@ export type HomeCategory = {
   title: string;
   description: string;
   icon: LucideIcon;
+  /** Icon chip classes; full literals so Tailwind can detect them. */
+  accent: string;
   experiments: HomeExperiment[];
 };
 
-export const homeStats = [
-  { value: "90", label: "Experiments" },
-  { value: "8", label: "Categories" },
-  { value: "30+", label: "Cloudflare products" },
-  { value: "MIT", label: "Open source" },
-] as const;
+/** Homepage shows at most this many "New" badges so the label keeps meaning. */
+export const maxFeaturedNewBadges = 2;
 
 export const homePrinciples = [
   {
@@ -89,157 +87,51 @@ export const homeWorkflow = [
   },
 ] as const;
 
+/** Crowd-pleasers first: useful on day one, easy to demo, cover the headline products. */
 export const featuredExperiments: HomeExperiment[] = [
+  {
+    slug: "screenshot-api",
+    title: "Screenshot API",
+    description: "PNG screenshot of any URL from headless Chrome at the edge",
+  },
   {
     slug: "ai-website-summary",
     title: "AI Website Summary",
-    description: "Summarize any webpage with Workers AI",
+    description: "Summarize any webpage with a Workers AI model",
   },
   {
-    slug: "container-echo",
-    title: "Container Echo",
-    description: "Echo a payload via Cloudflare Containers",
+    slug: "is-it-down",
+    title: "Is It Down",
+    description: "Check whether a site is reachable from Cloudflare's network",
+  },
+  {
+    slug: "whereami",
+    title: "Where Am I",
+    description: "Geolocation, colo, ASN, and timezone from request.cf",
+  },
+  {
+    slug: "link-shortener",
+    title: "Link Shortener",
+    description: "Short links with D1 as the source of truth and KV as a cache",
+  },
+  {
+    slug: "rag-mini-search",
+    title: "RAG Mini Search",
+    description: "Grounded Q&A with Vectorize retrieval and Workers AI",
+  },
+  {
+    slug: "mcp-tools-server",
+    title: "MCP Tools Server",
+    description: "Remote MCP server with DNS, headers, and uptime tools for AI clients",
     status: "new",
   },
   {
-    slug: "dynamic-worker-runner",
-    title: "Dynamic Worker Runner",
-    description: "Run sandboxed JS with the Worker Loader API",
-    status: "new",
-  },
-  {
-    slug: "ai-search-demo",
-    title: "AI Search Demo",
-    description: "Query managed RAG with Cloudflare AI Search",
-    status: "new",
-  },
-  {
-    slug: "r2-sql-query",
-    title: "R2 SQL Query",
-    description: "Query Iceberg tables via R2 SQL",
-    status: "new",
-  },
-  {
-    slug: "stream-video-demo",
-    title: "Stream Video Demo",
-    description: "Stream upload URLs and signed playback tokens",
-    status: "new",
-  },
-  {
-    slug: "static-assets-spa",
-    title: "Static Assets SPA",
-    description: "SPA + API with Static Assets and run_worker_first",
-    status: "new",
-  },
-  {
-    slug: "flagship-rollout",
-    title: "Flagship Rollout",
-    description: "Evaluate edge feature flags with Flagship",
-    status: "new",
-  },
-  {
-    slug: "do-sqlite-notes",
-    title: "DO SQLite Notes",
-    description: "Per-user notes with SQLite-backed Durable Objects",
-    status: "new",
-  },
-  {
-    slug: "chat-agent",
-    title: "Chat Agent",
-    description: "Durable chat agent with optional Workers AI",
-    status: "new",
-  },
-  {
-    slug: "code-sandbox",
-    title: "Code Sandbox",
-    description: "Isolated code execution with the Sandbox SDK",
+    slug: "one-time-secret",
+    title: "One-Time Secret",
+    description: "Self-destructing secret links with AES-GCM and Durable Objects",
     status: "new",
   },
 ];
-
-export const platformCapabilities = [
-  {
-    icon: BrainCircuit,
-    title: "Workers AI & Gateway",
-    description:
-      "Summarization, translation, embeddings, image generation, speech-to-text, and AI Gateway caching.",
-    href: "experiments/ai-website-summary",
-  },
-  {
-    icon: Camera,
-    title: "Browser Rendering",
-    description:
-      "Headless Chrome at the edge for screenshots, PDFs, metrics, and JS-rendered content extraction.",
-    href: "experiments/screenshot-api",
-  },
-  {
-    icon: FileCode,
-    title: "HTMLRewriter",
-    description:
-      "Parse and transform HTML without a browser - metadata, stats, social tags, and rewrites.",
-    href: "experiments/html-rewriter",
-  },
-  {
-    icon: Globe,
-    title: "Edge networking",
-    description:
-      "DNS lookup, propagation checks, uptime monitoring, CORS testing, TLS inspection, and geolocation.",
-    href: "experiments/is-it-down",
-  },
-  {
-    icon: Database,
-    title: "D1, KV & Vectorize",
-    description:
-      "Edge SQL, key-value storage, semantic search, mock APIs, and short links with cache layers.",
-    href: "experiments/d1-sql-playground",
-  },
-  {
-    icon: HardDrive,
-    title: "R2 object storage",
-    description:
-      "Private and public buckets, presigned uploads, and snapshot storage for change tracking.",
-    href: "experiments/r2-storage",
-  },
-  {
-    icon: Layers,
-    title: "Durable Objects",
-    description:
-      "Strongly consistent state, WebSockets, alarms, and webhook capture sessions at the edge.",
-    href: "experiments/durable-counter",
-  },
-  {
-    icon: Clock,
-    title: "Cron & Queues",
-    description:
-      "Scheduled handlers, background job processing, retries, and pipeline orchestration.",
-    href: "experiments/cron-heartbeat",
-  },
-] as const;
-
-export const cloudflareBindings = [
-  "AI",
-  "BROWSER",
-  "D1",
-  "KV",
-  "R2",
-  "DO",
-  "QUEUE",
-  "VECTORIZE",
-  "CRON",
-  "CACHE",
-  "EMAIL",
-  "WORKFLOW",
-  "ANALYTICS",
-  "RATE_LIMITER",
-  "LOADER",
-  "FLAGS",
-  "PIPELINE",
-  "SECRETS",
-  "DISPATCHER",
-  "CONTAINER",
-  "STREAM",
-  "ASSETS",
-] as const;
 
 export const homeCategories: HomeCategory[] = [
   {
@@ -247,6 +139,7 @@ export const homeCategories: HomeCategory[] = [
     title: "AI & Machine Learning",
     description: "Workers AI, embeddings, RAG, image generation, and AI Gateway patterns.",
     icon: Sparkles,
+    accent: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
     experiments: [
       {
         slug: "ai-website-summary",
@@ -326,6 +219,36 @@ export const homeCategories: HomeCategory[] = [
         description: "Async batch embeddings with queueRequest",
         status: "new",
       },
+      {
+        slug: "mcp-tools-server",
+        title: "MCP Tools Server",
+        description: "Remote MCP tools for AI clients",
+        status: "new",
+      },
+      {
+        slug: "receipt-parser",
+        title: "Receipt Parser",
+        description: "Receipts to JSON via Workers AI",
+        status: "new",
+      },
+      {
+        slug: "article-to-audio",
+        title: "Article to Audio",
+        description: "Listen to any article as MP3",
+        status: "new",
+      },
+      {
+        slug: "natural-language-calendar",
+        title: "Natural Language Calendar",
+        description: "Plain English to .ics invite",
+        status: "new",
+      },
+      {
+        slug: "newsletter-digest",
+        title: "Newsletter Digest",
+        description: "AI-summarized daily newsletter digest",
+        status: "new",
+      },
     ],
   },
   {
@@ -333,6 +256,7 @@ export const homeCategories: HomeCategory[] = [
     title: "Web Scraping & Parsing",
     description: "Fetch, HTMLRewriter, metadata extraction, and structured page APIs.",
     icon: Code,
+    accent: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
     experiments: [
       {
         slug: "website-metadata-extractor",
@@ -396,6 +320,7 @@ export const homeCategories: HomeCategory[] = [
     title: "Browser Rendering",
     description: "Fully rendered DOM via Puppeteer at the edge.",
     icon: Camera,
+    accent: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
     experiments: [
       { slug: "screenshot-api", title: "Screenshot API", description: "PNG captures of any URL" },
       { slug: "pdf-api", title: "PDF API", description: "Generate PDFs from webpages" },
@@ -419,6 +344,18 @@ export const homeCategories: HomeCategory[] = [
         description: "Markdown + CSS scrape via quickAction",
         status: "new",
       },
+      {
+        slug: "accessibility-auditor",
+        title: "Accessibility Auditor",
+        description: "axe-core WCAG audit + alt text",
+        status: "new",
+      },
+      {
+        slug: "privacy-tracker-scanner",
+        title: "Privacy Tracker Scanner",
+        description: "Pre-consent tracker detection",
+        status: "new",
+      },
     ],
   },
   {
@@ -426,6 +363,7 @@ export const homeCategories: HomeCategory[] = [
     title: "Network & Monitoring",
     description: "Reachability, DNS, TLS, latency, change tracking, and CORS debugging.",
     icon: Activity,
+    accent: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
     experiments: [
       { slug: "is-it-down", title: "Is It Down", description: "Edge reachability checks" },
       {
@@ -495,6 +433,12 @@ export const homeCategories: HomeCategory[] = [
         description: "Origin latency with Smart Placement",
         status: "new",
       },
+      {
+        slug: "domain-expiry-reminder",
+        title: "Domain Expiry Reminder",
+        description: "Domain and TLS expiry email alerts",
+        status: "new",
+      },
     ],
   },
   {
@@ -502,17 +446,30 @@ export const homeCategories: HomeCategory[] = [
     title: "Edge Platform",
     description: "Cache, crypto, auth helpers, feature flags, Realtime, and platform APIs.",
     icon: ShieldCheck,
+    accent: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
     experiments: [
       { slug: "edge-cache", title: "Edge Cache", description: "Workers Cache API HIT/MISS" },
       { slug: "crypto-hash", title: "Crypto Hash", description: "SHA-256/384/512 digests" },
       { slug: "websocket-echo", title: "WebSocket Echo", description: "WebSocketPair echo server" },
       { slug: "image-resizer", title: "Image Resizer", description: "cf.image resizing" },
       {
+        slug: "image-converter",
+        title: "Image Converter",
+        description: "Convert, resize, watermark via Images binding",
+        status: "new",
+      },
+      {
         slug: "turnstile-verify",
         title: "Turnstile Verify",
         description: "Bot challenge verification",
       },
       { slug: "jwt-inspector", title: "JWT Inspector", description: "Decode, verify, issue JWTs" },
+      {
+        slug: "access-jwt-validator",
+        title: "Access JWT Validator",
+        description: "Verify Cloudflare Access JWTs",
+        status: "new",
+      },
       {
         slug: "rate-limiter-demo",
         title: "Rate Limiter Demo",
@@ -559,6 +516,12 @@ export const homeCategories: HomeCategory[] = [
         description: "SPA with ASSETS binding and run_worker_first",
         status: "new",
       },
+      {
+        slug: "static-form-backend",
+        title: "Static Form Backend",
+        description: "Turnstile forms for static sites",
+        status: "new",
+      },
     ],
   },
   {
@@ -566,6 +529,7 @@ export const homeCategories: HomeCategory[] = [
     title: "Compute & Isolation",
     description: "Containers, Sandbox SDK, Dynamic Workers, and Workers for Platforms dispatch.",
     icon: Boxes,
+    accent: "bg-slate-500/10 text-slate-600 dark:text-slate-300",
     experiments: [
       {
         slug: "dynamic-worker-runner",
@@ -598,6 +562,7 @@ export const homeCategories: HomeCategory[] = [
     title: "Storage & Data",
     description: "R2, D1, KV, Vectorize, Hyperdrive, Pipelines, and mock API patterns.",
     icon: HardDrive,
+    accent: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
     experiments: [
       { slug: "r2-storage", title: "R2 Storage", description: "List, get, put, delete objects" },
       { slug: "link-shortener", title: "Link Shortener", description: "D1 primary + KV cache" },
@@ -652,6 +617,7 @@ export const homeCategories: HomeCategory[] = [
     title: "Stateful & Async",
     description: "Durable Objects, Cron, Queues, Workflows, Email, and Analytics Engine.",
     icon: Zap,
+    accent: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
     experiments: [
       {
         slug: "durable-counter",
@@ -711,36 +677,73 @@ export const homeCategories: HomeCategory[] = [
         description: "Send mail via Email Service binding",
         status: "new",
       },
+      {
+        slug: "one-time-secret",
+        title: "One-Time Secret",
+        description: "Self-destructing secret links",
+        status: "new",
+      },
     ],
   },
 ];
 
-export const repoStructure = [
-  { path: "apps/experiments/<name>/", label: "Standalone Worker package" },
-  { path: "src/routes/", label: "Hono route handlers" },
-  { path: "src/lib/", label: "Domain logic" },
-  { path: "test/", label: "Vitest smoke + unit tests" },
-  { path: "wrangler.json", label: "Bindings and config" },
-] as const;
+export type HomeDocLink = {
+  title: string;
+  href: string;
+  description: string;
+  icon: LucideIcon;
+  /** Icon chip classes; full literals so Tailwind can detect them. */
+  accent: string;
+};
 
-export const docLinks = [
-  { title: "Quick Start", href: "quickstart", description: "Install, dev, and deploy" },
-  { title: "Philosophy", href: "philosophy", description: "Why this project exists" },
+export const docLinks: HomeDocLink[] = [
+  {
+    title: "Quick Start",
+    href: "quickstart",
+    description: "Install, run locally, and deploy your first Worker in minutes.",
+    icon: Rocket,
+    accent: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+  },
+  {
+    title: "Philosophy",
+    href: "philosophy",
+    description: "Why experiments stay small, edge-first, and independently deployable.",
+    icon: BookOpen,
+    accent: "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+  },
   {
     title: "Self-Hosted",
     href: "self-hosted",
-    description: "SaaS replacements on your Cloudflare account",
+    description: "SaaS-style tools you run on your own Cloudflare account.",
+    icon: Server,
+    accent: "bg-sky-500/10 text-sky-600 dark:text-sky-400",
   },
-  { title: "Adding Experiments", href: "adding-experiments", description: "Scaffold a new Worker" },
+  {
+    title: "Adding Experiments",
+    href: "adding-experiments",
+    description: "Scaffold a new Worker with the repo layout, tests, and docs checklist.",
+    icon: PlusCircle,
+    accent: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  },
   {
     title: "Code Standards",
     href: "code-standards",
-    description: "TypeScript and API conventions",
+    description: "TypeScript, Hono routes, validation, and JSON error conventions.",
+    icon: FileCode,
+    accent: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
   },
-  { title: "Deployment", href: "reference/deployment", description: "Deploy button and bindings" },
+  {
+    title: "Deployment",
+    href: "reference/deployment",
+    description: "Deploy buttons, bindings, secrets, and Wrangler workflows.",
+    icon: Zap,
+    accent: "bg-rose-500/10 text-rose-600 dark:text-rose-400",
+  },
   {
     title: "Architecture",
     href: "reference/architecture",
-    description: "Monorepo layout patterns",
+    description: "Turborepo layout and how each experiment stays self-contained.",
+    icon: Layers,
+    accent: "bg-slate-500/10 text-slate-600 dark:text-slate-300",
   },
-] as const;
+];

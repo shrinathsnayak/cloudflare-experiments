@@ -1,0 +1,12 @@
+{
+  "name": "one-time-secret",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "durable_objects": {
+    "bindings": [{ "name": "SECRETS", "class_name": "SecretVault" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["SecretVault"] }],
+  "observability": {
+    "logs": { "enabled": true, "invocation_logs": true }
+  }
+}

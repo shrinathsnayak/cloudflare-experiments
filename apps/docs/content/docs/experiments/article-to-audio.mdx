@@ -1,0 +1,253 @@
+---
+title: "Article to Audio"
+description: "Listen to any article: HTMLRewriter extracts the text, Workers AI Deepgram Aura-2 reads it aloud as MP3, and R2 caches the result"
+icon: "Headphones"
+tags:
+  - ai
+  - workers-ai
+  - tts
+bindings:
+  - AI
+  - R2
+status: new
+---
+
+<Callout type="warning">
+
+This is an experimental Worker. Use it as a starting point for your own projects.
+
+</Callout>
+
+A "Listen to this article" endpoint for any URL. The Worker streams the page through [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) to pull out readable text, synthesizes speech with [Workers AI](https://developers.cloudflare.com/workers-ai/) Deepgram Aura-2, and caches the MP3 in [R2](https://developers.cloudflare.com/r2/) so repeat listens are instant.
+
+## Features
+
+- Readable-text extraction with HTMLRewriter: prefers `<article>` / `<main>`, collects `<p>` and `<h1>`–`<h3>`, skips `nav`, `footer`, `aside`, `script`, `style`, `noscript`, `template`, `svg`, `form`
+- Sentence-bounded chunking with `Intl.Segmenter` (up to 6 chunks of ≤1,000 characters)
+- Parallel text-to-speech with `@cf/deepgram/aura-2-en` or `@cf/deepgram/aura-2-es`
+- MP3 cached in R2 under a SHA-256 key of model + language + URL, with an `X-Cache: HIT|MISS` header
+- `/text` debug endpoint shows exactly what will be spoken
+
+## API Reference
+
+### GET /listen
+
+Synthesize an article as MP3. Returns `audio/mpeg`.
+
+<TypeTable
+  type={{
+    url: {
+      description: "Article URL. Must use `http://` or `https://`.",
+      type: "string",
+      required: true,
+    },
+    lang: {
+      description: "`en` (default, `@cf/deepgram/aura-2-en`) or `es` (`@cf/deepgram/aura-2-es`).",
+      type: "string",
+      required: false,
+    },
+  }}
+/>
+
+#### Response headers
+
+- `Content-Type: audio/mpeg`
+- `X-Cache: HIT` (served from R2) or `MISS` (synthesized for this request)
+- `Cache-Control: public, max-age=86400`
+
+#### Example Request
+
+```bash
+curl -o article.mp3 "https://your-worker.workers.dev/listen?url=https://blog.cloudflare.com/markdown-for-agents/"
+```
+
+Embed it directly in a page:
+
+```html
+<audio controls src="https://your-worker.workers.dev/listen?url=https://example.com/post"></audio>
+```
+
+### GET /text
+
+Return the extracted text without synthesizing audio. Same `url` parameter as `/listen`.
+
+#### Example Response
+
+```json
+{
+  "url": "https://blog.cloudflare.com/markdown-for-agents/",
+  "title": "Introducing Markdown for Agents | Cloudflare Blog",
+  "text": "Introducing Markdown for Agents. Celso Martinho and Will Allen ...",
+  "chars": 5433,
+  "chunks": 6,
+  "truncated": true
+}
+```
+
+**`chunks`** is the number of TTS calls `/listen` would make. **`truncated`** is `true` when the article was longer than the 6,000-character cap.
+
+#### Error Responses
+
+```json
+{ "error": "No readable article text found at url", "code": "NO_CONTENT" }
+```
+
+- `400` - `INVALID_URL`, `INVALID_LANG`, `NO_CONTENT` (the URL is not an HTML page)
+- `404` - `NO_CONTENT` (no readable text found)
+- `502` - `FETCH_ERROR` (page fetch failed or returned a non-2xx status), `TTS_ERROR` (speech synthesis failed)
+
+## Implementation Details
+
+<Steps>
+  <Step>
+
+### Check the cache
+
+    `src/lib/cache.ts` hashes `model + lang + url` with Web Crypto SHA-256. If `AUDIO_CACHE` has `audio/<hash>.mp3`, the object body streams straight back with `X-Cache: HIT`, without fetching the page or calling AI.
+
+  </Step>
+
+  <Step>
+
+### Extract readable text
+
+    `src/lib/extract.ts` registers HTMLRewriter handlers that call into `ArticleCollector` (`src/lib/text.ts`). The collector tracks skip and container depth, decodes HTML entities (HTMLRewriter text chunks are raw HTML), and adds a period after headings so speech pauses naturally.
+
+  </Step>
+
+  <Step>
+
+### Chunk on sentence boundaries
+
+    `chunkText` uses `Intl.Segmenter` with `granularity: "sentence"` to pack sentences into chunks of at most 1,000 characters, splitting very long sentences on word boundaries.
+
+  </Step>
+
+  <Step>
+
+### Synthesize and store
+
+    `src/lib/tts.ts` calls Aura-2 with `encoding: "mp3"` for every chunk in parallel. Aura returns raw MP3 frames with no ID3 or Xing header, so the segments are concatenated byte-for-byte. The result is written to R2 with the URL, language, and title as custom metadata.
+
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **Blogs and docs** - Add a "Listen" button that points an `<audio>` tag at `/listen`
+- **Read-later apps** - Turn saved links into a podcast-style queue
+- **Accessibility** - Offer an audio version of long-form content
+- **Commutes** - Generate MP3s of newsletters or articles to listen offline
+
+## Limitations
+
+- **Length cap**: Only the first ~6,000 characters (6 chunks, roughly 6 minutes of audio) are read; `/text` reports `truncated`
+- **Latency**: A cache miss for a full-length article takes roughly 30 seconds; cached responses return in milliseconds
+- **Static HTML only**: JavaScript-rendered pages aren't executed, so client-side apps may yield `NO_CONTENT`
+- **Heuristic extraction**: Pages without `<article>`/`<main>` fall back to every paragraph on the page, which may include boilerplate
+- **Languages**: Aura-2 on Workers AI supports English and Spanish
+- **No cache invalidation**: Edited articles keep their old audio until the R2 object is deleted
+
+## Use in your project
+
+<UseInYourProject
+  experiment="article-to-audio"
+  bindings={["Workers AI (AI binding)", "R2 bucket (AUDIO_CACHE)"]}
+  platform={["HTMLRewriter", "Workers AI", "R2", "Web Crypto", "Intl.Segmenter"]}
+  files={[
+    "src/lib/extract.ts",
+    "src/lib/text.ts",
+    "src/lib/tts.ts",
+    "src/lib/cache.ts",
+    "src/constants/defaults.ts",
+    "src/types/article.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/article-to-audio)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    The deploy flow provisions the `article-to-audio-cache` R2 bucket and the `AI` binding from `wrangler.json`. For a manual deploy, create the bucket first:
+
+    ```bash
+    npx wrangler r2 bucket create article-to-audio-cache
+    npx wrangler deploy
+    ```
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -sD - -o article.mp3 "https://your-worker.workers.dev/listen?url=https://blog.cloudflare.com/markdown-for-agents/"
+    ```
+
+    Run it twice: the second response has `X-Cache: HIT`.
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/article-to-audio
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/text?url=https://blog.cloudflare.com/markdown-for-agents/"
+curl -o article.mp3 "http://localhost:8787/listen?url=https://blog.cloudflare.com/markdown-for-agents/"
+```
+
+R2 is simulated locally. The `AI` binding always runs remotely, so you need a logged-in Wrangler session.
+
+## Configuration
+
+```json
+{
+  "ai": { "binding": "AI" },
+  "r2_buckets": [{ "binding": "AUDIO_CACHE", "bucket_name": "article-to-audio-cache" }]
+}
+```
+
+Tune `CHUNK_CHARS`, `MAX_CHUNKS`, `TTS_MODELS`, and the HTMLRewriter selectors in `src/constants/defaults.ts`.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/)** - Streaming HTML parsing for text extraction
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/models/aura-2-en/)** - Deepgram Aura-2 text-to-speech
+- **[R2](https://developers.cloudflare.com/r2/)** - Cache for generated MP3 files
+
+## Next Steps
+
+<Cards>
+  <Card title="Speech to Text Transcriber" href="/experiments/speech-to-text-transcriber">
+    The reverse direction: audio to text with Whisper
+  </Card>
+  <Card title="R2 Storage" href="/experiments/r2-storage">
+    More on R2 bucket bindings
+  </Card>
+  <Card
+    title="GitHub Repository"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/article-to-audio"
+  >
+    View the complete source code
+  </Card>
+</Cards>

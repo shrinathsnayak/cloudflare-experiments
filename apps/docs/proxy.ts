@@ -7,7 +7,7 @@ const { rewrite: rewriteLLM } = rewritePath(
   `${docsContentRoute}{/*path}/content.md`
 );
 
-/** Only negotiate markdown on docs routes — keep sitemap/robots off the proxy path. */
+/** Only negotiate markdown on docs routes - keep sitemap/robots off the proxy path. */
 export const config = {
   matcher: ["/docs", "/docs/:path*"],
 };

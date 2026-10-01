@@ -10,7 +10,7 @@ bindings: []
 status: new
 ---
 
-Query **Apache Iceberg** tables managed by R2 Data Catalog using the **R2 SQL HTTP API**. There is no Workers binding — this experiment uses account secrets and `fetch`. Without credentials it returns sample rows with `mode: "demo"`.
+Query **Apache Iceberg** tables managed by R2 Data Catalog using the **R2 SQL HTTP API**. There is no Workers binding - this experiment uses account secrets and `fetch`. Without credentials it returns sample rows with `mode: "demo"`.
 
 ## Features
 
@@ -78,7 +78,7 @@ Same behavior with a JSON body:
 
 - Requires account ID + R2 SQL API token for live queries
 - Only `SELECT` and `SHOW` are allowed
-- No Workers binding — uses the HTTP API
+- No Workers binding - uses the HTTP API
 - Demo mode returns sample rows, not real catalog data
 
 ## Use in your project
@@ -147,7 +147,7 @@ Without secrets, responses use `mode: "demo"`.
 ## Configuration
 
 - **Secrets** `CLOUDFLARE_ACCOUNT_ID`, `R2_SQL_AUTH_TOKEN`
-- **Var** `WAREHOUSE` (or `R2_BUCKET_NAME`) — default `demo-warehouse`
+- **Var** `WAREHOUSE` (or `R2_BUCKET_NAME`) - default `demo-warehouse`
 
 ## Cloudflare Features Used
 

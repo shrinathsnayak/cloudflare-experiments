@@ -242,7 +242,8 @@ export function groupSelfHostedEntries(catalog: SelfHostedCatalog): SelfHostedGr
 }
 
 export function getSelfHostedCategoryToc(catalog: SelfHostedCatalog): TOCItemType[] {
-  return catalog.categories.map((category) => ({
+  // Only categories that render on the page (have at least one entry).
+  return groupSelfHostedEntries(catalog).map(({ category }) => ({
     title: category.name,
     url: `#${category.id}`,
     depth: 2,

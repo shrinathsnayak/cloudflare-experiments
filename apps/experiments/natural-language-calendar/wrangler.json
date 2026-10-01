@@ -1,0 +1,9 @@
+{
+  "name": "natural-language-calendar",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "ai": { "binding": "AI" },
+  "observability": {
+    "logs": { "enabled": true, "invocation_logs": true }
+  }
+}

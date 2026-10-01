@@ -10,12 +10,13 @@ function separatorLabel(name: PageTree.Separator["name"]): string {
 }
 
 /**
- * Convert experiment category separators into collapsible folders.
- * Contributing / Reference stay as flat separators with their pages below.
+ * Convert experiment category separators into collapsible folders under a single
+ * "Experiments" heading. Contributing / Reference stay as flat separators with their pages below.
  */
 export function groupSeparatorsIntoFolders(tree: PageTree.Root): PageTree.Root {
   const children: PageTree.Node[] = [];
   let currentFolder: PageTree.Folder | null = null;
+  let hasExperimentsHeading = false;
 
   const flush = () => {
     if (currentFolder) {
@@ -31,6 +32,11 @@ export function groupSeparatorsIntoFolders(tree: PageTree.Root): PageTree.Root {
       if (FLAT_SEPARATORS.has(separatorLabel(node.name))) {
         children.push(node);
         continue;
+      }
+
+      if (!hasExperimentsHeading) {
+        children.push({ type: "separator", name: "Experiments" });
+        hasExperimentsHeading = true;
       }
 
       currentFolder = {

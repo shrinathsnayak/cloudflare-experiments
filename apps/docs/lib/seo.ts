@@ -1,14 +1,18 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { getExperimentCount } from "@/lib/catalog.server";
 import { siteIcons } from "@/lib/logo";
 import { getPageImage, getPageMarkdownUrl, type source } from "@/lib/source";
 import {
-  appDescription,
   appName,
+  docsRoute,
   gitConfig,
   githubProfileUrl,
   githubRepoUrl,
+  siteDescription,
   siteKeywords,
+  siteTitle,
   siteUrl,
+  themeColor,
 } from "@/lib/shared";
 
 type DocsPage = ReturnType<(typeof source)["getPage"]>;
@@ -25,16 +29,26 @@ export function getMetadataBase(): URL {
   return new URL(siteUrl);
 }
 
+export const rootViewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: themeColor.light },
+    { media: "(prefers-color-scheme: dark)", color: themeColor.dark },
+  ],
+};
+
 export function createRootMetadata(): Metadata {
   const ogImage = "/opengraph-image";
+  const experimentCount = getExperimentCount();
+  const title = siteTitle(experimentCount);
+  const description = siteDescription(experimentCount);
 
   return {
     metadataBase: getMetadataBase(),
     title: {
-      default: appName,
+      default: title,
       template: `%s | ${appName}`,
     },
-    description: appDescription,
+    description,
     keywords: siteKeywords,
     authors: [{ name: gitConfig.user, url: githubProfileUrl }],
     creator: gitConfig.user,
@@ -58,8 +72,8 @@ export function createRootMetadata(): Metadata {
       },
     },
     openGraph: {
-      title: appName,
-      description: appDescription,
+      title,
+      description,
       siteName: appName,
       type: "website",
       locale: "en_US",
@@ -69,18 +83,19 @@ export function createRootMetadata(): Metadata {
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: appName,
+          alt: title,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: appName,
-      description: appDescription,
+      title,
+      description,
       images: [ogImage],
     },
     icons: {
       icon: [
+        { url: siteIcons.faviconIco, sizes: "16x16 32x32 48x48" },
         { url: siteIcons.favicon192, sizes: "192x192", type: "image/png" },
         { url: siteIcons.favicon256, sizes: "256x256", type: "image/png" },
         { url: siteIcons.favicon128, sizes: "128x128", type: "image/png" },
@@ -139,7 +154,7 @@ export function createWebsiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: appName,
-    description: appDescription,
+    description: siteDescription(getExperimentCount()),
     url: siteUrl,
     inLanguage: "en-US",
     publisher: {
@@ -192,5 +207,24 @@ export function createDocsPageJsonLd(page: NonNullable<DocsPage>) {
       codeRepository: githubRepoUrl,
       programmingLanguage: "TypeScript",
     },
+  };
+}
+
+export function createDocsBreadcrumbJsonLd(page: NonNullable<DocsPage>) {
+  const crumbs = [
+    { name: appName, url: siteUrl },
+    { name: "Docs", url: absoluteUrl(docsRoute) },
+  ];
+  if (page.slugs.length > 0) crumbs.push({ name: page.data.title, url: absoluteUrl(page.url) });
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: crumb.name,
+      item: crumb.url,
+    })),
   };
 }

@@ -1,0 +1,262 @@
+---
+title: "MCP Tools Server"
+description: "Remote MCP server on Workers with the Agents SDK McpAgent, exposing DNS, HTTP headers, uptime, and hashing tools to AI clients"
+icon: "Wrench"
+tags:
+  - ai
+  - mcp
+  - durable-objects
+bindings:
+  - DO
+status: new
+---
+
+A remote **Model Context Protocol (MCP)** server built with the Agents SDK `McpAgent`. Each MCP session runs in its own SQLite-backed **Durable Object**, and clients such as Cursor, Claude Desktop, or the MCP Inspector connect over **Streamable HTTP** at `/mcp`.
+
+## Features
+
+- **`dns_lookup`** - Resolve `A`, `AAAA`, `MX`, `TXT`, `NS`, or `CNAME` records through Cloudflare DNS-over-HTTPS (1.1.1.1)
+- **`http_headers`** - Fetch a URL from the edge and return status, final URL, and response headers
+- **`is_it_up`** - Reachability check with latency in milliseconds
+- **`hash_text`** - SHA-256 / SHA-384 / SHA-512 digests via Web Crypto
+- **Ready-made client config** - `GET /` returns your endpoint URL and a paste-ready `mcp.json` snippet
+
+## API Reference
+
+### GET /
+
+Returns app info, the MCP endpoint for the current host, the tool list, and an `mcp.json` snippet.
+
+#### Example Request
+
+```bash
+curl "https://mcp-tools-server.your-subdomain.workers.dev/"
+```
+
+#### Success Response
+
+```json
+{
+  "name": "mcp-tools-server",
+  "description": "Remote MCP server exposing DNS, HTTP, uptime, and hashing tools",
+  "usage": {
+    "mcp": "POST /mcp (Streamable HTTP)",
+    "inspector": "npx @modelcontextprotocol/inspector, then connect to https://mcp-tools-server.your-subdomain.workers.dev/mcp"
+  },
+  "mcpEndpoint": "https://mcp-tools-server.your-subdomain.workers.dev/mcp",
+  "tools": ["dns_lookup", "http_headers", "is_it_up", "hash_text"],
+  "mcpConfig": {
+    "mcpServers": {
+      "mcp-tools-server": {
+        "command": "npx",
+        "args": ["mcp-remote", "https://mcp-tools-server.your-subdomain.workers.dev/mcp"]
+      }
+    }
+  },
+  "cloudflareFeatures": ["Agents SDK (McpAgent)", "Durable Objects"]
+}
+```
+
+#### Error Codes
+
+- `404` - Unknown path (`NOT_FOUND`)
+
+### POST /mcp
+
+The MCP Streamable HTTP endpoint, served by `ToolsMcp.serve("/mcp", { binding: "MCP_OBJECT" })`. Send JSON-RPC messages with an MCP client rather than by hand. The first `initialize` request creates a session, and the `mcp-session-id` response header routes later requests to the same Durable Object.
+
+### Tools
+
+Each tool returns one `text` content block containing JSON. On failure the result has `isError: true` and the text is `{ "error": string, "code": string }`.
+
+#### dns_lookup
+
+**`hostname`** `string` (required)
+
+Hostname such as `cloudflare.com`. An `http(s)` URL is also accepted, and its hostname is used.
+
+**`type`** `"A" | "AAAA" | "MX" | "TXT" | "NS" | "CNAME"` (optional, default `A`)
+
+```json
+{
+  "name": "cloudflare.com",
+  "type": "A",
+  "status": 0,
+  "answers": [{ "name": "cloudflare.com", "type": 1, "ttl": 300, "data": "104.16.132.229" }]
+}
+```
+
+Errors: `INVALID_HOSTNAME`, `DNS_ERROR`.
+
+#### http_headers
+
+**`url`** `string` (required) - http or https only.
+
+```json
+{
+  "url": "https://www.cloudflare.com/",
+  "finalUrl": "https://www.cloudflare.com/",
+  "status": 200,
+  "statusText": "OK",
+  "headers": { "content-type": "text/html; charset=utf-8", "server": "cloudflare" }
+}
+```
+
+Errors: `INVALID_URL`, `FETCH_ERROR`.
+
+#### is_it_up
+
+**`url`** `string` (required) - http or https only.
+
+```json
+{ "url": "https://www.cloudflare.com/", "up": true, "status": 200, "latencyMs": 84 }
+```
+
+When the request fails, `up` is `false`, `status` is `null`, and an `error` message is included. Errors: `INVALID_URL`.
+
+#### hash_text
+
+**`text`** `string` (required) - Up to 100,000 characters.
+
+**`algorithm`** `"SHA-256" | "SHA-384" | "SHA-512"` (optional, default `SHA-256`)
+
+```json
+{
+  "algorithm": "SHA-256",
+  "hex": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+}
+```
+
+## Connecting clients
+
+### Cursor and Claude Desktop
+
+Both can use [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) to bridge a local stdio client to a remote server. Add this to `~/.cursor/mcp.json` (Cursor) or `claude_desktop_config.json` (Claude Desktop), then restart the client:
+
+```json
+{
+  "mcpServers": {
+    "mcp-tools-server": {
+      "command": "npx",
+      "args": ["mcp-remote", "https://mcp-tools-server.your-subdomain.workers.dev/mcp"]
+    }
+  }
+}
+```
+
+You can copy the same snippet, filled in with your hostname, from `GET /`. Clients that support remote Streamable HTTP servers natively can use the `/mcp` URL directly.
+
+### MCP Inspector
+
+```bash
+npx @modelcontextprotocol/inspector
+```
+
+In the Inspector UI, choose **Streamable HTTP** as the transport, enter `https://<your-worker>/mcp` (or `http://localhost:8787/mcp` locally), click **Connect**, and then open **Tools → List Tools** to call each tool interactively.
+
+## Implementation Details
+
+- `src/mcp-agent.ts` - `ToolsMcp extends McpAgent` creates an SDK `McpServer` and calls `registerTools()` in `init()`
+- `src/lib/tools.ts` - Registers the four tools with Zod input schemas and read-only annotations
+- `src/lib/dns.ts`, `src/lib/http.ts`, `src/lib/hash.ts` - Plain functions with no MCP dependency, unit-tested with a mocked `fetch`
+- `src/index.ts` - Sends `/mcp` to the `McpAgent` handler and everything else to Hono
+
+<Callout type="info">
+  Cloudflare now recommends the stateless `createMcpHandler` (MCP SDK v2) for new servers, and
+  `McpAgent` is feature-frozen. This experiment uses `McpAgent` to show the Durable Object–backed
+  session model. Because the tools live in `src/lib/tools.ts`, you can move them to a stateless
+  handler later.
+</Callout>
+
+## Use Cases
+
+- Give Cursor or Claude network-debugging tools that run from Cloudflare's edge rather than your laptop
+- Learn the `McpAgent` + Durable Object session model before building stateful MCP tools
+- Use as a starting point for an internal MCP server (add your own tools in `src/lib/tools.ts`)
+- Test MCP clients and the Inspector against a real remote server
+
+## Limitations
+
+- **No authentication**: anyone with the URL can call the tools. Add OAuth (Workers OAuth Provider) or put the Worker behind Cloudflare Access before exposing internal tools
+- `http_headers` and `is_it_up` follow redirects and time out after 10 seconds
+- Each MCP session creates a Durable Object; idle sessions hibernate but still count toward storage
+- `McpAgent` is deprecated in favor of stateless `createMcpHandler`; see the callout above
+
+## Use in your project
+
+<UseInYourProject
+  experiment="mcp-tools-server"
+  dependencies={["agents", "@modelcontextprotocol/sdk", "zod"]}
+  bindings={["Durable Objects (MCP_OBJECT, new_sqlite_classes)"]}
+  platform={["Agents SDK McpAgent", "Web Crypto (`crypto.subtle`)", "nodejs_compat"]}
+  files={[
+    "src/lib/tools.ts",
+    "src/lib/dns.ts",
+    "src/lib/http.ts",
+    "src/lib/hash.ts",
+    "src/lib/url.ts",
+    "src/utils/mcp.ts",
+    "src/constants/defaults.ts",
+    "src/types/tools.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/mcp-tools-server)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    `wrangler.json` already declares the `MCP_OBJECT` Durable Object binding, the `new_sqlite_classes` migration for `ToolsMcp`, and the `nodejs_compat` flag.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://mcp-tools-server.your-subdomain.workers.dev/"
+    npx @modelcontextprotocol/inspector
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/mcp-tools-server
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/"
+# MCP endpoint for clients and the Inspector: http://localhost:8787/mcp
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Durable Object binding** `MCP_OBJECT` → class `ToolsMcp` (the default binding name `McpAgent.serve()` looks for)
+- **Migration** `v1` with `new_sqlite_classes: ["ToolsMcp"]`
+- **Compatibility flag** `nodejs_compat` (required by the Agents SDK)
+
+## Cloudflare Features Used
+
+- **[Agents SDK - MCP](https://developers.cloudflare.com/agents/model-context-protocol/)** - `McpAgent` and Streamable HTTP transport
+- **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** - One SQLite-backed instance per MCP session
+- **[DNS over HTTPS](https://developers.cloudflare.com/1.1.1.1/encryption/dns-over-https/make-api-requests/dns-json/)** - JSON API used by `dns_lookup`
+- **[Web Crypto](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)** - `crypto.subtle.digest` for `hash_text`

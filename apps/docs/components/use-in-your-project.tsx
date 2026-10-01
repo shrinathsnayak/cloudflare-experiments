@@ -19,7 +19,7 @@ export type UseInYourProjectProps = {
   dependencies?: string[];
   bindings?: string[];
   platform?: string[];
-  /** Paths under the experiment root — loaded from disk at build time */
+  /** Paths under the experiment root - loaded from disk at build time */
   files: string[];
   installCommand?: string;
   className?: string;
