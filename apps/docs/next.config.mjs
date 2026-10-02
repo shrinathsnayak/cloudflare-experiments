@@ -1,7 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createMDX } from "fumadocs-mdx/next";
-import { DOCS_CACHE_CONTROL, SECURITY_HEADERS } from "./lib/security-headers.mjs";
 
 const withMDX = createMDX();
 const monorepoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -39,22 +38,6 @@ const config = {
         pathname: "/button",
       },
     ],
-  },
-  async headers() {
-    return [
-      {
-        source: "/docs/:path*",
-        headers: [...SECURITY_HEADERS, { key: "Cache-Control", value: DOCS_CACHE_CONTROL }],
-      },
-      {
-        source: "/api/:path*",
-        headers: [...SECURITY_HEADERS],
-      },
-      {
-        source: "/:path*",
-        headers: [...SECURITY_HEADERS],
-      },
-    ];
   },
   async redirects() {
     return [
