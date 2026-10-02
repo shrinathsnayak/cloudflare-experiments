@@ -35,7 +35,16 @@ export type SelfHostedGroup = {
 
 const REPO = "theoephraim/awesome-cloudflare-selfhosted";
 const SOURCE = `https://github.com/${REPO}`;
-const TARBALL = `https://codeload.github.com/${REPO}/tar.gz/refs/heads/main`;
+/**
+ * Branch or commit SHA. Prefer a commit SHA in production when you want a
+ * pinned supply-chain snapshot; `main` tracks upstream.
+ */
+const SELF_HOSTED_REF = "main";
+const TARBALL = `https://codeload.github.com/${REPO}/tar.gz/${/^[0-9a-f]{40}$/i.test(SELF_HOSTED_REF) ? SELF_HOSTED_REF : `refs/heads/${SELF_HOSTED_REF}`
+  }`;
+const FETCH_TIMEOUT_MS = 15_000;
+const MAX_TARBALL_BYTES = 8 * 1024 * 1024;
+const GITHUB_REPO_RE = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 const textDecoder = new TextDecoder();
 
 function parseFrontmatter(text: string): Record<string, unknown> {
@@ -165,6 +174,10 @@ function buildCatalog(files: Map<string, string>): SelfHostedCatalog {
     }
 
     if (path.startsWith("data/entries/")) {
+      const repo = String(fm.repo ?? "");
+      // Skip entries with non-GitHub owner/repo shapes (avoids odd link targets).
+      if (!GITHUB_REPO_RE.test(repo)) continue;
+
       const bindings = Array.isArray(fm.bindings)
         ? fm.bindings.map(String)
         : typeof fm.bindings === "string"
@@ -174,7 +187,7 @@ function buildCatalog(files: Map<string, string>): SelfHostedCatalog {
       entries.push({
         id,
         name: String(fm.name ?? id),
-        repo: String(fm.repo ?? ""),
+        repo,
         category: String(fm.category ?? ""),
         license: String(fm.license ?? ""),
         licenseNote: typeof fm.license_note === "string" ? fm.license_note : undefined,
@@ -207,12 +220,23 @@ export async function getSelfHostedCatalog(): Promise<SelfHostedCatalog> {
 
   const response = await fetch(TARBALL, {
     headers: { Accept: "application/gzip" },
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
   if (!response.ok) {
     throw new Error(`Failed to fetch self-hosted catalog (${response.status})`);
   }
 
-  const files = await extractMarkdownFromTarGz(await response.arrayBuffer());
+  const contentLength = Number(response.headers.get("content-length") ?? 0);
+  if (contentLength > MAX_TARBALL_BYTES) {
+    throw new Error(`Self-hosted catalog tarball too large (${contentLength} bytes)`);
+  }
+
+  const buffer = await response.arrayBuffer();
+  if (buffer.byteLength > MAX_TARBALL_BYTES) {
+    throw new Error(`Self-hosted catalog tarball too large (${buffer.byteLength} bytes)`);
+  }
+
+  const files = await extractMarkdownFromTarGz(buffer);
   return buildCatalog(files);
 }
 
@@ -241,7 +265,7 @@ export function groupSelfHostedEntries(catalog: SelfHostedCatalog): SelfHostedGr
   return groups;
 }
 
-export function getSelfHostedCategoryToc(catalog: SelfHostedCatalog): TOCItemType[] {
+function getSelfHostedCategoryToc(catalog: SelfHostedCatalog): TOCItemType[] {
   // Only categories that render on the page (have at least one entry).
   return groupSelfHostedEntries(catalog).map(({ category }) => ({
     title: category.name,
