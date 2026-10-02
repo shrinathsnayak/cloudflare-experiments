@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite build && vite preview",
-    "deploy": "vite build && wrangler deploy",
+    "build": "rm -rf dist && vite build",
+    "preview": "npm run build && vite preview",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:version": "npm run build && wrangler versions upload",
     "postinstall": "fumadocs-mdx && node scripts/generate-logo-data.mjs"
   },
   "dependencies": {

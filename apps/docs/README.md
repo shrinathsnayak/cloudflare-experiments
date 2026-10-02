@@ -22,13 +22,32 @@ Open [http://localhost:5173](http://localhost:5173) (Vite dev server).
 The site builds with [vinext](https://github.com/cloudflare/vinext) and deploys as the `cloudflare-experiments-docs` Worker (`wrangler.jsonc`).
 
 ```bash
-npm run build     # production build
+npm run build     # production build (clears dist first)
 npm run preview   # build + run in workerd locally
 npm run deploy    # build + wrangler deploy
+npm run deploy:version  # build + wrangler versions upload (preview URL first)
 ```
+
+### Local
 
 - `NEXT_PUBLIC_*` values are inlined at build time from `.env.local` (see `.env.example`).
 - Workers have no filesystem: anything read from disk must happen at build time (e.g. `<UseInYourProject>` sources are inlined by `lib/remark-experiment-source.ts`; the OG logo is generated into `lib/generated/` on postinstall).
+
+### Cloudflare Workers Builds (CI)
+
+Configure the Worker under **Settings → Builds**:
+
+| Setting         | Suggested value                                                                         |
+| --------------- | --------------------------------------------------------------------------------------- |
+| Root directory  | `apps/docs`                                                                             |
+| Build command   | `cd ../.. && npm ci && cd apps/docs && npm run build` (monorepo install from repo root) |
+| Deploy command  | `npx wrangler deploy`                                                                   |
+| Build variables | `NEXT_PUBLIC_TRAKS_SITE` = your Traks site key (`pb_live_…`)                            |
+
+Without `NEXT_PUBLIC_TRAKS_SITE` as a **build** variable, production HTML used to 500 (`next-traks: site is required`) while `/api/*` still worked. The layout now skips Traks when the key is missing, but analytics will stay off until the build var is set.
+
+Optional: `NEXT_PUBLIC_SITE_URL=https://cloudflare-experiments.com` for absolute OG/canonical URLs.
+
 - Analytics: `TraksProvider` loads `/t.js` and posts to `/api/event`. Proxy those paths to the Traks collector on the site Worker (or zone routes) — not in the Next app. Same-account `workers.dev` fetches fail with error 1042; use a service binding or the collector’s public URL from a different account/path as needed.
 - **Security headers**: `X-Content-Type-Options`, `X-Frame-Options`, CSP, HSTS, and related headers live in `lib/security-headers.mjs` and are applied via `proxy.ts` / route handlers (`lib/security-headers.ts`). Do **not** put them in `next.config.mjs` `headers()` — that path has taken Workers page renders offline with vinext + `cacheComponents`.
 - **API rate limits**: `/api/search` and `/api/mcp` use the Workers `API_RATE_LIMITER` binding (60 req / 60s per IP+bucket). See `wrangler.jsonc`.

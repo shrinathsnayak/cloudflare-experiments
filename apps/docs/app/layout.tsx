@@ -11,18 +11,31 @@ export const viewport = rootViewport;
 /** First-party path; proxied to the Traks collector by the site Worker (not Next routes). */
 const traksScriptPath = "/t.js";
 
+/** Inlined at build time — must be set in Workers Builds vars (CI has no `.env.local`). */
+const traksSite = process.env.NEXT_PUBLIC_TRAKS_SITE?.trim();
+
 export default function Layout({ children }: LayoutProps<"/">) {
+  const body = (
+    <>
+      <JsonLd data={createWebsiteJsonLd()} />
+      <DocsRootProvider>{children}</DocsRootProvider>
+    </>
+  );
+
   return (
     <html lang="en" className={fontVariables} suppressHydrationWarning>
       <body className={`${uiFont.className} flex flex-col min-h-screen`}>
-        <TraksProvider
-          enabled={process.env.NODE_ENV === "production"}
-          site={process.env.NEXT_PUBLIC_TRAKS_SITE!}
-          src={traksScriptPath}
-        >
-          <JsonLd data={createWebsiteJsonLd()} />
-          <DocsRootProvider>{children}</DocsRootProvider>
-        </TraksProvider>
+        {traksSite ? (
+          <TraksProvider
+            enabled={process.env.NODE_ENV === "production"}
+            site={traksSite}
+            src={traksScriptPath}
+          >
+            {body}
+          </TraksProvider>
+        ) : (
+          body
+        )}
       </body>
     </html>
   );
