@@ -15,14 +15,21 @@ npm run dev -- --filter=docs
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) for the introduction page.
+Open [http://localhost:5173](http://localhost:5173) (Vite dev server).
 
-## Build
+## Build & deploy
+
+The site builds with [vinext](https://github.com/cloudflare/vinext) and deploys as the `cloudflare-experiments-docs` Worker (`wrangler.jsonc`).
 
 ```bash
-npm run build
-npm start
+npm run build     # production build
+npm run preview   # build + run in workerd locally
+npm run deploy    # build + wrangler deploy
 ```
+
+- `NEXT_PUBLIC_*` values are inlined at build time from `.env.local` (see `.env.example`).
+- Workers have no filesystem: anything read from disk must happen at build time (e.g. `<UseInYourProject>` sources are inlined by `lib/remark-experiment-source.ts`; the OG logo is generated into `lib/generated/` on postinstall).
+- Analytics: `TraksProvider` loads `/t.js` and posts to `/api/event`. Proxy those paths to the Traks collector on the site Worker (or zone routes) — not in the Next app. Same-account `workers.dev` fetches fail with error 1042; use a service binding or the collector’s public URL from a different account/path as needed.
 
 ## Content
 
@@ -34,47 +41,3 @@ npm start
 ## URL redirects
 
 Legacy `/docs/*` and `/introduction` paths redirect to the root URL structure via `next.config.mjs`.
-
-## IndexNow
-
-Search engines (Bing, Yandex, Naver, and others) are notified of URL changes via [IndexNow](https://www.indexnow.org/).
-
-Env vars (see `.env.example`):
-
-| Variable                  | Where                            | Purpose                                                       |
-| ------------------------- | -------------------------------- | ------------------------------------------------------------- |
-| `INDEXNOW_KEY`            | Vercel Production + `.env.local` | Ownership key served at `/{INDEXNOW_KEY}.txt` (Bing Option 1) |
-| `INDEXNOW_WEBHOOK_SECRET` | Vercel Production + `.env.local` | Auth for `POST /api/indexnow` (Vercel webhook HMAC + Bearer)  |
-
-### Automatic (recommended): Vercel webhook
-
-After merge → production deploy succeeds, Vercel calls your own API - no GitHub Actions.
-
-1. Deploy with `INDEXNOW_KEY` and `INDEXNOW_WEBHOOK_SECRET` set in Vercel
-2. Vercel → **Settings → Webhooks** (team or project) → create webhook:
-   - URL: `https://cloudflare-experiments.com/api/indexnow`
-   - Events: **Deployment Succeeded**
-   - Secret: same value as `INDEXNOW_WEBHOOK_SECRET`
-3. The route ignores preview deploys; it only submits when `target === "production"` (and `main` when commit ref is present)
-
-### Manual trigger
-
-```bash
-curl -X POST https://cloudflare-experiments.com/api/indexnow \
-  -H "Authorization: Bearer $INDEXNOW_WEBHOOK_SECRET" \
-  -H "Content-Type: application/json"
-```
-
-Optional body to submit specific URLs only:
-
-```bash
-curl -X POST https://cloudflare-experiments.com/api/indexnow \
-  -H "Authorization: Bearer $INDEXNOW_WEBHOOK_SECRET" \
-  -H "Content-Type: application/json" \
-  -d '{"urls":["https://cloudflare-experiments.com/docs/experiments/static-assets-spa"]}'
-```
-
-Success: `{ "ok": true, "submitted": N, "statuses": [200|202] }`.  
-Upstream IndexNow failures return **422** with `{ "error": "...", "code": "INDEXNOW_ERROR" }` (not 502 - edge proxies often rewrite origin 502 bodies).
-
-If IndexNow returns `UserForbiddedToAccessSite` (403), the key file is missing or Bing cannot verify the host. Confirm `https://cloudflare-experiments.com/$INDEXNOW_KEY.txt` returns only the key, then verify the site in [Bing Webmaster Tools](https://www.bing.com/webmasters) (DNS or XML file - avoid “import from Google” alone).

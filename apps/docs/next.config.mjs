@@ -1,8 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createMDX } from "fumadocs-mdx/next";
-import { withTraksProxy } from "next-traks/proxy";
-
 const withMDX = createMDX();
 const monorepoRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
@@ -58,6 +56,4 @@ const config = {
   },
 };
 
-export default withTraksProxy({
-  src: "https://traks-collect.abhijeetnayak99.workers.dev/t.js",
-})(withMDX(config));
+export default withMDX(config);

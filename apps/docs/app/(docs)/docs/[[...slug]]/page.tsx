@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { ExperimentTryBlock } from "@/components/experiment-try-block";
 import { JsonLd } from "@/components/json-ld";
 import { getMDXComponents } from "@/components/mdx";
 import { SelfHostedDocsPage } from "@/components/self-hosted-docs-page";
@@ -31,8 +30,6 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const githubUrl = githubDocsBlobUrl(page.path);
   const isSelfHosted = page.slugs.length === 1 && page.slugs[0] === "self-hosted";
   const isChangelog = page.slugs.length === 1 && page.slugs[0] === "changelog";
-  const experimentSlug =
-    page.slugs.length === 2 && page.slugs[0] === "experiments" ? page.slugs[1] : null;
   const jsonLd = [createDocsPageJsonLd(page), createDocsBreadcrumbJsonLd(page)];
 
   // Cheap sync branch before any self-hosted catalog work (async-cheap-condition-before-await).
@@ -71,7 +68,6 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
             <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubUrl} />
           </div>
         ) : null}
-        {experimentSlug ? <ExperimentTryBlock slug={experimentSlug} /> : null}
         <DocsBody>
           <MDX
             components={getMDXComponents({

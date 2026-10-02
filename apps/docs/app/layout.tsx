@@ -8,6 +8,9 @@ import { createRootMetadata, createWebsiteJsonLd, rootViewport } from "@/lib/seo
 export const metadata = createRootMetadata();
 export const viewport = rootViewport;
 
+/** First-party path; proxied to the Traks collector by the site Worker (not Next routes). */
+const traksScriptPath = "/t.js";
+
 export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={fontVariables} suppressHydrationWarning>
@@ -15,6 +18,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
         <TraksProvider
           enabled={process.env.NODE_ENV === "production"}
           site={process.env.NEXT_PUBLIC_TRAKS_SITE!}
+          src={traksScriptPath}
         >
           <JsonLd data={createWebsiteJsonLd()} />
           <DocsRootProvider>{children}</DocsRootProvider>

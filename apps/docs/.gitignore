@@ -3,6 +3,14 @@
 
 # generated content
 .source
+/lib/generated/
+
+# vinext / wrangler
+/dist/
+.vinext/
+.wrangler/
+.dev.vars*
+!.dev.vars.example
 
 # test & build
 /coverage
@@ -22,5 +30,4 @@ yarn-error.log*
 
 # others
 .env*.local
-.vercel
 next-env.d.ts
