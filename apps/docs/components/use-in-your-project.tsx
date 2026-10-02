@@ -1,5 +1,5 @@
 import { cn } from "@/lib/cn";
-import { readExperimentSource } from "@/lib/experiment-source";
+import type { ExperimentSourceFile } from "@/lib/experiment-source";
 import {
   CodeBlockTab,
   CodeBlockTabs,
@@ -19,8 +19,10 @@ export type UseInYourProjectProps = {
   dependencies?: string[];
   bindings?: string[];
   platform?: string[];
-  /** Paths under the experiment root — loaded from disk at build time */
+  /** Paths under the experiment root - inlined at MDX compile time as `sources` */
   files: string[];
+  /** Injected by `remarkExperimentSource`; do not set in MDX */
+  sources?: ExperimentSourceFile[];
   installCommand?: string;
   className?: string;
   children?: ReactNode;
@@ -43,16 +45,15 @@ export async function UseInYourProject({
   dependencies = [],
   bindings = [],
   platform = [],
-  files,
+  sources: tabs = [],
   installCommand,
   className,
   children,
 }: UseInYourProjectProps) {
-  if (files.length === 0) {
-    throw new Error(`UseInYourProject(${experiment}): provide at least one file path`);
+  if (tabs.length === 0) {
+    throw new Error(`UseInYourProject(${experiment}): no sources inlined - check \`files\``);
   }
 
-  const tabs = files.map((f) => readExperimentSource(experiment, f));
   const install =
     installCommand ?? (dependencies.length ? `npm install ${dependencies.join(" ")}` : undefined);
 

@@ -1,0 +1,35 @@
+{
+  "name": "newsletter-digest",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "triggers": {
+    "crons": ["0 7 * * *"]
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "newsletter-digest-db",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "EMAIL"
+    }
+  ],
+  "vars": {
+    "DIGEST_FROM": "digest@example.com",
+    "DIGEST_TO": "you@example.com",
+    "ALLOWED_SENDERS": ""
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

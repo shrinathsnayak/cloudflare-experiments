@@ -1,0 +1,195 @@
+---
+title: "Domain Expiry Reminder"
+description: "Track domain registration (RDAP) and TLS certificate (CT logs) expiry in D1, with daily cron email reminders at 30, 7, and 1 days left"
+icon: "CalendarClock"
+tags:
+  - network
+  - monitoring
+  - tls
+bindings:
+  - D1
+  - CRON
+  - EMAIL
+status: new
+---
+
+Never let a domain or TLS certificate expire. Registration expiry comes from **RDAP**, certificate expiry from **Certificate Transparency** logs, watched domains live in **D1**, and a daily **Cron Trigger** emails reminders through the `send_email` binding.
+
+## Features
+
+- Registration expiry via RDAP: IANA bootstrap (`data.iana.org/rdap/dns.json`, cached in memory for 24h) → registry server, falling back to `rdap.org`
+- TLS certificate expiry via [crt.sh](https://crt.sh) CT search: latest non-expired certificate whose names include the exact hostname
+- Reminders at **30**, **7**, and **1** days left, each sent once per expiry date (deduped in a `reminders` table, so a renewal resets them)
+- Partial results: a failing source returns `null` with a reason in `errors` instead of failing the request
+- One-off `GET /lookup` without saving anything
+
+## API Reference
+
+### POST /domains
+
+Watch a domain.
+
+**`domain`** `string` (required)
+
+Bare hostname such as `example.com` (no scheme, path, or port).
+
+**`alertEmail`** `string` (required)
+
+Where reminders are sent.
+
+```bash
+curl -X POST "https://your-worker.workers.dev/domains" \
+  -H "Content-Type: application/json" \
+  -d '{"domain":"example.com","alertEmail":"ops@example.com"}'
+```
+
+```json
+{
+  "id": 1,
+  "domain": "example.com",
+  "alertEmail": "ops@example.com",
+  "createdAt": "2026-10-01T09:00:00.000Z"
+}
+```
+
+### GET /domains/:id
+
+Runs a live check for a watched domain, stores the expiry dates on the row, and returns the record plus `status` (same shape as `/lookup`).
+
+### DELETE /domains/:id
+
+Stop watching a domain and delete its reminder history.
+
+### GET /lookup
+
+One-off check without saving.
+
+**`domain`** `string` (required)
+
+Bare hostname to check.
+
+```bash
+curl "https://your-worker.workers.dev/lookup?domain=example.com"
+```
+
+```json
+{
+  "domain": "example.com",
+  "checkedAt": "2026-10-01T09:00:00.000Z",
+  "registration": {
+    "expiresAt": "2027-08-13T04:00:00.000Z",
+    "daysLeft": 315,
+    "registrar": "RESERVED-Internet Assigned Numbers Authority"
+  },
+  "certificate": null,
+  "errors": {
+    "certificate": "crt.sh: Request timed out"
+  }
+}
+```
+
+#### Error Codes
+
+- `400` - `INVALID_BODY`, `INVALID_DOMAIN`, `INVALID_EMAIL`, `INVALID_ID`
+- `404` - `NOT_FOUND`
+- `500` - `INTERNAL_ERROR`
+
+## How reminders work
+
+The cron (`0 9 * * *`) loads every watched domain, checks both sources, and for each expiry finds the smallest threshold that days-left has crossed (`daysLeft <= 30` → 30, `<= 7` → 7, `<= 1` → 1). If no row exists in `reminders` for `(domain, kind, threshold, expiresAt)`, it sends the email and records it. A domain added with 5 days left gets the 7-day reminder only, then the 1-day reminder later. When the expiry date changes after a renewal, the thresholds apply again.
+
+## Use Cases
+
+- Side-project domains spread across several registrars
+- Catch certificates that silently stopped auto-renewing
+- Learn D1 + Cron Triggers + `send_email` with a dedupe table
+- Ad-hoc expiry checks from scripts via `GET /lookup`
+
+## Limitations
+
+- RDAP queries the hostname as given; pass the registrable domain (`example.co.uk`, not `www.example.co.uk`) for registration data
+- Some ccTLDs have no RDAP service, so `registration` is `null`
+- crt.sh is slow and frequently returns 5xx; requests time out after 10 seconds and the certificate comes back `null`
+- CT logs show issued certificates, not the one your server is actually serving
+- Domains are checked one after another in a single cron run, so very large lists can hit Worker time limits
+
+## Use in your project
+
+<UseInYourProject
+  experiment="domain-expiry-reminder"
+  bindings={[]}
+  platform={["Fetch API", "AbortSignal.timeout"]}
+  files={[
+    "src/lib/rdap.ts",
+    "src/lib/crtsh.ts",
+    "src/lib/expiry.ts",
+    "src/lib/http.ts",
+    "src/lib/validate.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/domain-expiry-reminder)
+
+  </Step>
+
+  <Step>
+
+### Apply migrations and configure email
+
+    ```bash
+    npx wrangler d1 migrations apply domain-expiry-reminder-db --remote
+    npx wrangler email sending enable yourdomain.com
+    ```
+
+    Set `ALERT_FROM_EMAIL` in `wrangler.json` to an address on the onboarded domain.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/lookup?domain=example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/domain-expiry-reminder
+npm install
+npx wrangler d1 migrations apply domain-expiry-reminder-db --local
+npx wrangler dev --test-scheduled
+```
+
+```bash
+curl "http://localhost:8787/lookup?domain=example.com"
+curl "http://localhost:8787/__scheduled?cron=0+9+*+*+*"
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **D1** `DB` (`migrations/0000_init.sql` creates `domains` and `reminders`)
+- **`send_email` binding** `EMAIL`
+- **Cron** `0 9 * * *`
+- **Var** `ALERT_FROM_EMAIL`
+
+## Cloudflare Features Used
+
+- **[D1](https://developers.cloudflare.com/d1/)** - Watched domains and sent-reminder log
+- **[Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/)** - Daily expiry checks
+- **[Email Sending](https://developers.cloudflare.com/email-service/api/send-emails/workers-api/)** - `send_email` binding for reminders

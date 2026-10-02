@@ -1,0 +1,231 @@
+---
+title: "Access JWT Validator"
+description: "Verify Cloudflare Zero Trust Access JWTs in a Worker with jose, the team JWKS, and a reusable Hono middleware"
+icon: "ShieldUser"
+tags:
+  - edge
+  - security
+  - zero-trust
+bindings: []
+status: new
+---
+
+Verify **Cloudflare Access** JWTs inside a Worker. The token comes from the `Cf-Access-Jwt-Assertion` header, or from the `CF_Authorization` cookie if the header is missing. The Worker checks it with [`jose`](https://github.com/panva/jose) against your team's public keys at `https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`, with **issuer = team domain** and **audience = the application's AUD tag**.
+
+## Features
+
+- **`requireAccess` Hono middleware** - Verifies the JWT and sets `c.var.accessIdentity` for downstream handlers
+- **Header or cookie** - Reads `Cf-Access-Jwt-Assertion` first, then the `CF_Authorization` cookie
+- **Full verification** - RS256 signature, issuer, audience, and expiry, with typed error codes
+- **Cached JWKS** - One `createRemoteJWKSet` per team domain per isolate, so keys aren't fetched on every request
+- **Service tokens** - Returns `common_name` (the client ID) when the token was issued for a service token rather than a user
+
+## API Reference
+
+### GET /me
+
+Verifies the Access JWT and returns its identity claims.
+
+#### Example Request
+
+```bash
+curl "https://app.example.com/me" \
+  -H "Cf-Access-Jwt-Assertion: <jwt>"
+```
+
+#### Success Response
+
+```json
+{
+  "email": "user@example.com",
+  "sub": "7335d417-61da-459d-899c-0a01c76a2f94",
+  "country": "US",
+  "identity_nonce": "6ei69kawdKzMIAPF",
+  "type": "app",
+  "iss": "https://yourteam.cloudflareaccess.com",
+  "aud": ["32eafc7626e974616deaf0dc3ce63d7bcbed58a2731e84d06bc3cdf1b53c4228"],
+  "iat": 1759336000,
+  "exp": 1759422400,
+  "source": "header"
+}
+```
+
+`source` is `"header"` or `"cookie"`. Service-token requests include `common_name` and usually have no `email`.
+
+#### Error Codes
+
+- `401` - No token (`MISSING_TOKEN`), bad signature, issuer, or audience (`INVALID_TOKEN`), expired (`TOKEN_EXPIRED`)
+- `500` - `TEAM_DOMAIN` or `POLICY_AUD` not set (`NOT_CONFIGURED`)
+- `502` - Could not fetch or parse the team JWKS (`JWKS_UNAVAILABLE`)
+
+### GET /protected
+
+An example route behind `app.use("/protected/*", requireAccess)`. It returns the same errors as `/me`.
+
+#### Success Response
+
+```json
+{
+  "message": "Hello, user@example.com. This response was only sent after verifying your Access JWT.",
+  "user": "user@example.com",
+  "country": "US"
+}
+```
+
+### GET /
+
+App info, including `configured: true | false` to show whether both vars are set.
+
+## Setup
+
+<Steps>
+  <Step>
+
+### Create an Access application
+
+    In [Zero Trust](https://one.dash.cloudflare.com/), go to **Access → Applications → Add an application → Self-hosted** and enter the Worker's hostname (a custom domain or `*.workers.dev`). Attach a policy, for example "emails ending in `@yourcompany.com`". You can also enable Access from the Worker's **Settings → Domains & Routes** in the Workers dashboard.
+
+  </Step>
+
+  <Step>
+
+### Copy the AUD tag
+
+    Open the application's **Overview** (or **Basic information**) tab and copy the **Application Audience (AUD) Tag**. That value is `POLICY_AUD`.
+
+  </Step>
+
+  <Step>
+
+### Find your team domain
+
+    Your team domain is `https://<team-name>.cloudflareaccess.com`. Find the team name under **Settings → Custom Pages** (or **Settings → General**) in Zero Trust. That value is `TEAM_DOMAIN`. A bare hostname or a trailing slash also works; the Worker normalizes it to an `https://` origin.
+
+  </Step>
+</Steps>
+
+<Callout type="warning" title="Don't trust identity headers by themselves">
+  Access also adds `Cf-Access-Authenticated-User-Email`. That header is **not signed**: anyone who
+  can reach your Worker without going through Access (another route, a `workers.dev` URL you forgot
+  to protect, or a misconfigured hostname) can set it to any value. Always verify
+  `Cf-Access-Jwt-Assertion` and read the email from the verified claims. This experiment never reads
+  the email header, and a test confirms that a request carrying only that header gets `401`.
+</Callout>
+
+## Implementation Details
+
+- `src/lib/access.ts` - `getAccessToken`, `verifyAccessJwt`, and the `requireAccess` middleware. `jose` errors are mapped to `TOKEN_EXPIRED`, `INVALID_TOKEN`, or `JWKS_UNAVAILABLE`
+- `src/lib/jwks.ts` - Caches `createRemoteJWKSet` per team domain. Tests mock this module with a local JWKS built from a `jose`-generated RSA key pair
+- `verifyAccessJwt(token, config, source, keySet)` takes an optional `keySet`, so you can inject `createLocalJWKSet` in tests or pass pre-fetched keys
+- Only `RS256` is accepted (`algorithms: ["RS256"]`), which blocks algorithm-confusion attacks
+
+<Callout>
+  If Access invokes your Worker directly, newer runtimes also expose the identity as `ctx.access`
+  without any JWT parsing (see [Cloudflare Access for
+  Workers](https://developers.cloudflare.com/workers/configuration/cloudflare-access/)). Verifying
+  the JWT yourself still matters when your origin or Worker is reached through other paths, or when
+  you forward the token to another service.
+</Callout>
+
+## Use Cases
+
+- Protect internal tools, admin APIs, or staging Workers with Zero Trust policies
+- Attribute actions to the verified Access user (`email` / `sub`) in logs or audit trails
+- Accept both browser sessions (cookie) and service tokens (header) on one route
+- Use as a reference for validating Access JWTs at any origin, not just Workers
+
+## Limitations
+
+- Requests that bypass Access never get a valid token. This is intentional: such requests receive `401`
+- The JWKS is cached per isolate. Access rotates keys periodically, and `jose` refetches when it sees an unknown `kid`
+- `wrangler dev` has no Access in front of it. Pass a real token manually, for example from `cloudflared access token -app=https://your-app.example.com`
+- Only identity claims in the JWT are returned. For groups or IdP attributes, call `https://<team>.cloudflareaccess.com/cdn-cgi/access/get-identity` with the cookie
+
+## Use in your project
+
+<UseInYourProject
+  experiment="access-jwt-validator"
+  dependencies={["jose", "hono"]}
+  bindings={[]}
+  platform={["Cloudflare Access (Zero Trust)", "Vars: TEAM_DOMAIN, POLICY_AUD"]}
+  files={[
+    "src/lib/access.ts",
+    "src/lib/jwks.ts",
+    "src/types/access.ts",
+    "src/constants/defaults.ts",
+    "src/utils/response.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/access-jwt-validator)
+
+  </Step>
+
+  <Step>
+
+### Configure vars and Access
+
+    Set `TEAM_DOMAIN` and `POLICY_AUD` in `wrangler.json` `vars` (or in the dashboard under **Settings → Variables**). Then put an Access application in front of the Worker's hostname, as described in [Setup](#setup).
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    Open `https://<your-worker-host>/me` in a browser. After the Access login you'll see your claims. Without Access, the request fails:
+
+    ```bash
+    curl -i "https://<your-worker-host>/me"
+    # 401 {"error":"Missing Cf-Access-Jwt-Assertion header or CF_Authorization cookie","code":"MISSING_TOKEN"}
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/access-jwt-validator
+npm install
+npm run dev
+```
+
+```bash
+TOKEN=$(cloudflared access token -app=https://your-app.example.com)
+curl "http://localhost:8787/me" -H "Cf-Access-Jwt-Assertion: $TOKEN"
+```
+
+## Configuration
+
+| Var           | Example                                 | Purpose                                         |
+| ------------- | --------------------------------------- | ----------------------------------------------- |
+| `TEAM_DOMAIN` | `https://yourteam.cloudflareaccess.com` | JWT issuer and JWKS host                        |
+| `POLICY_AUD`  | `32eafc76…c4228`                        | Expected `aud` (the Access application AUD tag) |
+
+No bindings are required. Both values are public identifiers, not secrets.
+
+## Cloudflare Features Used
+
+- **[Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/access-controls/)** - Zero Trust authentication in front of the Worker
+- **[Validate Access JWTs](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/validating-json/)** - Team JWKS (`/cdn-cgi/access/certs`) and the `Cf-Access-Jwt-Assertion` header
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+
+## Next Steps
+
+<Cards>
+  <Card title="JWT Inspector" href="/experiments/jwt-inspector">
+    Decode and verify arbitrary JWTs with Web Crypto
+  </Card>
+  <Card title="Turnstile Verify" href="/experiments/turnstile-verify">
+    Bot protection for public forms
+  </Card>
+</Cards>

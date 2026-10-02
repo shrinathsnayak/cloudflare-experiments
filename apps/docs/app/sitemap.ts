@@ -3,7 +3,7 @@ import { docsRoute, homeRoute, siteUrl } from "@/lib/shared";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  // Filter on path (page.url) before absolutizing — comparing absolute URLs to
+  // Filter on path (page.url) before absolutizing - comparing absolute URLs to
   // docsRoute (/docs) never matched and duplicated the docs index entry.
   const docsPages = source
     .getPages()

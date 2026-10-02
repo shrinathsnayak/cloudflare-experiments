@@ -1,0 +1,213 @@
+---
+title: "Privacy Tracker Scanner"
+description: "Load a page with Browser Rendering without accepting consent and report third-party trackers, cookies, and a privacy verdict"
+icon: "EyeOff"
+tags:
+  - browser
+  - privacy
+  - security
+bindings:
+  - BROWSER
+status: new
+---
+
+See what a page does to a first-time visitor **before they click anything**. The Worker loads the URL in **Browser Rendering**, never touches the consent banner, records every network request and cookie, and classifies third-party hosts against a built-in tracker list.
+
+## Features
+
+- **Pre-consent capture** - no clicks, no scrolling; just what loads on arrival
+- **Every request recorded** - `page.on("request")` across the main frame and iframes
+- **Full cookie jar** - CDP `Network.getAllCookies` returns cookies for all domains, not just the page's
+- **Tracker classification** - analytics, advertising, social, and session-replay vendors
+- **Verdict** - `clean`, `some-trackers`, or `heavy-tracking`
+
+## API Reference
+
+### GET /scan
+
+<TypeTable
+  type={{
+    url: {
+      description: "Page URL to scan (`http://` or `https://`)",
+      type: "string",
+      required: true,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/scan?url=https://www.cnn.com"
+```
+
+#### Success Response
+
+```json
+{
+  "url": "https://www.cnn.com/",
+  "finalUrl": "https://www.cnn.com/",
+  "firstPartyDomain": "cnn.com",
+  "timedOut": true,
+  "requests": { "total": 336, "thirdParty": 250 },
+  "thirdPartyDomains": [
+    {
+      "domain": "securepubads.g.doubleclick.net",
+      "requests": 9,
+      "tracker": { "name": "Google DoubleClick", "category": "advertising" }
+    },
+    { "domain": "media.cnn.com", "requests": 1 }
+  ],
+  "trackers": [
+    {
+      "name": "Google DoubleClick",
+      "category": "advertising",
+      "domains": ["securepubads.g.doubleclick.net"],
+      "requests": 15
+    }
+  ],
+  "cookies": {
+    "firstParty": 57,
+    "thirdParty": 3,
+    "list": [
+      {
+        "name": "IDE",
+        "domain": ".doubleclick.net",
+        "expires": "2027-10-26T12:00:00.000Z",
+        "secure": true,
+        "httpOnly": true,
+        "sameSite": "None",
+        "thirdParty": true
+      }
+    ]
+  },
+  "verdict": "heavy-tracking"
+}
+```
+
+**`firstPartyDomain`** `string`
+
+Registrable domain of the final page URL (after redirects).
+
+**`thirdPartyDomains`** `array`
+
+Every third-party hostname with its request count, sorted by requests. `tracker` is present when the host matches the tracker list.
+
+**`trackers`** `array`
+
+Matched trackers aggregated by vendor: `name`, `category` (`analytics` | `advertising` | `social` | `session-replay`), matching `domains`, and total `requests`.
+
+**`cookies.list[].expires`** `string | null`
+
+ISO timestamp, or `null` for session cookies.
+
+**`timedOut`** `boolean`
+
+`true` when the page didn't reach network idle within 15 seconds. The report covers everything that loaded until then.
+
+**`verdict`** `string`
+
+- `clean` - no known trackers
+- `some-trackers` - 1–4 distinct trackers and fewer than 10 third-party cookies
+- `heavy-tracking` - 5+ distinct trackers or 10+ third-party cookies
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` (`INVALID_URL`)
+- `502` - Browser launch or navigation failed (`BROWSER_ERROR`)
+
+## Implementation Details
+
+- **Third party** - a host is third party when its registrable domain differs from the page's. `src/lib/domain.ts` uses an eTLD+1 heuristic: the last two labels, or three when the suffix is a known two-part TLD (`co.uk`, `com.au`, `co.jp`, …). It is not a full Public Suffix List lookup.
+- **Tracker list** - `src/constants/trackers.ts` matches hostname suffixes, and the most specific entry wins (`connect.facebook.net` → Facebook Pixel, `www.facebook.com` → Facebook). Includes Google Analytics, Tag Manager, DoubleClick, AdSense, Facebook Pixel, Hotjar, Microsoft Clarity, FullStory, Segment, Mixpanel, Amplitude, TikTok Pixel, LinkedIn Insight, X Ads, Criteo, Taboola, Outbrain, and more.
+- **Navigation** - `networkidle2` with a 15 s cap. On timeout the scan keeps the partial capture instead of failing.
+
+## Use Cases
+
+- Check whether a site loads ad or analytics tags before consent (GDPR / ePrivacy audits)
+- Compare tracker footprints between competitors or releases
+- Verify that a consent management platform actually blocks tags
+- Learn request interception and CDP sessions in Browser Rendering
+
+## Limitations
+
+- Built-in tracker list is intentionally small; unknown vendors appear only in `thirdPartyDomains`
+- Registrable-domain detection is heuristic and can misjudge uncommon multi-part TLDs
+- Some sites block headless browsers or show a different page to bots
+- One visit from Cloudflare's network; geo-targeted consent behavior may differ from your region
+- Same-company domains (e.g. `cnn.com` and `turner.com`) count as third party
+
+## Use in your project
+
+<UseInYourProject
+  experiment="privacy-tracker-scanner"
+  dependencies={["@cloudflare/puppeteer"]}
+  bindings={["Browser Rendering"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/browser.ts",
+    "src/lib/report.ts",
+    "src/lib/domain.ts",
+    "src/lib/trackers.ts",
+    "src/constants/trackers.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/privacy-tracker-scanner)
+
+  </Step>
+
+  <Step>
+
+### Enable Browser Rendering
+
+    The `BROWSER` binding in `wrangler.json` requires Browser Rendering on your account. See the [Browser Rendering docs](https://developers.cloudflare.com/browser-rendering/).
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/scan?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/privacy-tracker-scanner
+npm install
+npm run dev
+```
+
+```bash
+curl "http://localhost:8787/scan?url=https://example.com"
+```
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`, request events, and a CDP session for cookies
+
+## Next Steps
+
+<Cards>
+  <Card title="Browser CDP Inspect" href="/experiments/browser-cdp-inspect">
+    Title, cookies, and performance timing via Puppeteer
+  </Card>
+  <Card title="Security Headers Grader" href="/experiments/security-headers-grader">
+    Grade HSTS, CSP, and related headers
+  </Card>
+</Cards>

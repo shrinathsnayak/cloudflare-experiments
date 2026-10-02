@@ -1,0 +1,255 @@
+---
+title: "Accessibility Auditor"
+description: "Run axe-core WCAG 2.1 AA audits with Browser Rendering and suggest alt text for unlabeled images with a Workers AI vision model"
+icon: "Accessibility"
+tags:
+  - browser
+  - ai
+  - accessibility
+bindings:
+  - BROWSER
+  - AI
+status: new
+---
+
+Audit any page for WCAG 2.0/2.1 **A + AA** issues by injecting [axe-core](https://github.com/dequelabs/axe-core) into a **Browser Rendering** session, then optionally describe images that are missing alt text with a **Workers AI** vision model.
+
+## Features
+
+- **GET /audit** - axe-core run on the fully rendered page, summarized into a compact JSON report
+- **Impact counts and score** - violated rules grouped by `critical` / `serious` / `moderate` / `minor`, plus a 0–100 weighted score
+- **Alt text suggestions** - `?altText=true` describes up to 5 `<img>` elements with missing or empty `alt`
+- **POST /alt-text** - standalone alt text generation for an uploaded image or image URL
+
+## API Reference
+
+### GET /audit
+
+Loads the page, injects axe-core, and runs rules tagged `wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`.
+
+<TypeTable
+  type={{
+    url: {
+      description: "Page URL to audit (`http://` or `https://`)",
+      type: "string",
+      required: true,
+    },
+    altText: {
+      description:
+        "`true` to fetch up to 5 images missing alt text (max 2 MB, `image/*` only) and generate suggestions",
+      type: "boolean",
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl "https://your-worker.workers.dev/audit?url=https://dequeuniversity.com/demo/mars/&altText=true"
+```
+
+#### Success Response
+
+```json
+{
+  "url": "https://dequeuniversity.com/demo/mars/",
+  "score": 35,
+  "counts": { "critical": 3, "serious": 5, "moderate": 0, "minor": 0 },
+  "violations": [
+    {
+      "id": "button-name",
+      "impact": "critical",
+      "help": "Buttons must have discernible text",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.13/button-name?application=axeAPI",
+      "totalNodes": 1,
+      "nodes": [
+        {
+          "target": [".departure-date > .ui-datepicker-trigger:nth-child(4)"],
+          "html": "<button class=\"ui-datepicker-trigger\" type=\"button\">…"
+        }
+      ]
+    }
+  ],
+  "passes": 29,
+  "incomplete": 3,
+  "altSuggestions": [
+    {
+      "src": "https://dequeuniversity.com/assets/demo-sites/mars/images/mars-spaceman.jpg",
+      "suggestion": "A space suit with a helmet on a rocky surface."
+    }
+  ]
+}
+```
+
+**`counts`** `object`
+
+Number of violated **rules** per impact level.
+
+**`violations[].totalNodes`** `number`
+
+Failing elements for that rule. At most 10 are returned in `nodes`, each with its CSS `target` (shadow DOM hops joined with `>>>`) and `html` truncated to 300 characters.
+
+**`score`** `number`
+
+`100 × passes / (passes + penalty)`, where each violated rule adds 10 (critical), 5 (serious), 3 (moderate), or 1 (minor). `100` means no violations.
+
+**`altSuggestions`** `array` (only with `altText=true`)
+
+`{ src, suggestion }`. When an image can't be fetched or described, `suggestion` is `null` and `error` explains why.
+
+### POST /alt-text
+
+Generate alt text for a single image. Send raw image bytes (`Content-Type: image/*`, max 2 MB) **or** pass an image URL.
+
+<TypeTable
+  type={{
+    image: {
+      description: "Image URL to describe instead of sending a body (`http://` or `https://`)",
+      type: "string",
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/alt-text" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary @photo.jpg
+```
+
+#### Success Response
+
+```json
+{
+  "altText": "A red bicycle leaning against a brick wall.",
+  "model": "@cf/llava-hf/llava-1.5-7b-hf"
+}
+```
+
+#### Error Codes
+
+- `400` - Missing or invalid `url` / `image` (`INVALID_URL`), `altText` not `true`/`false` (`INVALID_QUERY`), empty body (`MISSING_IMAGE`)
+- `413` - Image larger than 2 MB (`PAYLOAD_TOO_LARGE`)
+- `415` - Body or remote image is not `image/*` (`UNSUPPORTED_MEDIA_TYPE`)
+- `502` - Navigation or axe-core injection failed (`BROWSER_ERROR`), remote image fetch failed (`FETCH_ERROR`), Workers AI call failed (`AI_ERROR`)
+
+## Implementation Details
+
+- **Injection** - `page.addScriptTag({ content: axe.source })` after `page.setBypassCSP(true)`, so strict Content-Security-Policy headers don't block the inline script. If the page reloads itself (e.g. `<meta http-equiv="refresh">`) and `window.axe` is gone, axe is injected once more.
+- **`keep_names: false`** - `axe.source` is axe-core's function stringified from the Worker bundle. With Wrangler's default `keep_names`, esbuild injects `__name()` calls into that function that don't exist in the page, so `wrangler.json` turns it off.
+- **Navigation** - 1280×800 viewport, `networkidle2`, 20 s timeout.
+- **Vision model** - `@cf/llava-hf/llava-1.5-7b-hf` receives `{ image: number[], prompt, max_tokens: 80 }`; prefixes like "Image of" are stripped from the output.
+
+## Use Cases
+
+- Add an accessibility gate to CI or preview deployments
+- Track WCAG regressions across a list of pages over time
+- Bootstrap alt text for legacy image-heavy content
+- Learn how to inject third-party scripts into Browser Rendering sessions
+
+## Limitations
+
+- Automated checks catch only part of WCAG; manual review is still required
+- Single page per request; no crawling or authenticated pages
+- Alt text suggestions are a starting point. Review them for context, and use `alt=""` for decorative images
+- Images over 2 MB, non-`image/*` responses, and `data:` URIs are skipped
+- Workers AI vision models are billed per request and can be slow on cold starts
+
+## Use in your project
+
+<UseInYourProject
+  experiment="accessibility-auditor"
+  dependencies={["@cloudflare/puppeteer", "axe-core"]}
+  bindings={["Browser Rendering"]}
+  platform={["Workers runtime"]}
+  files={[
+    "src/lib/browser.ts",
+    "src/lib/report.ts",
+    "src/lib/url.ts",
+    "src/types/audit.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+<Callout type="warning">
+
+Set `"keep_names": false` in your `wrangler.json`, or the injected axe-core source will throw `__name is not defined` in the page.
+
+</Callout>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/accessibility-auditor)
+
+  </Step>
+
+  <Step>
+
+### Enable Browser Rendering and Workers AI
+
+    The Worker uses the `BROWSER` and `AI` bindings declared in `wrangler.json`. Both must be available on your account. See the [Browser Rendering docs](https://developers.cloudflare.com/browser-rendering/) and [Workers AI docs](https://developers.cloudflare.com/workers-ai/).
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/audit?url=https://example.com"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/accessibility-auditor
+npm install
+npm run dev
+```
+
+<Callout>
+
+Workers AI always runs remotely, even in `wrangler dev`, so run `wrangler login` first. Use `npx wrangler dev --remote` if a local browser isn't available.
+
+</Callout>
+
+```bash
+curl "http://localhost:8787/audit?url=https://example.com&altText=true"
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **`browser` binding** `BROWSER`
+- **`ai` binding** `AI`
+- **`keep_names: false`** - required for `axe.source` injection
+
+Dependencies: `@cloudflare/puppeteer`, `axe-core`, `hono`.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Browser Rendering](https://developers.cloudflare.com/browser-rendering/)** - Headless Chromium via `@cloudflare/puppeteer`
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/models/llava-1.5-7b-hf/)** - `@cf/llava-hf/llava-1.5-7b-hf` image-to-text for alt text
+
+## Next Steps
+
+<Cards>
+  <Card title="Screenshot API" href="/experiments/screenshot-api">
+    Capture PNG screenshots with Browser Rendering
+  </Card>
+  <Card title="Privacy Tracker Scanner" href="/experiments/privacy-tracker-scanner">
+    Detect trackers and cookies set before consent
+  </Card>
+</Cards>

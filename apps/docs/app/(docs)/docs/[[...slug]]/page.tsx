@@ -3,7 +3,11 @@ import { JsonLd } from "@/components/json-ld";
 import { getMDXComponents } from "@/components/mdx";
 import { SelfHostedDocsPage } from "@/components/self-hosted-docs-page";
 import { getCachedPage, getPageMarkdownUrl, source } from "@/lib/source";
-import { createDocsPageJsonLd, createDocsPageMetadata } from "@/lib/seo";
+import {
+  createDocsBreadcrumbJsonLd,
+  createDocsPageJsonLd,
+  createDocsPageMetadata,
+} from "@/lib/seo";
 import { githubDocsBlobUrl } from "@/lib/shared";
 import {
   DocsBody,
@@ -26,12 +30,13 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const githubUrl = githubDocsBlobUrl(page.path);
   const isSelfHosted = page.slugs.length === 1 && page.slugs[0] === "self-hosted";
   const isChangelog = page.slugs.length === 1 && page.slugs[0] === "changelog";
+  const jsonLd = [createDocsPageJsonLd(page), createDocsBreadcrumbJsonLd(page)];
 
   // Cheap sync branch before any self-hosted catalog work (async-cheap-condition-before-await).
   if (isSelfHosted) {
     return (
       <>
-        <JsonLd data={createDocsPageJsonLd(page)} />
+        <JsonLd data={jsonLd} />
         <Suspense
           fallback={
             <DocsPage toc={page.data.toc} full={page.data.full} tableOfContent={{ enabled: true }}>
@@ -53,7 +58,7 @@ export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
 
   return (
     <>
-      <JsonLd data={createDocsPageJsonLd(page)} />
+      <JsonLd data={jsonLd} />
       <DocsPage toc={page.data.toc} full={page.data.full} tableOfContent={{ enabled: true }}>
         <DocsTitle>{page.data.title}</DocsTitle>
         <DocsDescription>{page.data.description}</DocsDescription>

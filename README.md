@@ -1,8 +1,32 @@
 # Cloudflare Experiments
 
-A curated collection of **reference implementations** for building with **Cloudflare products and services**.
+**102 deployable Cloudflare Workers - real tools with tests, API docs, and a one-click Deploy button. Not Hello World demos.**
 
-📖 **Documentation:** [cloudflare-experiments.com](https://cloudflare-experiments.com) · source in [`apps/docs/`](apps/docs/) (Fumadocs + Next.js)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-cloudflare--experiments.com-f38020)](https://cloudflare-experiments.com)
+[![Built on Cloudflare Workers](https://img.shields.io/badge/built%20on-Cloudflare%20Workers-f38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
+
+**Live site:** [cloudflare-experiments.com](https://cloudflare-experiments.com) · [Browse experiments](https://cloudflare-experiments.com/docs#experiment-categories) · [Quick start](https://cloudflare-experiments.com/docs/quickstart)
+
+### Start here
+
+Not sure where to begin? Each of these deploys to your Cloudflare account in one click.
+
+| Experiment                                                 | What it shows                                                 | Deploy                                                                                                                                                                                                                     |
+| ---------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Screenshot API](apps/experiments/screenshot-api/)         | Browser Rendering - PNG screenshot of any URL                 | [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/screenshot-api)     |
+| [AI Website Summary](apps/experiments/ai-website-summary/) | Workers AI - summarize any webpage                            | [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-website-summary) |
+| [Is It Down](apps/experiments/is-it-down/)                 | Edge fetch - reachability check with zero bindings            | [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/is-it-down)         |
+| [Link Shortener](apps/experiments/link-shortener/)         | D1 + KV - short links with a database and a cache layer       | [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/link-shortener)     |
+| [RAG Mini Search](apps/experiments/rag-mini-search/)       | Vectorize + Workers AI - grounded Q&A over your own documents | [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rag-mini-search)    |
+
+Docs source lives in [`apps/docs/`](apps/docs/) (Fumadocs + Next.js).
+
+---
+
+## About
+
+A curated collection of **reference implementations** for building with **Cloudflare products and services**.
 
 The goal of this repository is to help developers **learn how to use Cloudflare platform features** by studying small, deployable examples. Each experiment maps to a specific product or capability — Workers AI, Durable Objects, Queues, D1, R2, Hyperdrive, Email Workers, Browser Rendering, and more.
 
@@ -44,7 +68,7 @@ Every experiment demonstrates **one specific Cloudflare capability**, including:
 cloudflare-experiments/
 ├── apps/
 │   ├── docs/                 # Fumadocs documentation site (cloudflare-experiments.com)
-│   └── experiments/          # 90 independently deployable Worker experiments
+│   └── experiments/          # 102 independently deployable Worker experiments
 ├── turbo.json
 ├── .cursor/                  # Agent rules and skills
 ├── README.md
@@ -57,7 +81,7 @@ This is a **Turborepo** monorepo. Each experiment lives under [`apps/experiments
 
 ## Experiments
 
-There are **90** experiments, grouped the same way as the [docs sidebar](https://cloudflare-experiments.com/docs). Each row links to the source and a one-click Cloudflare deploy.
+There are **102** experiments, grouped the same way as the [docs sidebar](https://cloudflare-experiments.com/docs). Each row links to the source and a one-click Cloudflare deploy.
 
 ### AI & Machine Learning
 
@@ -78,6 +102,11 @@ There are **90** experiments, grouped the same way as the [docs sidebar](https:/
 | [Chat Agent](apps/experiments/chat-agent/)                                 | Durable AI chat agent with SQLite-backed Durable Objects and optional Workers AI          | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/chat-agent)                 |
 | [AI Search Demo](apps/experiments/ai-search-demo/)                         | Query Cloudflare AI Search (managed RAG) from a Worker                                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-search-demo)             |
 | [AI Batch Infer](apps/experiments/ai-batch-infer/)                         | Queue Workers AI embedding batches with `queueRequest` and poll by `request_id`           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ai-batch-infer)             |
+| [MCP Tools Server](apps/experiments/mcp-tools-server/)                     | Remote MCP server (Agents SDK) with DNS, headers, uptime, and hash tools                  | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/mcp-tools-server)           |
+| [Receipt Parser](apps/experiments/receipt-parser/)                         | Parse receipt/invoice PDFs or photos into structured JSON with Workers AI                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/receipt-parser)             |
+| [Article to Audio](apps/experiments/article-to-audio/)                     | Listen to any article: HTMLRewriter + Workers AI TTS, cached in R2                        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/article-to-audio)           |
+| [Natural Language Calendar](apps/experiments/natural-language-calendar/)   | Turn plain English into a calendar invite (.ics, Google, Outlook)                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/natural-language-calendar)  |
+| [Newsletter Digest](apps/experiments/newsletter-digest/)                   | Forward newsletters; get one Workers AI-summarized digest email per day                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/newsletter-digest)          |
 
 ### Web Scraping & Parsing
 
@@ -107,6 +136,8 @@ There are **90** experiments, grouped the same way as the [docs sidebar](https:/
 | [Browser CDP Inspect](apps/experiments/browser-cdp-inspect/)         | Browser Rendering inspection — title, cookies, performance via Puppeteer        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-cdp-inspect)     |
 | [Readability Extractor](apps/experiments/readability-extractor/)     | Extract clean article content with Browser Rendering and readability heuristics | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/readability-extractor)   |
 | [Browser Markdown Scrape](apps/experiments/browser-markdown-scrape/) | URL → Markdown and CSS scrape via Browser Rendering quickAction                 | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/browser-markdown-scrape) |
+| [Accessibility Auditor](apps/experiments/accessibility-auditor/)     | axe-core WCAG audits and AI alt-text suggestions via Browser Rendering          | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/accessibility-auditor)   |
+| [Privacy Tracker Scanner](apps/experiments/privacy-tracker-scanner/) | Detect trackers and third-party cookies a page sets before consent              | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/privacy-tracker-scanner) |
 
 ### Network & Monitoring
 
@@ -127,6 +158,7 @@ There are **90** experiments, grouped the same way as the [docs sidebar](https:/
 | [CORS Preflight Tester](apps/experiments/cors-preflight-tester/)         | Simulate browser CORS preflight OPTIONS and analyze response headers         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/cors-preflight-tester)     |
 | [Broken Link Checker](apps/experiments/broken-link-checker/)             | Extract page links and report HTTP status codes from the edge                | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/broken-link-checker)       |
 | [Smart Placement Probe](apps/experiments/smart-placement-probe/)         | Demonstrate Workers Smart Placement by probing origin latency from the colo  | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/smart-placement-probe)     |
+| [Domain Expiry Reminder](apps/experiments/domain-expiry-reminder/)       | Track domain and TLS certificate expiry with daily email reminders           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/domain-expiry-reminder)    |
 
 ### Edge Platform
 
@@ -136,8 +168,10 @@ There are **90** experiments, grouped the same way as the [docs sidebar](https:/
 | [Crypto Hash](apps/experiments/crypto-hash/)                               | Compute SHA-256/384/512 digests with the Web Crypto API at the edge               | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/crypto-hash)                |
 | [WebSocket Echo](apps/experiments/websocket-echo/)                         | WebSocket echo server using WebSocketPair on Workers                              | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/websocket-echo)             |
 | [Image Resizer](apps/experiments/image-resizer/)                           | Resize remote images with Cloudflare Image Resizing via `cf.image`                | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/image-resizer)              |
+| [Image Converter](apps/experiments/image-converter/)                       | Convert, resize, and watermark images with the Images binding                     | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/image-converter)            |
 | [Turnstile Verify](apps/experiments/turnstile-verify/)                     | Verify Cloudflare Turnstile tokens via the siteverify API                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/turnstile-verify)           |
 | [JWT Inspector](apps/experiments/jwt-inspector/)                           | Decode, verify, and issue JWTs for experimentation                                | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/jwt-inspector)              |
+| [Access JWT Validator](apps/experiments/access-jwt-validator/)             | Verify Cloudflare Access JWTs at the edge with jose and Hono middleware           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/access-jwt-validator)       |
 | [Rate Limiter Demo](apps/experiments/rate-limiter-demo/)                   | Native Workers Rate Limiting binding with 429 responses                           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/rate-limiter-demo)          |
 | [Webhook Signature Verifier](apps/experiments/webhook-signature-verifier/) | Verify HMAC-SHA256 webhook signatures with timing-safe compare                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/webhook-signature-verifier) |
 | [Flagship Rollout](apps/experiments/flagship-rollout/)                     | Evaluate Cloudflare Flagship feature flags at the edge                            | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/flagship-rollout)           |
@@ -146,6 +180,7 @@ There are **90** experiments, grouped the same way as the [docs sidebar](https:/
 | [WebRTC Relay](apps/experiments/webrtc-relay/)                             | Issue Cloudflare Realtime TURN credentials for WebRTC (demo mode without secrets) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/webrtc-relay)               |
 | [Stream Video Demo](apps/experiments/stream-video-demo/)                   | Create Stream direct upload URLs and signed playback tokens                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/stream-video-demo)          |
 | [Static Assets SPA](apps/experiments/static-assets-spa/)                   | Workers Static Assets SPA with ASSETS binding and run_worker_first for /api       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/static-assets-spa)          |
+| [Static Form Backend](apps/experiments/static-form-backend/)               | Contact-form backend for static sites with Turnstile, rate limiting, and email    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/static-form-backend)        |
 
 ### Compute & Isolation
 
@@ -188,6 +223,7 @@ There are **90** experiments, grouped the same way as the [docs sidebar](https:/
 | [Webhook Relay Inspector](apps/experiments/webhook-relay-inspector/) | Capture inbound webhooks in a Durable Object session for debugging    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/webhook-relay-inspector) |
 | [Email Worker Inbox](apps/experiments/email-worker-inbox/)           | Receive inbound emails with Email Workers and inspect them via KV     | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/email-worker-inbox)      |
 | [Transactional Email](apps/experiments/transactional-email/)         | Send transactional email via the Cloudflare Email Service binding     | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/transactional-email)     |
+| [One-Time Secret](apps/experiments/one-time-secret/)                 | Self-destructing secret links with AES-GCM and Durable Objects        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/one-time-secret)         |
 
 Deploy from [shrinathsnayak/cloudflare-experiments](https://github.com/shrinathsnayak/cloudflare-experiments); fork and change the owner in the URL to use your own repo.
 
@@ -219,12 +255,11 @@ By participating, you agree to the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Future Experiments
 
-Additional platform features that may be explored:
+Stream ([Stream Video Demo](apps/experiments/stream-video-demo/)), Containers ([Container Echo](apps/experiments/container-echo/)), Sandbox ([Code Sandbox](apps/experiments/code-sandbox/)), and Secrets Store ([Secrets Store Demo](apps/experiments/secrets-store-demo/)) are already covered. Ideas still open:
 
 - D1 full-text search
-- Cloudflare Stream
-- Workers Containers / Sandbox
-- Secrets Store rotation patterns
+
+Have an idea? [Open an issue](https://github.com/shrinathsnayak/cloudflare-experiments/issues/new) describing the Cloudflare capability you want to see.
 
 ---
 

@@ -12,6 +12,8 @@ export const logoDimensions = {
 
 /** Favicon and PWA icon paths (served from public/). */
 export const siteIcons = {
+  /** Multi-size ICO (16/32/48) for crawlers and browsers that request `/favicon.ico` directly. */
+  faviconIco: "/favicon.ico",
   favicon16: "/favicon-16.png",
   favicon32: "/favicon-32.png",
   favicon48: "/favicon-48.png",

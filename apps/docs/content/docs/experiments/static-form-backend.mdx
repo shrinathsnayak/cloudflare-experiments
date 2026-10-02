@@ -1,0 +1,240 @@
+---
+title: "Static Form Backend"
+description: "Contact-form backend for static sites with Turnstile, honeypot, native rate limiting, D1 storage, and email notifications"
+icon: "ClipboardList"
+tags:
+  - edge
+  - security
+  - email
+bindings:
+  - D1
+  - RATE_LIMITER
+  - EMAIL
+status: new
+---
+
+Point any static site's `<form action>` at this Worker. Each submission is checked with **Turnstile**, a honeypot field, and the native **Rate Limiting** binding, then stored in **D1** and emailed to the form owner through the `send_email` binding.
+
+## Features
+
+- Accepts `application/x-www-form-urlencoded`, `multipart/form-data` (text fields only), and JSON
+- Turnstile siteverify on the `cf-turnstile-response` field
+- `_gotcha` honeypot: bots get a normal success reply, nothing is stored or emailed
+- Per-IP rate limiting keyed by `CF-Connecting-IP`
+- Per-form `allowedOrigin` enforcement and `redirectUrl` (303) for plain HTML form posts
+- Submissions stored as a JSON blob with a salted SHA-256 IP hash (never the raw IP) and user agent
+- Owner notification email with `replyTo` set from the submitter's `email` field when valid
+
+## API Reference
+
+### POST /forms
+
+Create a form. Requires `Authorization: Bearer <ADMIN_TOKEN>`.
+
+**`ownerEmail`** `string` (required)
+
+Where submissions are emailed.
+
+**`allowedOrigin`** `string` (optional)
+
+Origin allowed to submit, e.g. `https://mysite.com`. Normalized to `scheme://host[:port]`. When set, any other `Origin` header (or none) is rejected.
+
+**`redirectUrl`** `string` (optional)
+
+Where browsers are sent after an HTML form post (http or https only).
+
+```bash
+curl -X POST "https://your-worker.workers.dev/forms" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"ownerEmail":"me@example.com","allowedOrigin":"https://mysite.com","redirectUrl":"https://mysite.com/thanks"}'
+```
+
+```json
+{
+  "id": "3f9c2a7b1d4e8f60",
+  "ownerEmail": "me@example.com",
+  "allowedOrigin": "https://mysite.com",
+  "redirectUrl": "https://mysite.com/thanks",
+  "endpoint": "https://your-worker.workers.dev/f/3f9c2a7b1d4e8f60",
+  "createdAt": "2026-10-01T09:00:00.000Z"
+}
+```
+
+### POST /f/:formId
+
+Public submission endpoint. Fields are free-form, with these limits and reserved names:
+
+- Max **30** fields and **5000** characters per value (repeated keys are joined with `, `); field names up to 100 characters
+- `cf-turnstile-response` - Turnstile token (required when `TURNSTILE_SECRET_KEY` is set)
+- `_gotcha` - honeypot; leave empty
+
+The request is checked in this order: form exists → `Origin` → rate limit → body parse → honeypot → Turnstile → store and email.
+
+```bash
+curl -X POST "https://your-worker.workers.dev/f/3f9c2a7b1d4e8f60" \
+  -H "Origin: https://mysite.com" \
+  -H "Accept: application/json" \
+  -d "name=Ada&email=ada@example.com&message=Hello&cf-turnstile-response=<token>"
+```
+
+```json
+{ "ok": true, "id": 42, "turnstile": "passed", "emailed": true }
+```
+
+With `Accept: text/html` (a normal browser form post) and a `redirectUrl` configured, the response is `303 See Other` to that URL instead. `emailed: false` means the submission was stored but the notification failed.
+
+<Callout type="warning">
+
+When `TURNSTILE_SECRET_KEY` is not set, verification is skipped and responses include `"turnstile": "skipped"`. This is for local development only; always set the secret in production.
+
+</Callout>
+
+### GET /forms/:id/submissions
+
+Latest 50 submissions, newest first. Requires `Authorization: Bearer <ADMIN_TOKEN>`.
+
+```json
+{
+  "form": { "id": "3f9c2a7b1d4e8f60", "ownerEmail": "me@example.com", "...": "..." },
+  "submissions": [
+    {
+      "id": 42,
+      "fields": { "name": "Ada", "email": "ada@example.com", "message": "Hello" },
+      "ipHash": "9b74c9897bac770ffc029102a200c5de...",
+      "userAgent": "Mozilla/5.0 ...",
+      "createdAt": "2026-10-01T09:05:00.000Z"
+    }
+  ]
+}
+```
+
+#### Error Codes
+
+- `400` - `INVALID_BODY`, `INVALID_EMAIL`, `INVALID_ORIGIN`, `INVALID_URL`, `INVALID_FIELD_NAME`, `FIELD_TOO_LONG`, `TOO_MANY_FIELDS`, `MISSING_TURNSTILE_TOKEN`, `EMPTY_SUBMISSION`
+- `401` - `UNAUTHORIZED` (missing or wrong admin token, or `ADMIN_TOKEN` not configured)
+- `403` - `ORIGIN_NOT_ALLOWED`, `TURNSTILE_FAILED`
+- `404` - `FORM_NOT_FOUND`
+- `415` - `UNSUPPORTED_CONTENT_TYPE`
+- `429` - `RATE_LIMITED`
+- `502` - `TURNSTILE_ERROR` (siteverify unreachable)
+- `500` - `INTERNAL_ERROR`
+
+## Wiring it into a static site
+
+`examples/contact.html` is a plain HTML form that works on any static host:
+
+1. Create a form with `POST /forms` and copy the `endpoint` into the form's `action`.
+2. Create a [Turnstile widget](https://developers.cloudflare.com/turnstile/get-started/) for your site's hostname, put the site key in `data-sitekey`, and set the secret as `TURNSTILE_SECRET_KEY` on the Worker.
+3. Keep the visually hidden `_gotcha` input; real users never fill it.
+
+Without JavaScript, the browser posts the form and follows the 303 redirect. The optional script in the example submits with `fetch()` and `Accept: application/json` instead. CORS headers are returned for `/f/*`, so the JSON reply is readable cross-origin.
+
+## Use Cases
+
+- Contact and feedback forms on Pages, GitHub Pages, or any static host
+- Waitlist or beta sign-up forms without running a server
+- Learn Turnstile + Rate Limiting + D1 + Email Sending together
+- Replace a third-party form service with something you control
+
+## Limitations
+
+- File uploads are dropped; only text fields are stored
+- The Rate Limiting binding is per Cloudflare location and eventually consistent, so treat it as abuse protection, not an exact quota
+- `allowedOrigin` relies on the `Origin` header, which browsers send but scripts can forge; Turnstile is the real bot defense
+- The honeypot only stops naive bots
+- No submission deletion, export, or pagination beyond the latest 50
+
+## Use in your project
+
+<UseInYourProject
+  experiment="static-form-backend"
+  bindings={[]}
+  platform={["Request.formData()", "Turnstile siteverify"]}
+  files={[
+    "src/lib/body.ts",
+    "src/lib/turnstile.ts",
+    "src/constants/defaults.ts",
+    "src/types/form.ts",
+    "examples/usage.ts",
+    "examples/contact.html",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/static-form-backend)
+
+  </Step>
+
+  <Step>
+
+### Apply migrations, set secrets, and configure email
+
+    ```bash
+    npx wrangler d1 migrations apply static-form-backend-db --remote
+    npx wrangler secret put ADMIN_TOKEN
+    npx wrangler secret put TURNSTILE_SECRET_KEY
+    npx wrangler secret put IP_HASH_SALT
+    npx wrangler email sending enable yourdomain.com
+    ```
+
+    Set `FROM_EMAIL` in `wrangler.json` to an address on the onboarded domain.
+
+  </Step>
+
+  <Step>
+
+### Create a form
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/forms" \
+      -H "Authorization: Bearer $ADMIN_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"ownerEmail":"me@example.com"}'
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/static-form-backend
+npm install
+npx wrangler d1 migrations apply static-form-backend-db --local
+echo 'ADMIN_TOKEN=dev-token' > .dev.vars
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/forms" \
+  -H "Authorization: Bearer dev-token" \
+  -H "Content-Type: application/json" \
+  -d '{"ownerEmail":"me@example.com"}'
+
+curl -X POST "http://localhost:8787/f/<id>" -d "name=Ada&message=Hello"
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **D1** `DB` (`migrations/0000_init.sql` creates `forms` and `submissions`)
+- **`send_email` binding** `EMAIL`
+- **Rate Limiting** `FORM_RATE_LIMITER` (5 requests / 60 seconds per IP)
+- **Var** `FROM_EMAIL`
+
+Secrets: `ADMIN_TOKEN`, `TURNSTILE_SECRET_KEY`, and optional `IP_HASH_SALT`.
+
+## Cloudflare Features Used
+
+- **[Turnstile](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/)** - Server-side token validation
+- **[Rate Limiting binding](https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/)** - Per-IP submission limits
+- **[D1](https://developers.cloudflare.com/d1/)** - Forms and submissions
+- **[Email Sending](https://developers.cloudflare.com/email-service/api/send-emails/workers-api/)** - Owner notifications via `send_email`

@@ -1,0 +1,50 @@
+<!doctype html>
+<!--
+  Drop-in contact form for any static site.
+  1. Replace YOUR_WORKER and FORM_ID with the `endpoint` returned by POST /forms.
+  2. Replace YOUR_SITE_KEY with your Turnstile widget site key.
+  The widget injects a hidden `cf-turnstile-response` input; `_gotcha` is the honeypot.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Contact</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+      .hp {
+        position: absolute;
+        left: -10000px;
+      }
+    </style>
+  </head>
+  <body>
+    <form action="https://YOUR_WORKER.workers.dev/f/FORM_ID" method="POST">
+      <label>Name <input name="name" required maxlength="200" /></label>
+      <label>Email <input name="email" type="email" required /></label>
+      <label>Message <textarea name="message" required maxlength="5000"></textarea></label>
+
+      <label class="hp" aria-hidden="true">
+        Leave this empty <input name="_gotcha" tabindex="-1" autocomplete="off" />
+      </label>
+
+      <div class="cf-turnstile" data-sitekey="YOUR_SITE_KEY"></div>
+      <button type="submit">Send</button>
+    </form>
+
+    <!-- Optional: submit with fetch() instead of a full-page post -->
+    <script>
+      document.querySelector("form").addEventListener("submit", async (event) => {
+        if (!window.fetch) return;
+        event.preventDefault();
+        const form = event.currentTarget;
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        const data = await res.json();
+        form.replaceWith(res.ok ? "Thanks! We'll be in touch." : `Error: ${data.error}`);
+      });
+    </script>
+  </body>
+</html>

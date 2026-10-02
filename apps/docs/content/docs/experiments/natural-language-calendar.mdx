@@ -1,0 +1,267 @@
+---
+title: "Natural Language Calendar"
+description: "Turn plain English into a calendar invite: Workers AI JSON mode extracts the event, the Worker returns an .ics file plus Google and Outlook links"
+icon: "CalendarPlus"
+tags:
+  - ai
+  - workers-ai
+  - calendar
+bindings:
+  - AI
+status: new
+---
+
+<Callout type="warning">
+
+This is an experimental Worker. Use it as a starting point for your own projects.
+
+</Callout>
+
+Type "Lunch with sam@example.com next Tue 1pm at Blue Bottle" and get back a real calendar invite. [Workers AI JSON mode](https://developers.cloudflare.com/workers-ai/features/json-mode/) extracts the event. Code then validates it, converts it to UTC, and builds an RFC 5545 `.ics` file plus Google Calendar and Outlook links.
+
+## Features
+
+- Resolves relative dates ("tomorrow", "next Tue") with a prompt that lists today and the next 14 dates with weekdays
+- Time zone from the request body, else the visitor's `request.cf.timezone`, else UTC
+- DST-safe local-to-UTC conversion with `Intl.DateTimeFormat`
+- RFC 5545 generator: CRLF, 75-octet folding, TEXT escaping, `UID`, `DTSTAMP`
+- `GET /event.ics` downloads directly into Calendar apps
+- Attendee emails are kept only if they appear in the input text
+
+## API Reference
+
+### POST /event
+
+Parse text into an event.
+
+<TypeTable
+  type={{
+    text: {
+      description: "Event description in plain English. 1-500 characters.",
+      type: "string",
+      required: true,
+    },
+    timezone: {
+      description:
+        "IANA time zone, e.g. `America/New_York`. Defaults to `request.cf.timezone`, then `UTC`.",
+      type: "string",
+      required: false,
+    },
+    now: {
+      description:
+        "ISO 8601 reference time used to resolve relative dates. Defaults to the current time.",
+      type: "string",
+      required: false,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/event" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Lunch with sam@example.com next Tue 1pm at Blue Bottle","timezone":"America/New_York"}'
+```
+
+#### Example Response
+
+```json
+{
+  "event": {
+    "title": "Lunch",
+    "allDay": false,
+    "timezone": "America/New_York",
+    "start": "2026-10-06T13:00:00",
+    "end": "2026-10-06T14:00:00",
+    "startUtc": "2026-10-06T17:00:00.000Z",
+    "endUtc": "2026-10-06T18:00:00.000Z",
+    "durationMinutes": 60,
+    "location": "Blue Bottle",
+    "description": null,
+    "attendees": ["sam@example.com"]
+  },
+  "ics": "BEGIN:VCALENDAR\r\nVERSION:2.0\r\n...",
+  "googleCalendarUrl": "https://calendar.google.com/calendar/render?action=TEMPLATE&text=Lunch&dates=20261006T170000Z%2F20261006T180000Z&...",
+  "outlookUrl": "https://outlook.live.com/calendar/0/deeplink/compose?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent&..."
+}
+```
+
+**`start`** / **`end`** are local wall times in `timezone`. For all-day events they are dates, `end` is exclusive, and `startUtc` / `endUtc` are `null`.
+
+### GET /event.ics
+
+Same inputs as query parameters: `text`, `timezone`, `now`. Returns `text/calendar; charset=utf-8` with `Content-Disposition: attachment; filename=event.ics`.
+
+```bash
+curl -OJ "https://your-worker.workers.dev/event.ics?text=Team%20offsite%20Oct%2012-13%20in%20Lisbon&timezone=Europe/Lisbon"
+```
+
+```text
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//cloudflare-experiments//natural-language-calendar//EN
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:ee85e37b-1c18-40ef-8b56-6a9a68b9fcd4@natural-language-calendar.workers.
+ dev
+DTSTAMP:20261001T165159Z
+DTSTART;VALUE=DATE:20261012
+DTEND;VALUE=DATE:20261014
+SUMMARY:Team offsite
+LOCATION:Lisbon
+END:VEVENT
+END:VCALENDAR
+```
+
+#### Error Responses
+
+```json
+{
+  "error": "Couldn't find a date in that text. Try rephrasing, e.g. 'Lunch with Sam next Tuesday at 1pm'",
+  "code": "PARSE_ERROR"
+}
+```
+
+- `400` - `INVALID_TEXT` (missing or over 500 characters), `INVALID_TIMEZONE`, `INVALID_NOW`, `INVALID_BODY` (`POST` body is not JSON), `PARSE_ERROR` (model output has no usable date)
+- `502` - `AI_ERROR` (model call failed)
+
+## Implementation Details
+
+### Why UTC instead of TZID
+
+A `DTSTART;TZID=America/New_York:...` line is only strictly valid with a matching `VTIMEZONE` block. Instead, `src/lib/ics.ts` writes timed events in UTC (`DTSTART:20261006T170000Z`), so no `VTIMEZONE` block is needed and every client shows the correct instant in the viewer's own zone. All-day events use `DTSTART;VALUE=DATE:` with an exclusive `DTEND`.
+
+### Local time to UTC
+
+The model returns wall-clock time (`2026-10-06T13:00`). `zonedTimeToUtc` in `src/lib/timezone.ts` guesses the offset with `Intl.DateTimeFormat#formatToParts`, then re-checks it at the resulting instant, so times just after a DST change are still correct.
+
+### Normalization rules
+
+`src/lib/normalize.ts` applies these defaults:
+
+- Duration is 60 minutes when neither `end` nor `durationMinutes` is given
+- An `end` earlier than `start` rolls over to the next day ("10pm to 1am")
+- Text without a time of day becomes an all-day event
+- Attendees must be valid emails that appear in the original text
+- The model's `hasDateOrTime` flag, or an unparseable `start`, produces `PARSE_ERROR`
+
+### ICS formatting
+
+Lines end in CRLF. Lines longer than 75 octets are folded with a leading space, and multi-byte UTF-8 characters are never split. `\`, `;`, `,` and newlines in TEXT values are escaped.
+
+## Use Cases
+
+- **"Add to calendar" from chat** - Slack or Discord bots that turn messages into invites
+- **Email assistants** - Convert "can we meet Thursday at 3?" into a draft event
+- **Quick-add widgets** - A single text box on a website that downloads an `.ics`
+- **Voice input** - Pair with speech-to-text to create events by voice
+
+## Limitations
+
+- **Model interpretation**: Ambiguous phrases ("next Tuesday" said on a Monday) follow the model's reading; pass `now` and `timezone` for deterministic tests
+- **Single events only**: Recurrence ("every Monday") is not mapped to `RRULE`
+- **No invites sent**: `ATTENDEE` lines are included, but no email is sent
+- **Attendees by email only**: Names without an email address are ignored
+- **Outlook link**: Targets `outlook.live.com` (personal accounts); work accounts use `outlook.office.com`
+
+## Use in your project
+
+<UseInYourProject
+  experiment="natural-language-calendar"
+  bindings={["Workers AI (AI binding)"]}
+  platform={["Workers AI JSON mode", "Intl.DateTimeFormat", "request.cf.timezone"]}
+  files={[
+    "src/lib/event.ts",
+    "src/lib/extract.ts",
+    "src/lib/normalize.ts",
+    "src/lib/timezone.ts",
+    "src/lib/ics.ts",
+    "src/lib/links.ts",
+    "src/lib/input.ts",
+    "src/constants/defaults.ts",
+    "src/constants/schema.ts",
+    "src/types/event.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/natural-language-calendar)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    The `AI` binding is configured in `wrangler.json`. Requires a Cloudflare account with Workers AI enabled.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -OJ "https://your-worker.workers.dev/event.ics?text=Coffee%20tomorrow%2010am"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/natural-language-calendar
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/event" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Dentist tomorrow 9:30am for 45 minutes","timezone":"Asia/Kolkata"}'
+```
+
+The `AI` binding always runs remotely, so local development needs a logged-in Wrangler session.
+
+## Configuration
+
+`wrangler.json` declares a single binding:
+
+```json
+{
+  "ai": { "binding": "AI" }
+}
+```
+
+Defaults such as `AI_MODEL`, `MAX_TEXT_LENGTH`, and `DEFAULT_DURATION_MINUTES` live in `src/constants/defaults.ts`.
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime; `request.cf.timezone` for the default zone
+- **[Workers AI JSON Mode](https://developers.cloudflare.com/workers-ai/features/json-mode/)** - Schema-constrained output from `@cf/meta/llama-3.3-70b-instruct-fp8-fast`
+
+## Next Steps
+
+<Cards>
+  <Card title="Receipt Parser" href="/experiments/receipt-parser">
+    Another JSON-mode extraction experiment
+  </Card>
+  <Card title="RFC 5545" href="https://www.rfc-editor.org/rfc/rfc5545">
+    The iCalendar specification
+  </Card>
+  <Card
+    title="GitHub Repository"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/natural-language-calendar"
+  >
+    View the complete source code
+  </Card>
+</Cards>

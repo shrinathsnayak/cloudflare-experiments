@@ -1,0 +1,232 @@
+---
+title: "Newsletter Digest"
+description: "Forward newsletters to an Email Routing address and get one Workers AI-summarized digest email per day, stored in D1"
+icon: "Newspaper"
+tags:
+  - email
+  - ai
+  - workers-ai
+  - stateful
+bindings:
+  - AI
+  - D1
+  - CRON
+  - EMAIL
+status: new
+---
+
+Forward newsletters to an **Email Routing** address and get one digest email per day instead. An `email()` handler parses each message with `postal-mime`, summarizes it with **Workers AI**, and stores it in **D1**; a daily **Cron Trigger** sends one digest grouped by sender via the `send_email` binding.
+
+## Features
+
+- Inbound `email()` handler with `postal-mime` parsing; messages over 1 MB are rejected
+- Optional `ALLOWED_SENDERS` allowlist (addresses or domains), checked against both envelope sender and `From` header
+- HTML-only newsletters are stripped to plain text before summarizing
+- 2–3 bullet summaries from `@cf/meta/llama-3.1-8b-instruct-fast`, falling back to the first 300 characters if AI fails
+- First non-unsubscribe link kept as a "Read more" link
+- Daily digest (text + HTML) grouped by sender; items are marked digested only after the send succeeds
+
+## API Reference
+
+### GET /items
+
+List the latest 100 items, newest first.
+
+**`pending`** `"true" | "false"` (optional)
+
+`true` returns only items not yet included in a digest.
+
+```bash
+curl "https://your-worker.workers.dev/items?pending=true"
+```
+
+```json
+{
+  "count": 1,
+  "items": [
+    {
+      "id": 7,
+      "from": "news@example.com",
+      "fromName": "Example News",
+      "subject": "Issue #42",
+      "summary": "- Big launch this week\n- Pricing changes in November",
+      "link": "https://example.com/42",
+      "receivedAt": "2026-10-01T05:12:00.000Z",
+      "digestedAt": null
+    }
+  ]
+}
+```
+
+### POST /digest/preview
+
+Build the digest from pending items (up to 100) without sending or marking anything.
+
+```bash
+curl -X POST "https://your-worker.workers.dev/digest/preview"
+```
+
+```json
+{
+  "subject": "Newsletter digest 2026-10-01: 1 item",
+  "text": "Newsletter digest 2026-10-01: 1 item\n\n== Example News <news@example.com> ==\n\nIssue #42\n  - Big launch this week\n  - Pricing changes in November\n  https://example.com/42",
+  "html": "<!doctype html><html>...</html>",
+  "itemCount": 1,
+  "senderCount": 1
+}
+```
+
+### POST /digest/send
+
+Send the digest now to `DIGEST_TO` and mark the included items digested. Requires `Authorization: Bearer <ADMIN_TOKEN>`.
+
+```bash
+curl -X POST "https://your-worker.workers.dev/digest/send" \
+  -H "Authorization: Bearer $ADMIN_TOKEN"
+```
+
+```json
+{ "sent": true, "itemCount": 1, "messageId": "..." }
+```
+
+When nothing is pending, the response is `{ "sent": false, "itemCount": 0 }` and no email is sent.
+
+#### Error Codes
+
+- `400` - `INVALID_QUERY` (bad `pending` value), `MISSING_CONFIG` (`DIGEST_TO` not set)
+- `401` - `UNAUTHORIZED`
+- `502` - `SEND_ERROR` (Email Sending rejected the digest; items stay pending)
+- `500` - `INTERNAL_ERROR`
+
+## Architecture
+
+```text
+newsletter → Email Routing (digest@yourdomain.com) → email() handler
+  ├─ > 1 MB → setReject
+  ├─ sender not allowed → ignored
+  └─ postal-mime → text / html→text → Workers AI summary → D1 items (digested_at NULL)
+
+cron 0 7 * * * → pending items → group by sender → send_email → digested_at = now
+```
+
+## Use Cases
+
+- Cut a dozen daily newsletters down to one email
+- Learn the inbound `email()` handler, Workers AI, D1, Cron, and Email Sending together
+- Starting point for any "collect mail, process later" pipeline (receipts, alerts, reports)
+
+## Limitations
+
+- `GET /items` and `POST /digest/preview` are public; put them behind [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/) or add the admin check if summaries are sensitive
+- HTML-to-text is regex-based and rough on complex layouts; only the first 6000 characters are sent to the model
+- Link extraction picks the first non-unsubscribe link, which may be a header or sponsor link
+- One digest holds at most 100 items; the rest go in the next run
+- Messages are processed one at a time in the `email()` handler, so the AI call adds latency to delivery
+
+## Use in your project
+
+<UseInYourProject
+  experiment="newsletter-digest"
+  dependencies={["postal-mime"]}
+  bindings={["AI"]}
+  platform={["Email Workers (`email()` handler)", "Workers AI"]}
+  files={[
+    "src/lib/text.ts",
+    "src/lib/summarize.ts",
+    "src/constants/defaults.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/newsletter-digest)
+
+  </Step>
+
+  <Step>
+
+### Apply migrations and set the admin token
+
+    ```bash
+    npx wrangler d1 migrations apply newsletter-digest-db --remote
+    npx wrangler secret put ADMIN_TOKEN
+    ```
+
+  </Step>
+
+  <Step>
+
+### Route inbound mail to the Worker
+
+    In the dashboard, enable **Email Routing** on your zone and create a custom address (e.g. `digest@yourdomain.com`) with the action **Send to a Worker** → `newsletter-digest`. Subscribe or forward newsletters to that address.
+
+  </Step>
+
+  <Step>
+
+### Configure the digest sender
+
+    ```bash
+    npx wrangler email sending enable yourdomain.com
+    ```
+
+    Set `DIGEST_FROM` (on the onboarded domain), `DIGEST_TO`, and optionally `ALLOWED_SENDERS` in `wrangler.json`, then redeploy.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl "https://your-worker.workers.dev/items?pending=true"
+    curl -X POST "https://your-worker.workers.dev/digest/preview"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/newsletter-digest
+npm install
+npx wrangler d1 migrations apply newsletter-digest-db --local
+npx wrangler dev --test-scheduled
+```
+
+Simulate an inbound email, then preview and trigger the cron:
+
+```bash
+curl -X POST "http://localhost:8787/cdn-cgi/handler/email?from=news@example.com&to=digest@example.com" \
+  --data-binary $'From: Example News <news@example.com>\r\nTo: digest@example.com\r\nSubject: Issue 1\r\nContent-Type: text/plain\r\n\r\nBig news this week. https://example.com/1'
+
+curl -X POST "http://localhost:8787/digest/preview"
+curl "http://localhost:8787/__scheduled?cron=0+7+*+*+*"
+```
+
+## Configuration
+
+`wrangler.json` declares:
+
+- **Workers AI** `AI`
+- **D1** `DB` (`migrations/0000_init.sql` creates `items`)
+- **`send_email` binding** `EMAIL`
+- **Cron** `0 7 * * *`
+- **Vars** `DIGEST_FROM`, `DIGEST_TO`, `ALLOWED_SENDERS` (comma-separated addresses or domains; empty accepts all)
+
+Secret: `ADMIN_TOKEN`. Dependency: `postal-mime`.
+
+## Cloudflare Features Used
+
+- **[Email Routing / Email Workers](https://developers.cloudflare.com/email-routing/email-workers/)** - Inbound `email()` handler
+- **[Workers AI](https://developers.cloudflare.com/workers-ai/)** - Newsletter summaries
+- **[D1](https://developers.cloudflare.com/d1/)** - Item storage and digest state
+- **[Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/)** - Daily digest
+- **[Email Sending](https://developers.cloudflare.com/email-service/api/send-emails/workers-api/)** - Digest delivery via `send_email`

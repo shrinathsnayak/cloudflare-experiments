@@ -16,7 +16,7 @@ function Badge({ children, tone = "muted" }: { children: ReactNode; tone?: "mute
       className={cn(
         "inline-flex shrink-0 items-center rounded-md border px-2 py-0.5 font-mono text-[11px] leading-none",
         tone === "muted" &&
-          "border-fd-border bg-fd-secondary text-fd-muted-foreground no-underline",
+        "border-fd-border bg-fd-secondary text-fd-muted-foreground no-underline",
         tone === "brand" && "border-brand/30 bg-brand/10 text-brand no-underline"
       )}
     >
@@ -83,10 +83,14 @@ function CategoryGroup({
   entries: SelfHostedEntry[];
 }) {
   return (
-    <section id={category.id} className="self-hosted-category scroll-mt-24 space-y-3">
+    <section className="self-hosted-category space-y-3">
       <div className="border-b border-fd-border pb-2">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-lg font-semibold tracking-tight text-fd-foreground">
+          {/* Id on h2 (not section): fumadocs TOC observes at threshold 0.9 */}
+          <h2
+            id={category.id}
+            className="scroll-mt-24 text-lg font-semibold tracking-tight text-fd-foreground"
+          >
             {category.name}
           </h2>
           <p className="text-xs font-medium uppercase tracking-wide text-fd-muted-foreground">

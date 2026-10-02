@@ -9,7 +9,11 @@ export const experimentDocsMeta: Record<
   "ai-bot-visibility": { icon: "Bot", tags: ["ai", "seo"], bindings: [] },
   "cloud-ai-proxy": { icon: "Cpu", tags: ["ai", "workers-ai"], bindings: ["AI"] },
   "text-translator": { icon: "Languages", tags: ["ai", "workers-ai"], bindings: ["AI"] },
-  "sentiment-analyzer": { icon: "FaceSlightlySmiling", tags: ["ai", "workers-ai"], bindings: ["AI"] },
+  "sentiment-analyzer": {
+    icon: "FaceSlightlySmiling",
+    tags: ["ai", "workers-ai"],
+    bindings: ["AI"],
+  },
   "text-similarity": { icon: "GitCompareArrows", tags: ["ai", "embeddings"], bindings: ["AI"] },
   "ai-image-generator": { icon: "Image", tags: ["ai", "workers-ai"], bindings: ["AI"] },
   "website-metadata-extractor": { icon: "FileSearch", tags: ["scraping"], bindings: [] },
@@ -94,5 +98,61 @@ export const experimentDocsMeta: Record<
     icon: "HeartPulse",
     tags: ["network", "monitoring"],
     bindings: ["D1", "EMAIL"],
+  },
+  "mcp-tools-server": {
+    icon: "Wrench",
+    tags: ["ai", "mcp", "durable-objects"],
+    bindings: ["DO"],
+  },
+  "receipt-parser": {
+    icon: "ReceiptText",
+    tags: ["ai", "workers-ai", "markdown"],
+    bindings: ["AI"],
+  },
+  "article-to-audio": {
+    icon: "Headphones",
+    tags: ["ai", "workers-ai", "tts"],
+    bindings: ["AI", "R2"],
+  },
+  "natural-language-calendar": {
+    icon: "CalendarPlus",
+    tags: ["ai", "workers-ai"],
+    bindings: ["AI"],
+  },
+  "newsletter-digest": {
+    icon: "Newspaper",
+    tags: ["email", "ai", "workers-ai", "stateful"],
+    bindings: ["AI", "D1", "CRON", "EMAIL"],
+  },
+  "accessibility-auditor": {
+    icon: "Accessibility",
+    tags: ["browser", "ai", "accessibility"],
+    bindings: ["BROWSER", "AI"],
+  },
+  "privacy-tracker-scanner": {
+    icon: "EyeOff",
+    tags: ["browser", "privacy", "security"],
+    bindings: ["BROWSER"],
+  },
+  "domain-expiry-reminder": {
+    icon: "CalendarClock",
+    tags: ["network", "monitoring", "tls"],
+    bindings: ["D1", "CRON", "EMAIL"],
+  },
+  "image-converter": { icon: "FileImage", tags: ["edge", "images"], bindings: ["IMAGES"] },
+  "access-jwt-validator": {
+    icon: "ShieldUser",
+    tags: ["edge", "security", "zero-trust"],
+    bindings: [],
+  },
+  "static-form-backend": {
+    icon: "ClipboardList",
+    tags: ["edge", "security", "email"],
+    bindings: ["D1", "RATE_LIMITER", "EMAIL"],
+  },
+  "one-time-secret": {
+    icon: "Flame",
+    tags: ["stateful", "security", "durable-objects"],
+    bindings: ["DO"],
   },
 };

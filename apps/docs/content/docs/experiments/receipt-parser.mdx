@@ -1,0 +1,262 @@
+---
+title: "Receipt Parser"
+description: "Parse receipt and invoice PDFs or photos into structured JSON or CSV with Workers AI Markdown Conversion and JSON mode"
+icon: "ReceiptText"
+tags:
+  - ai
+  - workers-ai
+  - markdown
+bindings:
+  - AI
+status: new
+---
+
+<Callout type="warning">
+
+This is an experimental Worker. Use it as a starting point for your own projects.
+
+</Callout>
+
+Upload a receipt or invoice and get back vendor, date, totals, and line items. The Worker converts the file to Markdown with [Workers AI Markdown Conversion](https://developers.cloudflare.com/workers-ai/features/markdown-conversion/) (`env.AI.toMarkdown`), then extracts fields with a [JSON mode](https://developers.cloudflare.com/workers-ai/features/json-mode/) LLM and validates the result in code.
+
+## Features
+
+- Accepts PDF, JPEG, PNG, and WebP (detected from file bytes, not the `Content-Type` header)
+- Raw request body or multipart `file` field, up to 10MB
+- Two-step pipeline: `toMarkdown` (vision model describes images) then `@cf/meta/llama-3.3-70b-instruct-fp8-fast` with a JSON schema
+- Normalizes model output: money strings coerced to numbers, invalid dates and unknown fields become `null`
+- Sanity-check `warnings` such as "line items don't sum to subtotal"
+- `?format=csv` returns a spreadsheet-ready CSV row
+
+## API Reference
+
+### POST /parse
+
+Parse a receipt or invoice. Send the file as the raw body, or as multipart form field `file`.
+
+<TypeTable
+  type={{
+    format: {
+      description: "`json` (default) or `csv`.",
+      type: "string",
+      required: false,
+    },
+    name: {
+      description: "File name to report for raw bodies. Defaults to `receipt.<ext>`.",
+      type: "string",
+      required: false,
+    },
+  }}
+/>
+
+#### Example Request
+
+```bash
+curl -X POST "https://your-worker.workers.dev/parse?name=lunch.jpg" \
+  -H "Content-Type: image/jpeg" \
+  --data-binary @lunch.jpg
+```
+
+Multipart upload with CSV output:
+
+```bash
+curl -X POST "https://your-worker.workers.dev/parse?format=csv" -F "file=@invoice.pdf"
+```
+
+#### Example Response
+
+```json
+{
+  "fileName": "lunch.jpg",
+  "mimeType": "image/jpeg",
+  "markdownPreview": "# lunch.jpg\n\n## Description\nA receipt from Corner Cafe...",
+  "receipt": {
+    "vendor": "Corner Cafe",
+    "date": "2026-09-01",
+    "currency": "USD",
+    "subtotal": 7,
+    "tax": 0.56,
+    "tip": 1.5,
+    "total": 9.06,
+    "lineItems": [
+      { "description": "Bagel", "quantity": 2, "unitPrice": 2.5, "amount": 5 },
+      { "description": "Tea", "quantity": 1, "unitPrice": 2, "amount": 2 }
+    ],
+    "paymentMethod": "Visa ****4242",
+    "category": "food"
+  },
+  "warnings": []
+}
+```
+
+**`receipt.category`** is one of `food`, `travel`, `lodging`, `office`, `software`, `other`. Any field the model could not find is `null`. **`markdownPreview`** is the first 500 characters of the converted Markdown.
+
+With `?format=csv`, the response is `text/csv` with a header line and one data row:
+
+```text
+fileName,vendor,date,currency,subtotal,tax,tip,total,paymentMethod,category,lineItemCount,warnings
+lunch.jpg,Corner Cafe,2026-09-01,USD,7,0.56,1.5,9.06,Visa ****4242,food,2,
+```
+
+#### Error Responses
+
+```json
+{ "error": "Unsupported file type. Use PDF, JPEG, PNG, or WebP", "code": "UNSUPPORTED_MEDIA_TYPE" }
+```
+
+- `400` - `MISSING_FILE` (empty body or no `file` field), `INVALID_QUERY` (bad `format`)
+- `413` - `PAYLOAD_TOO_LARGE` (over 10MB)
+- `415` - `UNSUPPORTED_MEDIA_TYPE`
+- `502` - `CONVERSION_ERROR` (Markdown conversion failed or returned no text), `AI_ERROR` (extraction model failed, including `JSON Mode couldn't be met`)
+
+## Implementation Details
+
+<Steps>
+  <Step>
+
+### Read and sniff the upload
+
+    `src/lib/upload.ts` reads the raw body or multipart `file` field, enforces the size limit, and detects the type from magic bytes (`%PDF`, JPEG `FF D8 FF`, PNG, `RIFF....WEBP`).
+
+  </Step>
+
+  <Step>
+
+### Convert to Markdown
+
+    `src/lib/convert.ts` calls `env.AI.toMarkdown({ name, blob })`. PDFs are converted to text; images are described by Workers AI vision models. A `format: "error"` result becomes `CONVERSION_ERROR`.
+
+  </Step>
+
+  <Step>
+
+### Extract fields with JSON mode
+
+    `src/lib/extract.ts` sends the Markdown (capped at 12,000 characters) to `@cf/meta/llama-3.3-70b-instruct-fp8-fast` with `response_format: { type: "json_schema", json_schema }`. The schema lives in `src/constants/schema.ts`. If the model returns truncated JSON (it occasionally repeats itself until it hits `max_tokens`), the call is retried once.
+
+  </Step>
+
+  <Step>
+
+### Normalize and check
+
+    `src/lib/normalize.ts` coerces values like `"$1,234.50"` or `"1.234,56 €"` to numbers, validates dates and ISO 4217 currency codes, and derives missing line amounts from quantity × unit price. `src/lib/checks.ts` compares sums with a 0.02 tolerance and returns warnings.
+
+  </Step>
+</Steps>
+
+## Use Cases
+
+- **Expense reports** - Drop receipt photos in and get rows for a spreadsheet
+- **Bookkeeping inboxes** - Pair with an Email Worker to parse forwarded invoices
+- **Reimbursement apps** - Pre-fill amount, date, and category from a photo
+- **Data entry QA** - Use `warnings` to flag receipts that need human review
+
+## Limitations
+
+- **Model accuracy**: Extraction quality depends on the scan; always review `warnings` and low-quality photos
+- **Image conversion cost**: `toMarkdown` uses Workers AI models for images, which counts against Workers AI usage
+- **Single receipt per file**: Multi-receipt PDFs are treated as one document
+- **Text cap**: Only the first 12,000 characters of Markdown are sent to the model
+- **Currency symbols**: `$` is assumed to be USD when the model returns a bare symbol
+
+## Use in your project
+
+<UseInYourProject
+  experiment="receipt-parser"
+  bindings={["Workers AI (AI binding)"]}
+  platform={["Workers AI Markdown Conversion", "Workers AI JSON mode"]}
+  files={[
+    "src/lib/upload.ts",
+    "src/lib/convert.ts",
+    "src/lib/extract.ts",
+    "src/lib/normalize.ts",
+    "src/lib/checks.ts",
+    "src/constants/defaults.ts",
+    "src/constants/schema.ts",
+    "src/types/receipt.ts",
+    "examples/usage.ts",
+  ]}
+/>
+
+## Deployment
+
+<Steps>
+  <Step>
+
+### Click the deploy button
+
+    [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/receipt-parser)
+
+  </Step>
+
+  <Step>
+
+### Deploy
+
+    The `AI` binding is configured in `wrangler.json`. Requires a Cloudflare account with Workers AI enabled.
+
+  </Step>
+
+  <Step>
+
+### Test your deployment
+
+    ```bash
+    curl -X POST "https://your-worker.workers.dev/parse" -F "file=@receipt.jpg"
+    ```
+
+  </Step>
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/receipt-parser
+npm install
+npm run dev
+```
+
+```bash
+curl -X POST "http://localhost:8787/parse" -F "file=@receipt.jpg"
+```
+
+The `AI` binding always runs remotely, so local development needs a logged-in Wrangler session.
+
+## Configuration
+
+`wrangler.json` declares a single Workers AI binding:
+
+```json
+{
+  "ai": { "binding": "AI" }
+}
+```
+
+Models and limits are in `src/constants/defaults.ts` (`TEXT_MODEL`, `MAX_FILE_BYTES`, `MAX_MARKDOWN_CHARS`, `SUM_TOLERANCE`).
+
+## Cloudflare Features Used
+
+- **[Workers](https://developers.cloudflare.com/workers/)** - Edge compute runtime
+- **[Markdown Conversion](https://developers.cloudflare.com/workers-ai/features/markdown-conversion/)** - `env.AI.toMarkdown` for PDFs and images
+- **[JSON Mode](https://developers.cloudflare.com/workers-ai/features/json-mode/)** - Schema-constrained output from `@cf/meta/llama-3.3-70b-instruct-fp8-fast`
+
+## Next Steps
+
+<Cards>
+  <Card
+    title="Markdown Conversion formats"
+    href="https://developers.cloudflare.com/workers-ai/features/markdown-conversion/supported-formats/"
+  >
+    All file types `toMarkdown` supports
+  </Card>
+  <Card title="Speech to Text Transcriber" href="/experiments/speech-to-text-transcriber">
+    Another file-upload Workers AI experiment
+  </Card>
+  <Card
+    title="GitHub Repository"
+    href="https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/receipt-parser"
+  >
+    View the complete source code
+  </Card>
+</Cards>

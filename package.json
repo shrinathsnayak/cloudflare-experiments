@@ -14,7 +14,7 @@
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "lint:links": "npm run lint:links --workspace=docs"
+    "lint:links": "npm exec -w docs tsx ./scripts/lint-links.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
@@ -22,7 +22,8 @@
     "globals": "^15.12.0",
     "prettier": "^3.4.2",
     "turbo": "^2.5.4",
-    "typescript-eslint": "^8.15.0"
+    "typescript-eslint": "^8.15.0",
+    "vite": "^8.3.2"
   },
   "packageManager": "npm@10.9.2"
 }

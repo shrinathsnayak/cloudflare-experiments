@@ -1,4 +1,5 @@
 import { SiteBanner } from "@/components/site-banner";
+import { SiteFooter } from "@/components/site-footer";
 import { homeLayoutOptions } from "@/lib/layout.shared";
 import { HomeLayout } from "fumadocs-ui/layouts/home";
 
@@ -6,7 +7,10 @@ export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <>
       <SiteBanner />
-      <HomeLayout {...homeLayoutOptions}>{children}</HomeLayout>
+      <HomeLayout {...homeLayoutOptions}>
+        {children}
+        <SiteFooter />
+      </HomeLayout>
     </>
   );
 }

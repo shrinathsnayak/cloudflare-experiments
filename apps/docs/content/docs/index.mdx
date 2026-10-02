@@ -30,8 +30,8 @@ Each experiment is:
   <Card title="What's New" href="/docs/changelog">
     New experiments and docs updates
   </Card>
-  <Card title="Browse Experiments" href="/docs/experiments/ai-website-summary">
-    Explore 90 edge computing experiments
+  <Card title="Browse Experiments" href="#experiment-categories">
+    Every experiment, grouped by Cloudflare capability
   </Card>
   <Card title="Contributing" href="/docs/contributing">
     Add your own experiments
@@ -65,105 +65,133 @@ Every experiment demonstrates **practical capabilities of the Cloudflare platfor
 
 ## Experiment Categories
 
-<Accordions>
-  <Accordion title="AI & Machine Learning">
-    - **AI Website Summary** - Summarize any webpage using Workers AI
-    - **AI Website Tag Generator** - Generate topic tags for any website
-    - **GitHub Repo Explainer** - AI explanation of GitHub repositories
-    - **AI Bot Visibility** - Check if URLs are configured for AI crawlers
-    - **Cloud AI Proxy** - Call Workers AI with any model and prompt from one endpoint
-    - **Text Translator** - Translate text with Workers AI at the edge
-    - **Sentiment Analyzer** - Analyze text sentiment with Workers AI
-    - **Text Similarity** - Compare text similarity with Workers AI embeddings
-    - **AI Image Generator** - Generate images from text prompts with Workers AI
-    - **Speech to Text Transcriber** - Transcribe uploaded audio with Workers AI Whisper
-    - **RAG Mini Search** - Grounded Q&A with Vectorize retrieval and Workers AI
-    - **AI Gateway Dashboard** - Workers AI through AI Gateway with cache and latency metadata
-    - **Chat Agent** - Durable AI chat agent with SQLite-backed Durable Objects
-    - **AI Search Demo** - Query Cloudflare AI Search (managed RAG) from a Worker
-  </Accordion>
+Every experiment, grouped the same way as the sidebar. Each page has an example request, a sample response, and a Deploy button.
 
-<Accordion title="Web Scraping & Parsing">
-  - **Website Metadata Extractor** - Extract title, description, Open Graph data, and canonical URL
-  - **Website to API** - Turn webpages into structured JSON - **Website to llms.txt** - Convert
-  pages for LLM consumption - **DevTools Inspector** - DevTools-style inspection of websites -
-  **Dependency Analyzer** - Analyze external resources loaded by a page - **HTML Rewriter** -
-  Extract HTML stats and transform pages with HTMLRewriter - **Social Preview Inspector** - Preview
-  Twitter/X, Open Graph, and Google snippets side by side - **Robots Sitemap Inspector** - Parse
-  robots.txt and linked sitemaps - **RSS / Atom Feed Parser** - Normalize feeds into JSON -
-  **JSON-LD Extractor** - Extract Schema.org JSON-LD structured data - **HTML to Markdown** -
-  Convert webpage HTML into Markdown
-</Accordion>
+### AI & Machine Learning [#ai]
 
-<Accordion title="Browser Rendering">
-  - **Screenshot API** - Capture screenshots from the edge - **PDF API** - Generate PDF documents
-  from any webpage - **Page Metrics** - Collect Puppeteer page load metrics - **Rendered Text** -
-  Extract JavaScript-rendered visible text - **Browser Links** - Extract links from
-  JavaScript-rendered pages - **Browser CDP Inspect** - Title, cookies, and performance via
-  Puppeteer - **Readability Extractor** - Extract clean article content with Browser Rendering
-</Accordion>
+- [AI Website Summary](/docs/experiments/ai-website-summary) - Summarize any webpage using Workers AI on the edge
+- [AI Website Tag Generator](/docs/experiments/ai-website-tag-generator) - Generate topic tags for any website using Workers AI on the edge
+- [GitHub Repo Explainer](/docs/experiments/github-repo-explainer) - Generate AI-powered explanations of any GitHub repository using Workers AI
+- [AI Bot Visibility Checker](/docs/experiments/ai-bot-visibility) - Check if a URL is configured to allow or block AI crawlers like GPTBot, ClaudeBot, and others
+- [Cloud AI Proxy](/docs/experiments/cloud-ai-proxy) - Call Workers AI with any model and prompt from a single public endpoint
+- [Text Translator](/docs/experiments/text-translator) - Translate text with Workers AI at the edge
+- [Sentiment Analyzer](/docs/experiments/sentiment-analyzer) - Analyze text sentiment with Workers AI at the edge
+- [Text Similarity](/docs/experiments/text-similarity) - Compare text similarity with Workers AI embeddings at the edge
+- [AI Image Generator](/docs/experiments/ai-image-generator) - Generate images from text prompts with Workers AI at the edge
+- [Speech to Text Transcriber](/docs/experiments/speech-to-text-transcriber) - Transcribe uploaded audio with Workers AI Whisper at the edge
+- [RAG Mini Search](/docs/experiments/rag-mini-search) - Grounded Q&A over experiment docs using Vectorize retrieval and Workers AI
+- [AI Gateway Dashboard](/docs/experiments/ai-gateway-dashboard) - Route Workers AI through AI Gateway and surface cache and latency metadata
+- [Chat Agent](/docs/experiments/chat-agent) - Durable AI chat agent with SQLite-backed Durable Objects and optional Workers AI
+- [AI Search Demo](/docs/experiments/ai-search-demo) - Query Cloudflare AI Search (managed RAG) from a Worker
+- [AI Batch Infer](/docs/experiments/ai-batch-infer) - Workers AI async batch embeddings with queueRequest and poll
+- [MCP Tools Server](/docs/experiments/mcp-tools-server) - Remote MCP server on Workers with the Agents SDK McpAgent, exposing DNS, HTTP headers, uptime, and hashing tools to AI clients
+- [Receipt Parser](/docs/experiments/receipt-parser) - Parse receipt and invoice PDFs or photos into structured JSON or CSV with Workers AI Markdown Conversion and JSON mode
+- [Article to Audio](/docs/experiments/article-to-audio) - Listen to any article: HTMLRewriter extracts the text, Workers AI Deepgram Aura-2 reads it aloud as MP3, and R2 caches the result
+- [Natural Language Calendar](/docs/experiments/natural-language-calendar) - Turn plain English into a calendar invite: Workers AI JSON mode extracts the event, the Worker returns an .ics file plus Google and Outlook links
+- [Newsletter Digest](/docs/experiments/newsletter-digest) - Forward newsletters to an Email Routing address and get one Workers AI-summarized digest email per day, stored in D1
 
-<Accordion title="Network & Monitoring">
-  - **Is It Down** - Check if websites are reachable from the edge - **URL DNS Lookup** - Get DNS
-  records for any hostname - **Email Auth Checker** - Analyze SPF, DMARC, and DKIM via DoH - **DNS
-  Propagation Checker** - Compare answers from Cloudflare, Google, and Quad9 resolvers - **Edge
-  Redirect Simulator** - Trace redirect chains and status codes - **Where Am I** - Request metadata
-  and geolocation from the edge - **Response Headers** - Inspect HTTP response headers for any URL -
-  **Security Headers Grader** - Grade HSTS, CSP, and related security headers - **SSL Certificate
-  Inspector** - Inspect TLS certificate metadata for a domain - **Multi-PoP Latency Map** - Fetch
-  latency plus serving colo per request - **Website Change Tracker** - Scheduled snapshots with R2
-  storage and D1 diff history - **Uptime Monitor Alerts** - Persistent URL monitors with D1 history
-  and email alerts - **CORS Preflight Tester** - Simulate browser CORS preflight and analyze
-  response headers - **Broken Link Checker** - Extract page links and report HTTP status codes -
-  **Smart Placement Probe** - Probe origin latency with Workers Smart Placement
-</Accordion>
+### Web Scraping & Parsing [#scraping]
 
-<Accordion title="Edge Platform">
-  - **Edge Cache** - Fetch URLs with the Workers Cache API - **Crypto Hash** - Compute SHA digests
-  with the Web Crypto API - **WebSocket Echo** - WebSocket echo server on Workers - **Image
-  Resizer** - Resize remote images with Cloudflare Image Resizing - **Turnstile Verify** - Verify
-  Cloudflare Turnstile tokens via siteverify - **JWT Inspector** - Decode, verify, and issue JWTs
-  for experimentation - **Rate Limiter Demo** - Native Workers Rate Limiting binding with 429
-  responses - **Webhook Signature Verifier** - Verify HMAC-SHA256 webhook signatures with
-  timing-safe compare - **Flagship Rollout** - Evaluate Cloudflare Flagship feature flags at the
-  edge - **Secrets Store Demo** - Read account-scoped secrets from Secrets Store - **Tail Logger** -
-  Tail Worker that stores recent traces in KV - **WebRTC Relay** - Issue Cloudflare Realtime TURN
-  credentials for WebRTC
-</Accordion>
+- [Website Metadata Extractor](/docs/experiments/website-metadata-extractor) - Extract metadata from any webpage including title, description, Open Graph tags, and canonical URL
+- [Website to API](/docs/experiments/website-to-api) - Turn any webpage into structured JSON with title, headings, links, and images
+- [Website to llms.txt](/docs/experiments/website-to-llms-txt) - Convert any webpage into llms.txt format for LLM consumption
+- [Website DevTools Inspector](/docs/experiments/website-devtools-inspector) - Inspect any website like browser DevTools - analyze headers, cookies, scripts, assets, and metadata
+- [Dependency Analyzer](/docs/experiments/dependency-analyzer) - Analyze all external resources and dependencies loaded by a webpage
+- [HTML Rewriter](/docs/experiments/html-rewriter) - Extract HTML stats and transform pages with HTMLRewriter at the edge
+- [Social Preview Inspector](/docs/experiments/social-preview-inspector) - Preview Twitter/X Cards, Open Graph unfurls, and Google snippets side by side with HTMLRewriter
+- [Robots Sitemap Inspector](/docs/experiments/robots-sitemap-inspector) - Parse robots.txt and linked sitemaps for any URL from the edge
+- [RSS / Atom Feed Parser](/docs/experiments/rss-atom-feed-parser) - Parse RSS or Atom feeds into normalized JSON from the edge
+- [JSON-LD Extractor](/docs/experiments/json-ld-extractor) - Extract Schema.org JSON-LD structured data from any webpage at the edge
+- [HTML to Markdown](/docs/experiments/html-to-markdown) - Convert any webpage HTML into clean Markdown from the edge
 
-<Accordion title="Compute & Isolation">
-  - **Dynamic Worker Runner** - Execute untrusted JavaScript via Dynamic Workers - **Container
-  Echo** - Echo a message via Cloudflare Containers - **Code Sandbox** - Run a JavaScript snippet in
-  an isolated Sandbox SDK container - **User Script Dispatcher** - Workers for Platforms style
-  dispatch
-</Accordion>
+### Browser Rendering [#browser]
 
-<Accordion title="Storage & Data">
-  - **R2 Storage** - R2 object storage with list/get/put/delete - **Link Shortener** - URL shortener
-  using D1 and KV - **D1 SQL Playground** - Read-only SQL playground over a seeded D1 database -
-  **KV Notes** - Simple note storage with Workers KV - **Vectorize Search** - Semantic search with
-  Workers AI embeddings and Vectorize - **Presigned R2 Upload** - Presigned PUT URLs for direct
-  browser-to-R2 uploads - **API Mock Server** - Define mock HTTP endpoints in KV and serve them on
-  demand - **Hyperdrive SQL Demo** - Query PostgreSQL through Hyperdrive connection pooling -
-  **Event Pipeline** - Ingest events into Cloudflare Pipelines - **Artifact Workspace** - Versioned
-  filesystem artifacts on R2
-</Accordion>
+- [Screenshot API](/docs/experiments/screenshot-api) - Capture screenshots of any website from the edge using Cloudflare Browser Rendering
+- [PDF API](/docs/experiments/pdf-api) - Generate PDF documents from any webpage using Cloudflare Browser Rendering
+- [Page Metrics](/docs/experiments/page-metrics) - Collect Puppeteer page load metrics using Cloudflare Browser Rendering
+- [Rendered Text](/docs/experiments/rendered-text) - Extract JavaScript-rendered visible text using Cloudflare Browser Rendering
+- [Browser Links](/docs/experiments/browser-links) - Extract links from JavaScript-rendered pages using Browser Rendering
+- [Browser CDP Inspect](/docs/experiments/browser-cdp-inspect) - Browser Rendering inspection - title, cookies, and performance via Puppeteer
+- [Readability Extractor](/docs/experiments/readability-extractor) - Extract clean article content from URLs using Browser Rendering and readability heuristics
+- [Browser Markdown Scrape](/docs/experiments/browser-markdown-scrape) - URL to Markdown and CSS scrape via Browser Rendering quickAction
+- [Accessibility Auditor](/docs/experiments/accessibility-auditor) - Run axe-core WCAG 2.1 AA audits with Browser Rendering and suggest alt text for unlabeled images with a Workers AI vision model
+- [Privacy Tracker Scanner](/docs/experiments/privacy-tracker-scanner) - Load a page with Browser Rendering without accepting consent and report third-party trackers, cookies, and a privacy verdict
 
-  <Accordion title="Stateful & Async">
-    - **Durable Counter** - Globally consistent counter with Durable Objects
-    - **DO SQLite Notes** - Per-user notes with SQLite-backed Durable Objects
-    - **Cron Heartbeat** - Scheduled tasks with Cron Triggers and KV metadata
-    - **Task Queue** - Enqueue tasks over HTTP and process them asynchronously
-    - **Analytics Engine** - Write custom events to Workers Analytics Engine
-    - **Workflows Pipeline Demo** - Durable fetch → AI summarize → R2 pipeline with Workflows
-    - **Live Cursor Tracker** - Real-time shared cursors over WebSocket via Durable Objects
-    - **Queue Job Visualizer** - Queues producer/consumer with KV job status and simulated retries
-    - **DO Alarm Scheduler** - One-off reminders with the Durable Object Alarm API
-    - **Webhook Relay Inspector** - Capture inbound webhooks in a Durable Object session for debugging
-    - **Email Worker Inbox** - Receive inbound emails with Email Workers
-    - **Transactional Email** - Send mail via the Email Service binding
-  </Accordion>
-</Accordions>
+### Network & Monitoring [#network]
+
+- [Is It Down?](/docs/experiments/is-it-down) - Check if a website is reachable from Cloudflare's edge network
+- [URL DNS Lookup](/docs/experiments/url-dns-lookup) - Get DNS records for the hostname of any URL using Cloudflare's DNS over HTTPS
+- [Email Auth Checker](/docs/experiments/email-auth-checker) - Analyze SPF, DMARC, and DKIM email authentication records via Cloudflare DoH
+- [Edge Redirect Simulator](/docs/experiments/edge-redirect-simulator) - Show redirect chains for any URL from Cloudflare's edge-each hop and status code
+- [Where Am I?](/docs/experiments/whereami) - Get request metadata from Cloudflare's edge including geolocation, colo, and more
+- [Response Headers](/docs/experiments/response-headers) - Inspect HTTP response headers for any URL from the edge
+- [Security Headers Grader](/docs/experiments/security-headers-grader) - Grade HTTP security headers (HSTS, CSP, XFO, and more) for any URL from the edge
+- [SSL Certificate Inspector](/docs/experiments/ssl-certificate-inspector) - Inspect TLS certificate metadata for a domain using Certificate Transparency and HTTPS probes
+- [Multi-PoP Latency Map](/docs/experiments/multi-pop-latency-map) - Measure fetch latency and report the Cloudflare colo that served the Worker invocation
+- [DNS Propagation Checker](/docs/experiments/dns-propagation-checker) - Compare DNS answers from Cloudflare, Google, and Quad9 resolvers in parallel via DoH
+- [Website Change Tracker](/docs/experiments/website-change-tracker) - Scheduled Browser Rendering snapshots with R2 storage and D1 diff history
+- [Uptime Monitor Alerts](/docs/experiments/uptime-monitor-alerts) - Persistent URL monitors with D1 history, cron checks, and email alerts on downtime
+- [CORS Preflight Tester](/docs/experiments/cors-preflight-tester) - Simulate browser CORS preflight OPTIONS requests and analyze response headers
+- [Broken Link Checker](/docs/experiments/broken-link-checker) - Extract links from a page and report HTTP status codes from the edge
+- [Smart Placement Probe](/docs/experiments/smart-placement-probe) - Demonstrate Workers Smart Placement by probing origin latency from the colo
+- [Domain Expiry Reminder](/docs/experiments/domain-expiry-reminder) - Track domain registration (RDAP) and TLS certificate (CT logs) expiry in D1, with daily cron email reminders at 30, 7, and 1 days left
+
+### Edge Platform [#edge]
+
+- [Edge Cache](/docs/experiments/edge-cache) - Fetch URLs with the Workers Cache API at the edge
+- [Crypto Hash](/docs/experiments/crypto-hash) - Compute SHA digests with the Web Crypto API at the edge
+- [WebSocket Echo](/docs/experiments/websocket-echo) - WebSocket echo server running on Cloudflare Workers
+- [Image Resizer](/docs/experiments/image-resizer) - Resize remote images with Cloudflare Image Resizing at the edge
+- [Image Converter](/docs/experiments/image-converter) - Convert, resize, and watermark images to WebP, AVIF, JPEG, or PNG with the Cloudflare Images binding, stripping GPS metadata
+- [Turnstile Verify](/docs/experiments/turnstile-verify) - Verify Cloudflare Turnstile tokens via the siteverify API
+- [JWT Inspector](/docs/experiments/jwt-inspector) - Decode, verify, and issue JWTs for experimentation using Web Crypto
+- [Access JWT Validator](/docs/experiments/access-jwt-validator) - Verify Cloudflare Zero Trust Access JWTs in a Worker with jose, the team JWKS, and a reusable Hono middleware
+- [Rate Limiter Demo](/docs/experiments/rate-limiter-demo) - Native Workers Rate Limiting binding with 429 responses and usage visualization
+- [Webhook Signature Verifier](/docs/experiments/webhook-signature-verifier) - Verify HMAC-SHA256 webhook signatures with timing-safe comparison at the edge
+- [Flagship Rollout](/docs/experiments/flagship-rollout) - Evaluate Cloudflare Flagship feature flags at the edge
+- [Secrets Store Demo](/docs/experiments/secrets-store-demo) - Read account-scoped secrets from Cloudflare Secrets Store
+- [Tail Logger](/docs/experiments/tail-logger) - Tail Worker that stores recent traces from another Worker in KV
+- [WebRTC Relay](/docs/experiments/webrtc-relay) - Issue Cloudflare Realtime TURN credentials for WebRTC (demo mode without secrets)
+- [Stream Video Demo](/docs/experiments/stream-video-demo) - Create Stream direct upload URLs and signed playback tokens
+- [Static Assets SPA](/docs/experiments/static-assets-spa) - Workers Static Assets with ASSETS binding and run_worker_first
+- [Static Form Backend](/docs/experiments/static-form-backend) - Contact-form backend for static sites with Turnstile, honeypot, native rate limiting, D1 storage, and email notifications
+
+### Compute & Isolation [#compute]
+
+- [Dynamic Worker Runner](/docs/experiments/dynamic-worker-runner) - Execute untrusted JavaScript via Dynamic Workers with no network access
+- [Container Echo](/docs/experiments/container-echo) - Echo a message via Cloudflare Containers backed by a Durable Object
+- [Code Sandbox](/docs/experiments/code-sandbox) - Run a JavaScript snippet in an isolated Sandbox SDK container
+- [User Script Dispatcher](/docs/experiments/user-script-dispatcher) - Workers for Platforms style dispatch via DispatchNamespace or KV handlers
+
+### Storage & Data [#storage]
+
+- [R2 Storage API](/docs/experiments/r2-storage) - Upload and serve files with Cloudflare R2 storage - private and public buckets with list, get, put, and delete operations
+- [Link Shortener](/docs/experiments/link-shortener) - URL shortener using Cloudflare D1 and KV - shorten links and redirect with edge caching
+- [D1 SQL Playground](/docs/experiments/d1-sql-playground) - Read-only SQL playground over a seeded D1 database with safe SELECT validation
+- [KV Notes](/docs/experiments/kv-notes) - Simple note storage with Workers KV at the edge
+- [Vectorize Search](/docs/experiments/vectorize-search) - Semantic search with Workers AI embeddings and Vectorize at the edge
+- [Presigned R2 Upload](/docs/experiments/presigned-r2-upload) - Generate presigned PUT URLs for direct browser-to-R2 uploads with aws4fetch
+- [API Mock Server](/docs/experiments/api-mock-server) - Define mock HTTP endpoints stored in Workers KV and serve them on demand
+- [Hyperdrive SQL Demo](/docs/experiments/hyperdrive-sql-demo) - Query PostgreSQL through Cloudflare Hyperdrive connection pooling from a Worker
+- [Event Pipeline](/docs/experiments/event-pipeline) - Ingest events into Cloudflare Pipelines (stream to R2/Iceberg)
+- [Artifact Workspace](/docs/experiments/artifact-workspace) - Store versioned filesystem artifacts (Artifacts-style workspace on R2)
+- [R2 SQL Query](/docs/experiments/r2-sql-query) - Query Apache Iceberg tables via the R2 SQL HTTP API
+
+### Stateful & Async [#stateful]
+
+- [Durable Counter](/docs/experiments/durable-counter) - Reference implementation for Durable Objects - a globally consistent counter with persistent edge state
+- [DO SQLite Notes](/docs/experiments/do-sqlite-notes) - Per-user notes stored in SQLite-backed Durable Objects via sql.exec
+- [Cron Heartbeat](/docs/experiments/cron-heartbeat) - Reference implementation for Cron Triggers - scheduled tasks with run metadata stored in KV
+- [Task Queue](/docs/experiments/task-queue) - Reference implementation for Queues - enqueue tasks over HTTP and process them asynchronously
+- [Analytics Engine](/docs/experiments/analytics-engine) - Write custom events to Workers Analytics Engine at the edge
+- [Workflows Pipeline Demo](/docs/experiments/workflows-pipeline-demo) - Durable fetch → AI summarize → R2 pipeline using Cloudflare Workflows with step.do and step.sleep
+- [Live Cursor Tracker](/docs/experiments/live-cursor-tracker) - Real-time shared cursor positions over WebSocket using Durable Objects and the Hibernation API
+- [Queue Job Visualizer](/docs/experiments/queue-job-visualizer) - Cloudflare Queues producer/consumer with KV-backed job status and simulated retries
+- [DO Alarm Scheduler](/docs/experiments/do-alarm-scheduler) - Schedule one-off reminders with the Durable Object Alarm API and poll for fired status
+- [Webhook Relay Inspector](/docs/experiments/webhook-relay-inspector) - Capture inbound HTTP webhooks in a Durable Object session for debugging and replay
+- [Email Worker Inbox](/docs/experiments/email-worker-inbox) - Receive inbound emails with Email Workers, store them in KV, and inspect over HTTP
+- [Transactional Email](/docs/experiments/transactional-email) - Send transactional email via the Cloudflare Email Service binding
+- [One-Time Secret](/docs/experiments/one-time-secret) - Share a secret via a self-destructing link: AES-GCM with Web Crypto, ciphertext in a per-secret Durable Object, alarm-based expiry
 
 ## Why This Project Exists
 

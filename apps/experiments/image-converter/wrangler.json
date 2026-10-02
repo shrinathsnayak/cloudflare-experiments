@@ -1,0 +1,15 @@
+{
+  "name": "image-converter",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-11-01",
+  "compatibility_flags": ["nodejs_compat_v2"],
+  "images": {
+    "binding": "IMAGES"
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}
