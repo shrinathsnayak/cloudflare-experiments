@@ -60,6 +60,11 @@ export const experimentsIndexRoute = `${docsRoute}#experiment-categories`;
 
 export const portfolioUrl = "https://snayak.dev";
 
+export function getBuyMeACoffeeUrl(): string | undefined {
+  const fromEnv = process.env.NEXT_PUBLIC_BUY_ME_A_COFFEE_URL?.trim();
+  return fromEnv || undefined;
+}
+
 export const siteBanner = {
   text: "This site is not affiliated with or endorsed by Cloudflare, Inc. It simply showcases experiments built using Cloudflare services.",
 };

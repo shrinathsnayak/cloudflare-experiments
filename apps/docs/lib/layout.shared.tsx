@@ -1,7 +1,8 @@
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { Globe } from "lucide-react";
 import { AppLogo } from "@/components/app-logo";
-import { docsRoute, githubRepoUrl, homeRoute, portfolioUrl } from "./shared";
+import { BuyMeACoffeeLink } from "@/components/buy-me-a-coffee-link";
+import { docsRoute, getBuyMeACoffeeUrl, githubRepoUrl, homeRoute, portfolioUrl } from "./shared";
 
 const nav = {
   title: <AppLogo />,
@@ -17,6 +18,15 @@ const portfolioLink = {
   external: true,
 };
 
+const buyMeACoffeeLinks = getBuyMeACoffeeUrl()
+  ? [
+    {
+      type: "custom" as const,
+      children: <BuyMeACoffeeLink />,
+    },
+  ]
+  : [];
+
 const sharedLayout: Pick<BaseLayoutProps, "githubUrl" | "themeSwitch" | "searchToggle"> = {
   githubUrl: githubRepoUrl,
   themeSwitch: {
@@ -28,23 +38,27 @@ const sharedLayout: Pick<BaseLayoutProps, "githubUrl" | "themeSwitch" | "searchT
   },
 };
 
-/** Docs sidebar layout ( /docs/* ) */
-export const docsLayoutOptions: BaseLayoutProps = {
+/** Docs notebook layout with top navbar ( /docs/* ) */
+export const docsLayoutOptions = {
   ...sharedLayout,
-  nav,
+  nav: {
+    ...nav,
+    mode: "top" as const,
+  },
   links: [
     {
-      type: "main",
+      type: "main" as const,
       text: "Home",
       url: homeRoute,
-      active: "url",
+      active: "url" as const,
     },
     {
-      type: "main",
+      type: "main" as const,
       text: "What's New",
       url: `${docsRoute}/changelog`,
-      active: "url",
+      active: "url" as const,
     },
+    ...buyMeACoffeeLinks,
     portfolioLink,
   ],
 };
@@ -72,6 +86,7 @@ export const homeLayoutOptions: BaseLayoutProps = {
       url: `${docsRoute}/changelog`,
       active: "url",
     },
+    ...buyMeACoffeeLinks,
     portfolioLink,
   ],
 };

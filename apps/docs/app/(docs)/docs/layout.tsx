@@ -3,7 +3,7 @@ import { SidebarCategory } from "@/components/sidebar-category";
 import { docsLayoutOptions } from "@/lib/layout.shared";
 import { groupSeparatorsIntoFolders } from "@/lib/page-tree";
 import { source } from "@/lib/source";
-import { DocsLayout } from "fumadocs-ui/layouts/docs";
+import { DocsLayout } from "fumadocs-ui/layouts/notebook";
 
 export default function Layout({ children }: LayoutProps<"/docs">) {
   const tree = groupSeparatorsIntoFolders(source.getPageTree());
