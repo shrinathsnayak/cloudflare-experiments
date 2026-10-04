@@ -249,6 +249,18 @@ export const homeCategories: HomeCategory[] = [
         description: "AI-summarized daily newsletter digest",
         status: "new",
       },
+      {
+        slug: "clef-decision",
+        title: "Clef Decision",
+        description: "Workers AI decision probabilities with Clef models",
+        status: "new",
+      },
+      {
+        slug: "web-search",
+        title: "Web Search",
+        description: "Web Search API through AI Gateway",
+        status: "new",
+      },
     ],
   },
   {
@@ -439,6 +451,12 @@ export const homeCategories: HomeCategory[] = [
         description: "Domain and TLS expiry email alerts",
         status: "new",
       },
+      {
+        slug: "radar-one-question",
+        title: "Radar One Question",
+        description: "Query Cloudflare Radar for domain or ASN facts",
+        status: "new",
+      },
     ],
   },
   {
@@ -520,6 +538,12 @@ export const homeCategories: HomeCategory[] = [
         slug: "static-form-backend",
         title: "Static Form Backend",
         description: "Turnstile forms for static sites",
+        status: "new",
+      },
+      {
+        slug: "ml-kem",
+        title: "ML-KEM",
+        description: "Post-quantum ML-KEM-768 key encapsulation",
         status: "new",
       },
     ],

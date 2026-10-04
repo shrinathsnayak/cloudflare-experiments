@@ -1,6 +1,6 @@
 # Cloudflare Experiments
 
-**102 deployable Cloudflare Workers - real tools with tests, API docs, and a one-click Deploy button. Not Hello World demos.**
+**106 deployable Cloudflare Workers - real tools with tests, API docs, and a one-click Deploy button. Not Hello World demos.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-cloudflare--experiments.com-f38020)](https://cloudflare-experiments.com)
@@ -81,7 +81,7 @@ This is a **Turborepo** monorepo. Each experiment lives under [`apps/experiments
 
 ## Experiments
 
-There are **102** experiments, grouped the same way as the [docs sidebar](https://cloudflare-experiments.com/docs). Each row links to the source and a one-click Cloudflare deploy.
+There are **106** experiments, grouped the same way as the [docs sidebar](https://cloudflare-experiments.com/docs). Each row links to the source and a one-click Cloudflare deploy.
 
 ### AI & Machine Learning
 
@@ -107,6 +107,8 @@ There are **102** experiments, grouped the same way as the [docs sidebar](https:
 | [Article to Audio](apps/experiments/article-to-audio/)                     | Listen to any article: HTMLRewriter + Workers AI TTS, cached in R2                        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/article-to-audio)           |
 | [Natural Language Calendar](apps/experiments/natural-language-calendar/)   | Turn plain English into a calendar invite (.ics, Google, Outlook)                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/natural-language-calendar)  |
 | [Newsletter Digest](apps/experiments/newsletter-digest/)                   | Forward newsletters; get one Workers AI-summarized digest email per day                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/newsletter-digest)          |
+| [Clef Decision](apps/experiments/clef-decision/)                           | Query Workers AI Clef models for decision probabilities                                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/clef-decision)              |
+| [Web Search](apps/experiments/web-search/)                                 | Web Search API through AI Gateway with ceramic, exa, or linkup providers                  | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/web-search)                 |
 
 ### Web Scraping & Parsing
 
@@ -159,6 +161,7 @@ There are **102** experiments, grouped the same way as the [docs sidebar](https:
 | [Broken Link Checker](apps/experiments/broken-link-checker/)             | Extract page links and report HTTP status codes from the edge                | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/broken-link-checker)       |
 | [Smart Placement Probe](apps/experiments/smart-placement-probe/)         | Demonstrate Workers Smart Placement by probing origin latency from the colo  | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/smart-placement-probe)     |
 | [Domain Expiry Reminder](apps/experiments/domain-expiry-reminder/)       | Track domain and TLS certificate expiry with daily email reminders           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/domain-expiry-reminder)    |
+| [Radar One Question](apps/experiments/radar-one-question/)               | Query Cloudflare Radar for one fact about a domain or ASN                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/radar-one-question)        |
 
 ### Edge Platform
 
@@ -181,6 +184,7 @@ There are **102** experiments, grouped the same way as the [docs sidebar](https:
 | [Stream Video Demo](apps/experiments/stream-video-demo/)                   | Create Stream direct upload URLs and signed playback tokens                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/stream-video-demo)          |
 | [Static Assets SPA](apps/experiments/static-assets-spa/)                   | Workers Static Assets SPA with ASSETS binding and run_worker_first for /api       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/static-assets-spa)          |
 | [Static Form Backend](apps/experiments/static-form-backend/)               | Contact-form backend for static sites with Turnstile, rate limiting, and email    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/static-form-backend)        |
+| [ML-KEM](apps/experiments/ml-kem/)                                         | Post-quantum ML-KEM-768 key encapsulation with Web Crypto                        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ml-kem)                     |
 
 ### Compute & Isolation
 

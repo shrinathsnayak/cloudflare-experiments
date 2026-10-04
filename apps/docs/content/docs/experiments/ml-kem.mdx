@@ -1,0 +1,130 @@
+---
+title: ML-KEM
+description: Post-quantum ML-KEM-768 key encapsulation with Web Crypto at the edge
+---
+
+Post-quantum key encapsulation using ML-KEM-768 (Module-Lattice-Based Key-Encapsulation Mechanism) with the Web Crypto API. This experiment demonstrates generating a key pair, encapsulating a shared secret, and decapsulating to verify the cryptographic operation.
+
+## API Reference
+
+### `GET /keygen`
+
+Generate an ML-KEM-768 key pair, encapsulate to a ciphertext, and decapsulate to verify that the shared secrets match.
+
+**Parameters:** None
+
+**Example request**
+
+```bash
+curl https://ml-kem.example.workers.dev/keygen
+```
+
+**Example response**
+
+```json
+{
+  "algorithm": "ML-KEM-768",
+  "publicKey": "a1b2c3d4...",
+  "ciphertext": "e5f6g7h8...",
+  "encapsulatedSecret": "i9j0k1l2...",
+  "decapsulatedSecret": "i9j0k1l2...",
+  "secretsMatch": true,
+  "publicKeyLength": 1184,
+  "ciphertextLength": 1088,
+  "sharedSecretLength": 32
+}
+```
+
+**Fields**
+
+- **`algorithm`** `string` - The ML-KEM variant used (ML-KEM-768)
+- **`publicKey`** `string` - Hex-encoded public key
+- **`ciphertext`** `string` - Hex-encoded ciphertext from encapsulation
+- **`encapsulatedSecret`** `string` - Truncated hex-encoded shared secret (first 32 chars + "...")
+- **`decapsulatedSecret`** `string` - Truncated hex-encoded shared secret from decapsulation
+- **`secretsMatch`** `boolean` - `true` when encapsulated and decapsulated secrets match
+- **`publicKeyLength`** `number` - Public key size in bytes (1184 for ML-KEM-768)
+- **`ciphertextLength`** `number` - Ciphertext size in bytes (1088 for ML-KEM-768)
+- **`sharedSecretLength`** `number` - Shared secret size in bytes (32)
+
+## Use Cases
+
+- Demonstrating post-quantum cryptography at the edge
+- Testing ML-KEM-768 implementation for migration planning
+- Building quantum-resistant key exchange demos
+- Educational exploration of NIST post-quantum standards
+
+## Limitations
+
+- Uses the `webcrypto_modern_algorithms` compatibility flag (may not be available in all environments)
+- Generates a fresh key pair on every request (stateless demo)
+- Shared secrets are truncated in response for readability
+- No persistent storage or key management
+
+## Deployment
+
+<Steps>
+
+<Step>
+### Deploy to Cloudflare Workers
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ml-kem)
+
+The Worker is live once deployment succeeds.
+</Step>
+
+<Step>
+### Test the endpoint
+
+```bash
+curl https://ml-kem.your-subdomain.workers.dev/keygen
+```
+
+You should see a JSON response with `secretsMatch: true`.
+</Step>
+
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/ml-kem
+npm install
+npm run dev
+```
+
+The Worker runs at `http://localhost:8787`.
+
+**Test locally**
+
+```bash
+curl http://localhost:8787/keygen
+```
+
+## Configuration
+
+### Compatibility flags
+
+This experiment requires the `webcrypto_modern_algorithms` flag in `wrangler.json`:
+
+```json
+{
+  "compatibility_flags": ["webcrypto_modern_algorithms"]
+}
+```
+
+No bindings or secrets required.
+
+## Cloudflare Features Used
+
+- [Workers](https://developers.cloudflare.com/workers/) - Edge compute platform
+- [Web Crypto API](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/) - Cryptographic operations at the edge
+- ML-KEM-768 post-quantum key encapsulation (via `webcrypto_modern_algorithms` flag)
+
+## Next Steps
+
+<Cards>
+  <Card title="Crypto Hash" href="/experiments/crypto-hash" description="SHA digests with Web Crypto" />
+  <Card title="JWT Inspector" href="/experiments/jwt-inspector" description="Decode and verify JWTs" />
+  <Card title="One-Time Secret" href="/experiments/one-time-secret" description="Self-destructing secrets with AES-GCM" />
+</Cards>
