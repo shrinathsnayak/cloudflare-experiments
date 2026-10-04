@@ -1,6 +1,6 @@
 # Cloudflare Experiments
 
-**106 deployable Cloudflare Workers - real tools with tests, API docs, and a one-click Deploy button. Not Hello World demos.**
+**110 deployable Cloudflare Workers - real tools with tests, API docs, and a one-click Deploy button. Not Hello World demos.**
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-cloudflare--experiments.com-f38020)](https://cloudflare-experiments.com)
@@ -81,7 +81,7 @@ This is a **Turborepo** monorepo. Each experiment lives under [`apps/experiments
 
 ## Experiments
 
-There are **106** experiments, grouped the same way as the [docs sidebar](https://cloudflare-experiments.com/docs). Each row links to the source and a one-click Cloudflare deploy.
+There are **110** experiments, grouped the same way as the [docs sidebar](https://cloudflare-experiments.com/docs). Each row links to the source and a one-click Cloudflare deploy.
 
 ### AI & Machine Learning
 
@@ -162,6 +162,7 @@ There are **106** experiments, grouped the same way as the [docs sidebar](https:
 | [Smart Placement Probe](apps/experiments/smart-placement-probe/)         | Demonstrate Workers Smart Placement by probing origin latency from the colo  | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/smart-placement-probe)     |
 | [Domain Expiry Reminder](apps/experiments/domain-expiry-reminder/)       | Track domain and TLS certificate expiry with daily email reminders           | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/domain-expiry-reminder)    |
 | [Radar One Question](apps/experiments/radar-one-question/)               | Query Cloudflare Radar for one fact about a domain or ASN                   | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/radar-one-question)        |
+| [Threat Signals Feed](apps/experiments/threat-signals-feed/)             | Query Cloudflare Threat Signals for structured threat indicators            | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/threat-signals-feed)      |
 
 ### Edge Platform
 
@@ -185,6 +186,7 @@ There are **106** experiments, grouped the same way as the [docs sidebar](https:
 | [Static Assets SPA](apps/experiments/static-assets-spa/)                   | Workers Static Assets SPA with ASSETS binding and run_worker_first for /api       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/static-assets-spa)          |
 | [Static Form Backend](apps/experiments/static-form-backend/)               | Contact-form backend for static sites with Turnstile, rate limiting, and email    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/static-form-backend)        |
 | [ML-KEM](apps/experiments/ml-kem/)                                         | Post-quantum ML-KEM-768 key encapsulation with Web Crypto                        | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ml-kem)                     |
+| [OAuth Provider v1](apps/experiments/oauth-provider-v1/)                   | OAuth 2.1 authorization server and MCP resource server with service binding       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/oauth-provider-v1)          |
 
 ### Compute & Isolation
 
@@ -194,6 +196,7 @@ There are **106** experiments, grouped the same way as the [docs sidebar](https:
 | [Container Echo](apps/experiments/container-echo/)                 | Echo a message via Cloudflare Containers                         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/container-echo)         |
 | [Code Sandbox](apps/experiments/code-sandbox/)                     | Run a JavaScript snippet in an isolated Sandbox SDK container    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/code-sandbox)           |
 | [User Script Dispatcher](apps/experiments/user-script-dispatcher/) | Workers for Platforms style dispatch via DispatchNamespace or KV | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/user-script-dispatcher) |
+| [Container Snapshot](apps/experiments/container-snapshot/)         | Snapshot and restore Container filesystem with durable_object policy | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/container-snapshot)     |
 
 ### Storage & Data
 
@@ -210,6 +213,7 @@ There are **106** experiments, grouped the same way as the [docs sidebar](https:
 | [Event Pipeline](apps/experiments/event-pipeline/)           | Ingest events into Cloudflare Pipelines (stream to R2/Iceberg)         | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/event-pipeline)      |
 | [Artifact Workspace](apps/experiments/artifact-workspace/)   | Store versioned filesystem artifacts (Artifacts-style workspace on R2) | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/artifact-workspace)  |
 | [R2 SQL Query](apps/experiments/r2-sql-query/)               | Query Apache Iceberg tables via the R2 SQL HTTP API                    | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/r2-sql-query)        |
+| [K2 Mini Stream](apps/experiments/k2-mini-stream/)           | Produce events to K2 and read them back in order                       | [Deploy](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/k2-mini-stream)      |
 
 ### Stateful & Async
 

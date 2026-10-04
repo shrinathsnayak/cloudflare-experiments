@@ -1,0 +1,27 @@
+{
+  "name": "container-snapshot",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SNAPSHOT_DEMO",
+        "class_name": "SnapshotDemo",
+        "script_name": "container-snapshot"
+      }
+    ]
+  },
+  "containers": {
+    "name": "container-snapshot-app",
+    "scheduling_policy": "durable_object",
+    "images": {
+      "debian": "cloudflare/debian-trixie@sha256:latest"
+    }
+  },
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

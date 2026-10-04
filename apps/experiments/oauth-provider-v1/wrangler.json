@@ -1,0 +1,17 @@
+{
+  "name": "oauth-provider-v1",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "kv_namespaces": [
+    {
+      "binding": "OAUTH_KV",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}
