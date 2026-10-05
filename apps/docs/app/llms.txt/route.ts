@@ -1,9 +1,10 @@
 import { docsLlms, source } from "@/lib/source";
-import { MARKDOWN_CACHE_CONTROL, applySecurityHeaders } from "@/lib/security-headers";
+import { isMarkdownPreferred } from "fumadocs-core/negotiation";
+import { markdownResponse } from "@/lib/markdown-response";
 import { appName, siteDescription, siteUrl } from "@/lib/shared";
 import { getExperimentCount } from "@/lib/catalog.server";
 
-export async function GET() {
+export async function GET(request: Request) {
   const experimentCount = getExperimentCount();
   const experimentPages = source.getPages().filter((page) => page.slugs[0] === "experiments");
 
@@ -39,10 +40,7 @@ ${catalog}
 ${await docsLlms.index()}
 `;
 
-  const headers = new Headers({
-    "Content-Type": "text/plain; charset=utf-8",
-    "Cache-Control": MARKDOWN_CACHE_CONTROL,
+  return markdownResponse(body, {
+    contentType: isMarkdownPreferred(request) ? "text/markdown" : "text/plain",
   });
-  applySecurityHeaders(headers);
-  return new Response(body, { headers });
 }

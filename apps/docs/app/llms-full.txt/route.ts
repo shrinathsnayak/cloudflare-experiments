@@ -1,5 +1,5 @@
 import { docsLlms } from "@/lib/source";
-import { MARKDOWN_CACHE_CONTROL, applySecurityHeaders } from "@/lib/security-headers";
+import { markdownResponse } from "@/lib/markdown-response";
 import { appName, siteDescription, siteUrl } from "@/lib/shared";
 import { getExperimentCount } from "@/lib/catalog.server";
 
@@ -19,10 +19,5 @@ Site: ${siteUrl}
 
 `;
 
-  const headers = new Headers({
-    "Content-Type": "text/plain; charset=utf-8",
-    "Cache-Control": MARKDOWN_CACHE_CONTROL,
-  });
-  applySecurityHeaders(headers);
-  return new Response(preamble + (await docsLlms.full()), { headers });
+  return markdownResponse(preamble + (await docsLlms.full()), { contentType: "text/plain" });
 }

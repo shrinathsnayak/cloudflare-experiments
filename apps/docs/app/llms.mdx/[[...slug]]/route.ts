@@ -1,5 +1,5 @@
 import { docsLlms, source } from "@/lib/source";
-import { MARKDOWN_CACHE_CONTROL, applySecurityHeaders } from "@/lib/security-headers";
+import { markdownResponse } from "@/lib/markdown-response";
 import { notFound } from "next/navigation";
 
 export async function GET(_req: Request, { params }: RouteContext<"/llms.mdx/[[...slug]]">) {
@@ -10,13 +10,7 @@ export async function GET(_req: Request, { params }: RouteContext<"/llms.mdx/[[.
   const page = source.getPage(slugs);
   if (!page) notFound();
 
-  const headers = new Headers({
-    "Content-Type": "text/markdown; charset=utf-8",
-    "Cache-Control": MARKDOWN_CACHE_CONTROL,
-  });
-  applySecurityHeaders(headers);
-
-  return new Response(await docsLlms.page(page), { headers });
+  return markdownResponse(await docsLlms.page(page));
 }
 
 export function generateStaticParams() {
