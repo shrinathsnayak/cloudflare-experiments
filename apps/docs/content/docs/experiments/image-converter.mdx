@@ -1,13 +1,16 @@
 ---
 title: "Image Converter"
-description: "Convert, resize, and watermark images to WebP, AVIF, JPEG, or PNG with the Cloudflare Images binding, stripping GPS metadata"
-icon: "FileImage"
+description: "Convert, resize, and watermark images to WebP, AVIF, JPEG, or PNG with the Cloudflare Images binding at the edge"
 tags:
   - edge
   - images
+  - webp
+  - avif
+  - conversion
+  - watermark
+  - resize
 bindings:
   - IMAGES
-status: new
 ---
 
 Convert uploaded or remote images to **WebP, AVIF, JPEG, or PNG**, resize them, and overlay a watermark with the Cloudflare [Images binding](https://developers.cloudflare.com/images/transform-images/bindings/) (`env.IMAGES`). Unlike [Image Resizer](/experiments/image-resizer) (`fetch` + `cf.image`), the binding works on raw bytes, so images don't need a public URL and no zone-level setup is required.

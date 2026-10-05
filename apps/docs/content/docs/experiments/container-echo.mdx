@@ -1,13 +1,14 @@
 ---
 title: "Container Echo"
-description: "Echo a message via Cloudflare Containers backed by a Durable Object"
-icon: "Box"
+description: "Minimal Cloudflare Containers demo — echo a message via a container backed by a Durable Object"
 tags:
   - containers
+  - durable-objects
+  - echo
+  - isolation
 bindings:
-  - Containers
+  - CONTAINERS
   - DO
-status: new
 ---
 
 Echo a message through **Cloudflare Containers**. A Durable Object subclass (`EchoContainer`) extends `@cloudflare/containers`'s `Container` and proxies requests to a Node HTTP server running in the container image.

@@ -1,14 +1,15 @@
 ---
 title: "AI Batch Infer"
-description: "Workers AI async batch embeddings with queueRequest and poll"
-icon: "Layers"
+description: "Workers AI async batch embeddings with queueRequest and polling — process large embedding jobs without blocking the request path"
 tags:
   - ai
+  - workers-ai
   - batch
   - embeddings
+  - async
+  - queue-request
 bindings:
   - AI
-status: new
 ---
 
 Submit a batch of Workers AI embedding inferences with `queueRequest: true`, then poll by `request_id` via the Asynchronous Batch API. Without an AI binding, routes return demo queued/poll responses.

@@ -1,12 +1,14 @@
 ---
 title: "Transactional Email"
-description: "Send transactional email via the Cloudflare Email Service binding"
-icon: "Send"
+description: "Send transactional email via the Cloudflare Email Service binding — receipts, alerts, and app mail from a Worker"
 tags:
   - email
+  - transactional
+  - notifications
+  - smtp
+  - outbound
 bindings:
-  - Email Sending
-status: new
+  - EMAIL
 ---
 
 Send transactional email via the Cloudflare **Email Service** `send_email` binding (`EMAIL`). Pair with [Email Worker Inbox](/experiments/email-worker-inbox) for the receive side.

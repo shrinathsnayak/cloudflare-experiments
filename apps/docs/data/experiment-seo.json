@@ -1,0 +1,1548 @@
+{
+  "access-jwt-validator": {
+    "description": "Verify Cloudflare Zero Trust Access JWTs in a Worker with jose, team JWKS, and reusable Hono middleware — edge auth for protected APIs",
+    "tags": [
+      "edge",
+      "security",
+      "zero-trust",
+      "jwt",
+      "access",
+      "auth",
+      "middleware"
+    ],
+    "bindings": [],
+    "title": "Access JWT Validator"
+  },
+  "accessibility-auditor": {
+    "description": "Run axe-core WCAG 2.1 AA accessibility audits with Browser Rendering and suggest alt text for unlabeled images via Workers AI vision",
+    "tags": [
+      "browser",
+      "ai",
+      "accessibility",
+      "wcag",
+      "axe-core",
+      "a11y",
+      "workers-ai"
+    ],
+    "bindings": [
+      "BROWSER",
+      "AI"
+    ],
+    "title": "Accessibility Auditor"
+  },
+  "ai-batch-infer": {
+    "description": "Workers AI async batch embeddings with queueRequest and polling — process large embedding jobs without blocking the request path",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "batch",
+      "embeddings",
+      "async",
+      "queue-request"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "AI Batch Infer"
+  },
+  "ai-bot-visibility": {
+    "description": "Check if robots.txt allows or blocks AI crawlers like GPTBot, ClaudeBot, Google-Extended, and PerplexityBot — AI SEO visibility audit",
+    "tags": [
+      "ai",
+      "seo",
+      "robots",
+      "crawlers",
+      "gptbot",
+      "llms",
+      "ai-bots"
+    ],
+    "bindings": [],
+    "title": "AI Bot Visibility Checker"
+  },
+  "ai-gateway-dashboard": {
+    "description": "Route Workers AI through Cloudflare AI Gateway and surface cache hits, latency, and gateway metadata for observability demos",
+    "tags": [
+      "ai",
+      "gateway",
+      "workers-ai",
+      "ai-gateway",
+      "caching",
+      "observability"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "AI Gateway Dashboard"
+  },
+  "ai-image-generator": {
+    "description": "Text-to-image generation with Workers AI at the edge — prompt in, image out from a deployable Cloudflare Worker",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "image-generation",
+      "text-to-image",
+      "diffusion"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "AI Image Generator"
+  },
+  "ai-search-demo": {
+    "description": "Query Cloudflare AI Search (managed RAG) from a Worker — grounded answers with retrieval over your indexed content",
+    "tags": [
+      "ai",
+      "rag",
+      "ai-search",
+      "retrieval",
+      "workers-ai",
+      "knowledge-base"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "AI Search Demo"
+  },
+  "ai-website-summary": {
+    "description": "Summarize any webpage with Workers AI on Cloudflare's edge — fetch URL, extract content, return a concise AI summary",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "summarization",
+      "scraping",
+      "content-extraction"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "AI Website Summary"
+  },
+  "ai-website-tag-generator": {
+    "description": "Generate SEO topic tags and keywords for any website using Workers AI — useful for content classification and metadata",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "seo",
+      "tagging",
+      "keywords",
+      "classification"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "AI Website Tag Generator"
+  },
+  "analytics-engine": {
+    "description": "Write custom analytics events to Workers Analytics Engine at the edge — high-cardinality metrics without a separate pipeline",
+    "tags": [
+      "stateful",
+      "analytics",
+      "metrics",
+      "observability",
+      "analytics-engine"
+    ],
+    "bindings": [
+      "ANALYTICS"
+    ],
+    "title": "Analytics Engine"
+  },
+  "api-mock-server": {
+    "description": "Define mock HTTP endpoints in Workers KV and serve them on demand — lightweight API mocking at the edge for demos and tests",
+    "tags": [
+      "storage",
+      "kv",
+      "mock",
+      "api",
+      "testing",
+      "stubs"
+    ],
+    "bindings": [
+      "KV"
+    ],
+    "title": "API Mock Server"
+  },
+  "article-to-audio": {
+    "description": "Turn any article into MP3: HTMLRewriter extracts text, Workers AI Deepgram Aura-2 narrates it, R2 caches the audio",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "tts",
+      "audio",
+      "htmlrewriter",
+      "r2",
+      "deepgram"
+    ],
+    "bindings": [
+      "AI",
+      "R2"
+    ],
+    "title": "Article to Audio"
+  },
+  "artifact-workspace": {
+    "description": "Versioned filesystem-style artifact workspace on R2 — store, list, and retrieve build or agent artifacts like a remote FS",
+    "tags": [
+      "storage",
+      "r2",
+      "artifacts",
+      "filesystem",
+      "agents",
+      "workspace"
+    ],
+    "bindings": [
+      "R2"
+    ],
+    "title": "Artifact Workspace"
+  },
+  "broken-link-checker": {
+    "description": "Crawl links from a page and report HTTP status codes from Cloudflare's edge — find 404s and broken outbound URLs fast",
+    "tags": [
+      "network",
+      "scraping",
+      "seo",
+      "link-checker",
+      "404",
+      "crawler"
+    ],
+    "bindings": [],
+    "title": "Broken Link Checker"
+  },
+  "browser-cdp-inspect": {
+    "description": "Browser Rendering + Puppeteer CDP inspection — capture title, cookies, document metadata, and performance timing without screenshots",
+    "tags": [
+      "browser",
+      "puppeteer",
+      "cdp",
+      "devtools",
+      "performance",
+      "browser-rendering"
+    ],
+    "bindings": [
+      "BROWSER"
+    ],
+    "title": "Browser CDP Inspect"
+  },
+  "browser-links": {
+    "description": "Extract all links from JavaScript-rendered pages using Cloudflare Browser Rendering — SPA-aware link discovery for crawlers",
+    "tags": [
+      "browser",
+      "scraping",
+      "links",
+      "spa",
+      "crawler",
+      "browser-rendering"
+    ],
+    "bindings": [
+      "BROWSER"
+    ],
+    "title": "Browser Links"
+  },
+  "browser-markdown-scrape": {
+    "description": "Convert any URL to Markdown or scrape CSS with Browser Rendering quickAction — JS-rendered pages to clean text for LLMs",
+    "tags": [
+      "browser",
+      "markdown",
+      "scraping",
+      "llms",
+      "browser-rendering",
+      "content-extraction"
+    ],
+    "bindings": [
+      "BROWSER"
+    ],
+    "title": "Browser Markdown Scrape"
+  },
+  "chat-agent": {
+    "description": "Durable AI chat agent with SQLite-backed Durable Objects and optional Workers AI — stateful conversational agent on Workers",
+    "tags": [
+      "ai",
+      "durable-objects",
+      "agents",
+      "chat",
+      "sqlite",
+      "workers-ai",
+      "conversational"
+    ],
+    "bindings": [
+      "AI",
+      "DO"
+    ],
+    "title": "Chat Agent"
+  },
+  "clef-decision": {
+    "title": "Clef Decision (Jev-compatible)",
+    "description": "Jev / System One API-compatible decision model on Workers AI — Clef & Clef-Flash return probabilities for noul/choice questions without free-form text",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "decision-model",
+      "jev",
+      "systemone",
+      "clef",
+      "agents",
+      "classification",
+      "structured-output"
+    ],
+    "bindings": [
+      "AI"
+    ]
+  },
+  "cloud-ai-proxy": {
+    "description": "Call any Workers AI model with a prompt from one public Worker endpoint — simple edge proxy for Workers AI inference",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "proxy",
+      "inference",
+      "llm",
+      "api"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "Cloud AI Proxy"
+  },
+  "code-sandbox": {
+    "description": "Run untrusted JavaScript in an isolated Sandbox SDK container on Cloudflare — safe code execution for agents and demos",
+    "tags": [
+      "containers",
+      "sandbox",
+      "isolation",
+      "code-execution",
+      "agents",
+      "durable-objects"
+    ],
+    "bindings": [
+      "CONTAINERS",
+      "DO"
+    ],
+    "title": "Code Sandbox"
+  },
+  "container-echo": {
+    "description": "Minimal Cloudflare Containers demo — echo a message via a container backed by a Durable Object",
+    "tags": [
+      "containers",
+      "durable-objects",
+      "echo",
+      "isolation"
+    ],
+    "bindings": [
+      "CONTAINERS",
+      "DO"
+    ],
+    "title": "Container Echo"
+  },
+  "cors-preflight-tester": {
+    "description": "Simulate browser CORS preflight OPTIONS requests and analyze ACAO/ACAH headers — debug cross-origin API access from the edge",
+    "tags": [
+      "network",
+      "cors",
+      "http",
+      "security",
+      "preflight",
+      "debugging"
+    ],
+    "bindings": [],
+    "title": "CORS Preflight Tester"
+  },
+  "cron-heartbeat": {
+    "description": "Cron Triggers reference: scheduled Worker runs with heartbeat metadata stored in KV — pattern for periodic edge jobs",
+    "tags": [
+      "stateful",
+      "cron",
+      "kv",
+      "scheduled",
+      "heartbeat",
+      "jobs"
+    ],
+    "bindings": [
+      "KV",
+      "CRON"
+    ],
+    "title": "Cron Heartbeat"
+  },
+  "crypto-hash": {
+    "description": "Compute SHA-256/384/512 digests with the Web Crypto API on Cloudflare Workers — pasteable edge hashing utility",
+    "tags": [
+      "edge",
+      "crypto",
+      "hash",
+      "web-crypto",
+      "sha256",
+      "security"
+    ],
+    "bindings": [],
+    "title": "Crypto Hash"
+  },
+  "d1-sql-playground": {
+    "description": "Read-only SQL playground over a seeded Cloudflare D1 database with safe SELECT validation — learn D1 at the edge",
+    "tags": [
+      "storage",
+      "d1",
+      "sql",
+      "sqlite",
+      "database",
+      "playground"
+    ],
+    "bindings": [
+      "D1"
+    ],
+    "title": "D1 SQL Playground"
+  },
+  "dependency-analyzer": {
+    "description": "Analyze scripts, stylesheets, images, fonts, and iframes loaded by any webpage — third-party dependency and asset inventory",
+    "tags": [
+      "scraping",
+      "dependencies",
+      "performance",
+      "third-party",
+      "assets",
+      "seo"
+    ],
+    "bindings": [],
+    "title": "Dependency Analyzer"
+  },
+  "dns-propagation-checker": {
+    "description": "Compare DNS answers from Cloudflare, Google, and Quad9 DoH resolvers in parallel — debug DNS propagation and mismatches",
+    "tags": [
+      "network",
+      "dns",
+      "doh",
+      "propagation",
+      "resolver",
+      "debugging"
+    ],
+    "bindings": [],
+    "title": "DNS Propagation Checker"
+  },
+  "do-alarm-scheduler": {
+    "description": "Schedule one-off reminders with the Durable Object Alarm API and poll fired status — deferred edge jobs without Cron",
+    "tags": [
+      "stateful",
+      "durable-objects",
+      "alarms",
+      "scheduler",
+      "reminders",
+      "jobs"
+    ],
+    "bindings": [
+      "DO"
+    ],
+    "title": "DO Alarm Scheduler"
+  },
+  "do-sqlite-notes": {
+    "description": "Per-user notes in SQLite-backed Durable Objects via sql.exec — structured storage pattern for stateful Workers",
+    "tags": [
+      "stateful",
+      "durable-objects",
+      "sqlite",
+      "notes",
+      "storage",
+      "sql"
+    ],
+    "bindings": [
+      "DO"
+    ],
+    "title": "DO SQLite Notes"
+  },
+  "domain-expiry-reminder": {
+    "description": "Track domain RDAP and TLS certificate expiry in D1 with daily cron emails at 30/7/1 days — domain and cert monitoring",
+    "tags": [
+      "network",
+      "monitoring",
+      "tls",
+      "rdap",
+      "email",
+      "cron",
+      "certificates"
+    ],
+    "bindings": [
+      "D1",
+      "CRON",
+      "EMAIL"
+    ],
+    "title": "Domain Expiry Reminder"
+  },
+  "durable-counter": {
+    "description": "Canonical Durable Objects counter — globally consistent increment/decrement with strong consistency at the edge",
+    "tags": [
+      "stateful",
+      "durable-objects",
+      "counter",
+      "consistency",
+      "reference"
+    ],
+    "bindings": [
+      "DO"
+    ],
+    "title": "Durable Counter"
+  },
+  "dynamic-worker-runner": {
+    "description": "Execute untrusted JavaScript via Dynamic Workers with no network access — isolate and run user code safely",
+    "tags": [
+      "edge",
+      "dynamic-workers",
+      "isolation",
+      "sandbox",
+      "code-execution",
+      "security"
+    ],
+    "bindings": [],
+    "title": "Dynamic Worker Runner"
+  },
+  "edge-cache": {
+    "description": "Fetch and cache URLs with the Workers Cache API at the edge — Cache API reference pattern for Cloudflare Workers",
+    "tags": [
+      "edge",
+      "cache",
+      "cache-api",
+      "performance",
+      "cdn"
+    ],
+    "bindings": [],
+    "title": "Edge Cache"
+  },
+  "edge-redirect-simulator": {
+    "description": "Follow and report full HTTP redirect chains from Cloudflare's edge — every hop, status code, and final URL",
+    "tags": [
+      "network",
+      "redirects",
+      "http",
+      "seo",
+      "debugging",
+      "chains"
+    ],
+    "bindings": [],
+    "title": "Edge Redirect Simulator"
+  },
+  "email-auth-checker": {
+    "description": "Analyze SPF, DMARC, and DKIM email authentication DNS records via Cloudflare DNS-over-HTTPS — email security audit",
+    "tags": [
+      "network",
+      "email",
+      "spf",
+      "dmarc",
+      "dkim",
+      "dns",
+      "security"
+    ],
+    "bindings": [],
+    "title": "Email Auth Checker"
+  },
+  "email-worker-inbox": {
+    "description": "Receive inbound email with Email Workers, store messages in KV, and inspect them over HTTP — edge inbox pattern",
+    "tags": [
+      "email",
+      "kv",
+      "inbound",
+      "email-workers",
+      "inbox",
+      "storage"
+    ],
+    "bindings": [
+      "KV"
+    ],
+    "title": "Email Worker Inbox"
+  },
+  "event-pipeline": {
+    "description": "Ingest events into Cloudflare Pipelines streaming to R2/Iceberg — event ingestion and analytics lake pattern",
+    "tags": [
+      "storage",
+      "pipelines",
+      "r2",
+      "iceberg",
+      "events",
+      "streaming",
+      "analytics"
+    ],
+    "bindings": [
+      "R2"
+    ],
+    "title": "Event Pipeline"
+  },
+  "flagship-rollout": {
+    "description": "Evaluate Cloudflare Flagship feature flags at the edge — progressive delivery and rollout checks in a Worker",
+    "tags": [
+      "edge",
+      "feature-flags",
+      "flagship",
+      "rollout",
+      "experimentation"
+    ],
+    "bindings": [],
+    "title": "Flagship Rollout"
+  },
+  "github-repo-explainer": {
+    "description": "AI-powered GitHub repository explainer with Workers AI — summarize README, structure, and purpose of any public repo",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "github",
+      "documentation",
+      "code-understanding"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "GitHub Repo Explainer"
+  },
+  "html-rewriter": {
+    "description": "Extract HTML stats and transform pages with Cloudflare HTMLRewriter — streaming HTML parse/transform at the edge",
+    "tags": [
+      "scraping",
+      "htmlrewriter",
+      "html",
+      "transform",
+      "streaming",
+      "parsing"
+    ],
+    "bindings": [],
+    "title": "HTML Rewriter"
+  },
+  "html-to-markdown": {
+    "description": "Convert any webpage HTML into clean Markdown from Cloudflare's edge — LLM-ready content extraction without a browser",
+    "tags": [
+      "scraping",
+      "markdown",
+      "html",
+      "llms",
+      "content-extraction",
+      "conversion"
+    ],
+    "bindings": [],
+    "title": "HTML to Markdown"
+  },
+  "hyperdrive-sql-demo": {
+    "description": "Query PostgreSQL through Cloudflare Hyperdrive connection pooling from a Worker — low-latency Postgres at the edge",
+    "tags": [
+      "storage",
+      "hyperdrive",
+      "postgres",
+      "sql",
+      "database",
+      "connection-pooling"
+    ],
+    "bindings": [
+      "HYPERDRIVE"
+    ],
+    "title": "Hyperdrive SQL Demo"
+  },
+  "image-converter": {
+    "description": "Convert, resize, and watermark images to WebP, AVIF, JPEG, or PNG with the Cloudflare Images binding at the edge",
+    "tags": [
+      "edge",
+      "images",
+      "webp",
+      "avif",
+      "conversion",
+      "watermark",
+      "resize"
+    ],
+    "bindings": [
+      "IMAGES"
+    ],
+    "title": "Image Converter"
+  },
+  "image-resizer": {
+    "description": "Resize remote images with Cloudflare Image Resizing from a Worker — on-the-fly thumbnails and responsive variants",
+    "tags": [
+      "edge",
+      "images",
+      "resize",
+      "thumbnails",
+      "cdn",
+      "image-resizing"
+    ],
+    "bindings": [],
+    "title": "Image Resizer"
+  },
+  "is-it-down": {
+    "description": "Check if a website is reachable from Cloudflare's edge network — uptime and latency probe API for any URL",
+    "tags": [
+      "network",
+      "uptime",
+      "monitoring",
+      "reachability",
+      "latency",
+      "health-check"
+    ],
+    "bindings": [],
+    "title": "Is It Down?"
+  },
+  "json-ld-extractor": {
+    "description": "Extract Schema.org JSON-LD structured data from any webpage at the edge — rich results and SEO markup inspection",
+    "tags": [
+      "scraping",
+      "seo",
+      "json-ld",
+      "schema.org",
+      "structured-data",
+      "rich-results"
+    ],
+    "bindings": [],
+    "title": "JSON-LD Extractor"
+  },
+  "jwt-inspector": {
+    "description": "Decode, verify, and issue JWTs with Web Crypto on Workers — JWT debugging and experimentation toolkit at the edge",
+    "tags": [
+      "edge",
+      "security",
+      "jwt",
+      "auth",
+      "web-crypto",
+      "tokens"
+    ],
+    "bindings": [],
+    "title": "JWT Inspector"
+  },
+  "kv-notes": {
+    "description": "Simple note CRUD with Workers KV at the edge — minimal key-value storage reference for Cloudflare Workers",
+    "tags": [
+      "storage",
+      "kv",
+      "notes",
+      "crud",
+      "key-value"
+    ],
+    "bindings": [
+      "KV"
+    ],
+    "title": "KV Notes"
+  },
+  "link-shortener": {
+    "description": "URL shortener with Cloudflare D1 + KV — create short links, redirect with edge caching, and track clicks",
+    "tags": [
+      "storage",
+      "d1",
+      "kv",
+      "url-shortener",
+      "redirects",
+      "links"
+    ],
+    "bindings": [
+      "D1",
+      "KV"
+    ],
+    "title": "Link Shortener"
+  },
+  "live-cursor-tracker": {
+    "description": "Real-time shared cursor positions over WebSocket using Durable Objects and Hibernation API — multiplayer presence demo",
+    "tags": [
+      "stateful",
+      "websocket",
+      "durable-objects",
+      "realtime",
+      "presence",
+      "multiplayer"
+    ],
+    "bindings": [
+      "DO"
+    ],
+    "title": "Live Cursor Tracker"
+  },
+  "mcp-tools-server": {
+    "description": "Remote MCP server on Workers with Agents SDK McpAgent — expose DNS, headers, uptime, and hash tools to Cursor and Claude",
+    "tags": [
+      "ai",
+      "mcp",
+      "agents",
+      "durable-objects",
+      "tools",
+      "cursor",
+      "model-context-protocol"
+    ],
+    "bindings": [
+      "DO"
+    ],
+    "title": "MCP Tools Server"
+  },
+  "ml-kem": {
+    "title": "ML-KEM (Post-Quantum)",
+    "description": "Post-quantum ML-KEM-768 (Kyber) key encapsulation with Web Crypto at the edge — PQC demo for quantum-resistant key exchange",
+    "tags": [
+      "edge",
+      "crypto",
+      "post-quantum",
+      "ml-kem",
+      "kyber",
+      "pqc",
+      "web-crypto",
+      "security"
+    ],
+    "bindings": []
+  },
+  "multi-pop-latency-map": {
+    "description": "Measure fetch latency and report the Cloudflare colo that served the Worker — edge PoP latency visibility for any URL",
+    "tags": [
+      "network",
+      "latency",
+      "colo",
+      "performance",
+      "pop",
+      "monitoring"
+    ],
+    "bindings": [],
+    "title": "Multi-PoP Latency Map"
+  },
+  "natural-language-calendar": {
+    "description": "Turn plain English into a calendar invite with Workers AI JSON mode — parse events and return .ics-ready structured data",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "calendar",
+      "nlp",
+      "ics",
+      "structured-output",
+      "json-mode"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "Natural Language Calendar"
+  },
+  "newsletter-digest": {
+    "description": "Forward newsletters to Email Routing and get one Workers AI-summarized daily digest — email + AI + cron pipeline",
+    "tags": [
+      "email",
+      "ai",
+      "workers-ai",
+      "stateful",
+      "digest",
+      "cron",
+      "summarization"
+    ],
+    "bindings": [
+      "AI",
+      "D1",
+      "CRON",
+      "EMAIL"
+    ],
+    "title": "Newsletter Digest"
+  },
+  "one-time-secret": {
+    "description": "Self-destructing secret links: AES-GCM with Web Crypto, ciphertext in a Durable Object, one-time read then burn",
+    "tags": [
+      "stateful",
+      "security",
+      "durable-objects",
+      "secrets",
+      "encryption",
+      "one-time"
+    ],
+    "bindings": [
+      "DO"
+    ],
+    "title": "One-Time Secret"
+  },
+  "page-metrics": {
+    "description": "Collect Puppeteer page-load metrics with Cloudflare Browser Rendering — Core Web Vitals-style timing from the edge",
+    "tags": [
+      "browser",
+      "performance",
+      "metrics",
+      "puppeteer",
+      "web-vitals",
+      "browser-rendering"
+    ],
+    "bindings": [
+      "BROWSER"
+    ],
+    "title": "Page Metrics"
+  },
+  "pdf-api": {
+    "description": "Generate PDFs from any webpage with Cloudflare Browser Rendering — HTML/URL to PDF API at the edge",
+    "tags": [
+      "browser",
+      "pdf",
+      "html-to-pdf",
+      "documents",
+      "browser-rendering"
+    ],
+    "bindings": [
+      "BROWSER"
+    ],
+    "title": "PDF API"
+  },
+  "presigned-r2-upload": {
+    "description": "Generate presigned PUT URLs for direct browser-to-R2 uploads with aws4fetch — secure client uploads without Worker proxying",
+    "tags": [
+      "storage",
+      "r2",
+      "presigned",
+      "upload",
+      "s3",
+      "aws4fetch"
+    ],
+    "bindings": [
+      "R2"
+    ],
+    "title": "Presigned R2 Upload"
+  },
+  "privacy-tracker-scanner": {
+    "description": "Load a page without accepting consent and report third-party trackers with Browser Rendering — privacy and CMP audit tool",
+    "tags": [
+      "browser",
+      "privacy",
+      "security",
+      "trackers",
+      "cookies",
+      "consent",
+      "gdpr"
+    ],
+    "bindings": [
+      "BROWSER"
+    ],
+    "title": "Privacy Tracker Scanner"
+  },
+  "queue-job-visualizer": {
+    "description": "Cloudflare Queues producer/consumer with KV-backed job status and simulated retries — visual job queue reference",
+    "tags": [
+      "stateful",
+      "queues",
+      "kv",
+      "jobs",
+      "retries",
+      "async"
+    ],
+    "bindings": [
+      "QUEUE",
+      "KV"
+    ],
+    "title": "Queue Job Visualizer"
+  },
+  "r2-sql-query": {
+    "description": "Query Apache Iceberg tables via the Cloudflare R2 SQL HTTP API — analytics SQL over object storage from a Worker",
+    "tags": [
+      "storage",
+      "r2",
+      "sql",
+      "iceberg",
+      "analytics",
+      "data-lake"
+    ],
+    "bindings": [],
+    "title": "R2 SQL Query"
+  },
+  "r2-storage": {
+    "description": "Upload and serve files with Cloudflare R2 — private and public bucket patterns, object CRUD, and edge file storage reference",
+    "tags": [
+      "storage",
+      "r2",
+      "object-storage",
+      "s3",
+      "files",
+      "upload"
+    ],
+    "bindings": [
+      "R2"
+    ],
+    "title": "R2 Storage API"
+  },
+  "radar-one-question": {
+    "description": "Ask Cloudflare Radar one fact about a domain rank or ASN org/location — Internet intelligence API demo for agents",
+    "tags": [
+      "network",
+      "radar",
+      "asn",
+      "domain-rank",
+      "internet-intelligence",
+      "api"
+    ],
+    "bindings": [],
+    "title": "Radar One Question"
+  },
+  "rag-mini-search": {
+    "description": "Mini RAG: Vectorize retrieval + Workers AI grounded answers over experiment docs — retrieval-augmented generation reference",
+    "tags": [
+      "ai",
+      "rag",
+      "vectorize",
+      "workers-ai",
+      "embeddings",
+      "retrieval",
+      "search"
+    ],
+    "bindings": [
+      "AI",
+      "VECTORIZE"
+    ],
+    "title": "RAG Mini Search"
+  },
+  "rate-limiter-demo": {
+    "description": "Native Workers Rate Limiting binding with 429 responses and usage visualization — protect APIs at the edge without Redis",
+    "tags": [
+      "edge",
+      "rate-limiting",
+      "security",
+      "api",
+      "throttling",
+      "kv"
+    ],
+    "bindings": [
+      "RATE_LIMITER",
+      "KV"
+    ],
+    "title": "Rate Limiter Demo"
+  },
+  "readability-extractor": {
+    "description": "Extract clean article content with Browser Rendering + Mozilla Readability — main content without nav/ads for LLMs",
+    "tags": [
+      "browser",
+      "scraping",
+      "readability",
+      "article",
+      "content-extraction",
+      "llms"
+    ],
+    "bindings": [
+      "BROWSER"
+    ],
+    "title": "Readability Extractor"
+  },
+  "receipt-parser": {
+    "description": "Parse receipt and invoice PDFs or photos into structured JSON/CSV with Workers AI vision — expense automation at the edge",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "ocr",
+      "vision",
+      "receipts",
+      "invoices",
+      "structured-output"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "Receipt Parser"
+  },
+  "rendered-text": {
+    "description": "Extract JavaScript-rendered visible text with Cloudflare Browser Rendering — SPA text scrape for search and AI ingestion",
+    "tags": [
+      "browser",
+      "scraping",
+      "text-extraction",
+      "spa",
+      "browser-rendering",
+      "llms"
+    ],
+    "bindings": [
+      "BROWSER"
+    ],
+    "title": "Rendered Text"
+  },
+  "response-headers": {
+    "description": "Inspect HTTP response headers for any URL from Cloudflare's edge — security, cache, and CORS header debugging",
+    "tags": [
+      "network",
+      "http",
+      "headers",
+      "debugging",
+      "security",
+      "cors"
+    ],
+    "bindings": [],
+    "title": "Response Headers"
+  },
+  "robots-sitemap-inspector": {
+    "description": "Parse robots.txt and linked sitemaps for any URL — SEO and AI-crawler access debugging from Cloudflare's edge",
+    "tags": [
+      "scraping",
+      "seo",
+      "robots",
+      "sitemap",
+      "crawlers",
+      "ai-bots"
+    ],
+    "bindings": [],
+    "title": "Robots Sitemap Inspector"
+  },
+  "rss-atom-feed-parser": {
+    "description": "Parse RSS or Atom feeds into normalized JSON from the edge — feed ingestion API for aggregators and agents",
+    "tags": [
+      "scraping",
+      "rss",
+      "atom",
+      "feeds",
+      "syndication",
+      "json"
+    ],
+    "bindings": [],
+    "title": "RSS / Atom Feed Parser"
+  },
+  "screenshot-api": {
+    "description": "Capture website screenshots with Cloudflare Browser Rendering — full-page or viewport PNG/JPEG screenshot API",
+    "tags": [
+      "browser",
+      "screenshot",
+      "puppeteer",
+      "browser-rendering",
+      "png",
+      "preview"
+    ],
+    "bindings": [
+      "BROWSER"
+    ],
+    "title": "Screenshot API"
+  },
+  "secrets-store-demo": {
+    "description": "Read account-scoped secrets from Cloudflare Secrets Store in a Worker — centralized secrets without per-Worker vars",
+    "tags": [
+      "edge",
+      "secrets",
+      "secrets-store",
+      "security",
+      "configuration"
+    ],
+    "bindings": [
+      "SECRETS_STORE"
+    ],
+    "title": "Secrets Store Demo"
+  },
+  "security-headers-grader": {
+    "description": "Grade HTTP security headers (HSTS, CSP, X-Frame-Options, and more) for any URL — security header audit from the edge",
+    "tags": [
+      "network",
+      "security",
+      "headers",
+      "hsts",
+      "csp",
+      "grading",
+      "audit"
+    ],
+    "bindings": [],
+    "title": "Security Headers Grader"
+  },
+  "sentiment-analyzer": {
+    "description": "Analyze text sentiment with Workers AI at the edge — positive/negative/neutral classification API for apps and agents",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "sentiment",
+      "nlp",
+      "classification",
+      "text-analysis"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "Sentiment Analyzer"
+  },
+  "smart-placement-probe": {
+    "description": "Demonstrate Workers Smart Placement by probing origin latency from the serving colo — place compute near your backend",
+    "tags": [
+      "network",
+      "placement",
+      "smart-placement",
+      "latency",
+      "performance",
+      "colo"
+    ],
+    "bindings": [],
+    "title": "Smart Placement Probe"
+  },
+  "social-preview-inspector": {
+    "description": "Preview Open Graph, Twitter/X Cards, and Google snippet fields side by side — social SEO unfurl debugger",
+    "tags": [
+      "scraping",
+      "seo",
+      "open-graph",
+      "twitter-cards",
+      "social",
+      "preview"
+    ],
+    "bindings": [],
+    "title": "Social Preview Inspector"
+  },
+  "speech-to-text-transcriber": {
+    "description": "Transcribe uploaded audio with Workers AI Whisper at the edge — speech-to-text API without a separate STT vendor",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "speech-to-text",
+      "whisper",
+      "transcription",
+      "audio"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "Speech to Text Transcriber"
+  },
+  "ssl-certificate-inspector": {
+    "description": "Inspect TLS certificate metadata via Certificate Transparency and edge probes — cert expiry, issuer, and chain details",
+    "tags": [
+      "network",
+      "tls",
+      "ssl",
+      "certificates",
+      "security",
+      "ct-logs"
+    ],
+    "bindings": [],
+    "title": "SSL Certificate Inspector"
+  },
+  "static-assets-spa": {
+    "description": "Workers Static Assets with ASSETS binding and run_worker_first — SPA hosting pattern on Cloudflare Workers",
+    "tags": [
+      "edge",
+      "assets",
+      "spa",
+      "static",
+      "hosting",
+      "frontend"
+    ],
+    "bindings": [],
+    "title": "Static Assets SPA"
+  },
+  "static-form-backend": {
+    "description": "Contact-form backend for static sites: Turnstile, honeypot, rate limiting, D1 storage, and email notifications",
+    "tags": [
+      "edge",
+      "security",
+      "email",
+      "forms",
+      "turnstile",
+      "d1",
+      "rate-limiting"
+    ],
+    "bindings": [
+      "D1",
+      "RATE_LIMITER",
+      "EMAIL"
+    ],
+    "title": "Static Form Backend"
+  },
+  "stream-video-demo": {
+    "description": "Create Cloudflare Stream direct-upload URLs and signed playback tokens — video upload and secure playback from a Worker",
+    "tags": [
+      "storage",
+      "stream",
+      "video",
+      "media",
+      "upload",
+      "playback"
+    ],
+    "bindings": [],
+    "title": "Stream Video Demo"
+  },
+  "tail-logger": {
+    "description": "Tail Worker that stores recent traces from another Worker in KV — live log tail and debugging pattern",
+    "tags": [
+      "stateful",
+      "tail",
+      "logging",
+      "observability",
+      "kv",
+      "debugging"
+    ],
+    "bindings": [
+      "KV"
+    ],
+    "title": "Tail Logger"
+  },
+  "task-queue": {
+    "description": "Cloudflare Queues reference: enqueue tasks over HTTP and process them asynchronously with a consumer Worker",
+    "tags": [
+      "stateful",
+      "queues",
+      "async",
+      "jobs",
+      "kv",
+      "background"
+    ],
+    "bindings": [
+      "QUEUE",
+      "KV"
+    ],
+    "title": "Task Queue"
+  },
+  "text-similarity": {
+    "description": "Compare text similarity with Workers AI embeddings at the edge — cosine similarity for duplicate and related-content detection",
+    "tags": [
+      "ai",
+      "embeddings",
+      "workers-ai",
+      "similarity",
+      "semantic-search",
+      "nlp"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "Text Similarity"
+  },
+  "text-translator": {
+    "description": "Translate text with Workers AI at the edge — multilingual translation API without a third-party translation service",
+    "tags": [
+      "ai",
+      "workers-ai",
+      "translation",
+      "i18n",
+      "nlp",
+      "multilingual"
+    ],
+    "bindings": [
+      "AI"
+    ],
+    "title": "Text Translator"
+  },
+  "transactional-email": {
+    "description": "Send transactional email via the Cloudflare Email Service binding — receipts, alerts, and app mail from a Worker",
+    "tags": [
+      "email",
+      "transactional",
+      "notifications",
+      "smtp",
+      "outbound"
+    ],
+    "bindings": [
+      "EMAIL"
+    ],
+    "title": "Transactional Email"
+  },
+  "turnstile-verify": {
+    "description": "Verify Cloudflare Turnstile tokens via the siteverify API — bot protection for forms and APIs on Workers",
+    "tags": [
+      "edge",
+      "security",
+      "turnstile",
+      "captcha",
+      "bot-protection",
+      "auth"
+    ],
+    "bindings": [],
+    "title": "Turnstile Verify"
+  },
+  "uptime-monitor-alerts": {
+    "description": "Persistent URL monitors with D1 history, cron checks, and email alerts on downtime — edge uptime monitoring starter",
+    "tags": [
+      "network",
+      "monitoring",
+      "uptime",
+      "cron",
+      "email",
+      "d1",
+      "alerts"
+    ],
+    "bindings": [
+      "D1",
+      "CRON",
+      "EMAIL"
+    ],
+    "title": "Uptime Monitor Alerts"
+  },
+  "url-dns-lookup": {
+    "description": "DNS lookup for any URL's hostname via Cloudflare DNS-over-HTTPS (1.1.1.1) — A, AAAA, MX, TXT, and more from a Worker",
+    "tags": [
+      "network",
+      "dns",
+      "doh",
+      "lookup",
+      "1.1.1.1",
+      "records"
+    ],
+    "bindings": [],
+    "title": "URL DNS Lookup"
+  },
+  "user-script-dispatcher": {
+    "description": "Workers for Platforms-style dispatch via Dispatch Namespace or KV-stored handlers — multi-tenant user Worker routing",
+    "tags": [
+      "edge",
+      "platforms",
+      "dispatch",
+      "multi-tenant",
+      "workers-for-platforms",
+      "kv"
+    ],
+    "bindings": [
+      "KV"
+    ],
+    "title": "User Script Dispatcher"
+  },
+  "vectorize-search": {
+    "description": "Semantic search with Workers AI embeddings and Vectorize — index text and query nearest neighbors at the edge",
+    "tags": [
+      "storage",
+      "ai",
+      "vectorize",
+      "embeddings",
+      "semantic-search",
+      "workers-ai"
+    ],
+    "bindings": [
+      "AI",
+      "VECTORIZE"
+    ],
+    "title": "Vectorize Search"
+  },
+  "web-search": {
+    "description": "Web Search API through Cloudflare AI Gateway with Ceramic, Exa, or Linkup — agent-ready search results from the edge",
+    "tags": [
+      "ai",
+      "search",
+      "ai-gateway",
+      "ceramic",
+      "exa",
+      "linkup",
+      "agents",
+      "web-search"
+    ],
+    "bindings": [],
+    "title": "Web Search"
+  },
+  "webhook-relay-inspector": {
+    "description": "Capture inbound HTTP webhooks in a Durable Object session for debugging and replay — webhook inbox for local/dev testing",
+    "tags": [
+      "stateful",
+      "webhooks",
+      "durable-objects",
+      "debugging",
+      "relay",
+      "inspector"
+    ],
+    "bindings": [
+      "DO"
+    ],
+    "title": "Webhook Relay Inspector"
+  },
+  "webhook-signature-verifier": {
+    "description": "Verify HMAC-SHA256 webhook signatures with timing-safe comparison at the edge — Stripe/GitHub-style webhook auth",
+    "tags": [
+      "edge",
+      "security",
+      "webhooks",
+      "hmac",
+      "signatures",
+      "auth"
+    ],
+    "bindings": [],
+    "title": "Webhook Signature Verifier"
+  },
+  "webrtc-relay": {
+    "description": "Issue Cloudflare Realtime (Calls) TURN credentials for WebRTC — STUN/TURN relay demo for peer connections",
+    "tags": [
+      "network",
+      "webrtc",
+      "realtime",
+      "turn",
+      "stun",
+      "calls"
+    ],
+    "bindings": [],
+    "title": "WebRTC Relay"
+  },
+  "website-change-tracker": {
+    "description": "Scheduled Browser Rendering snapshots with R2 storage and D1 diff history — detect website changes over time",
+    "tags": [
+      "network",
+      "monitoring",
+      "browser",
+      "change-detection",
+      "r2",
+      "d1",
+      "cron"
+    ],
+    "bindings": [
+      "D1",
+      "R2",
+      "BROWSER",
+      "CRON"
+    ],
+    "title": "Website Change Tracker"
+  },
+  "website-devtools-inspector": {
+    "description": "Inspect any site like browser DevTools — headers, cookies, scripts, assets, and metadata from Cloudflare's edge",
+    "tags": [
+      "scraping",
+      "devtools",
+      "headers",
+      "cookies",
+      "seo",
+      "debugging",
+      "assets"
+    ],
+    "bindings": [],
+    "title": "Website DevTools Inspector"
+  },
+  "website-metadata-extractor": {
+    "description": "Extract title, description, Open Graph, Twitter Card, and canonical URL from any webpage — SEO metadata API",
+    "tags": [
+      "scraping",
+      "seo",
+      "metadata",
+      "open-graph",
+      "canonical",
+      "meta-tags"
+    ],
+    "bindings": [],
+    "title": "Website Metadata Extractor"
+  },
+  "website-to-api": {
+    "description": "Turn any webpage into structured JSON (title, headings, links, images) — HTML-to-API scraper for agents and apps",
+    "tags": [
+      "scraping",
+      "api",
+      "json",
+      "html-to-json",
+      "agents",
+      "content-extraction"
+    ],
+    "bindings": [],
+    "title": "Website to API"
+  },
+  "website-to-llms-txt": {
+    "description": "Convert any webpage into llms.txt format for LLM and AI-agent consumption — AI-readable site summary generator",
+    "tags": [
+      "scraping",
+      "llms",
+      "llms-txt",
+      "ai-bots",
+      "seo",
+      "agents"
+    ],
+    "bindings": [],
+    "title": "Website to llms.txt"
+  },
+  "websocket-echo": {
+    "description": "WebSocket echo server on Cloudflare Workers — bidirectional realtime messaging reference implementation",
+    "tags": [
+      "edge",
+      "websocket",
+      "realtime",
+      "echo",
+      "networking"
+    ],
+    "bindings": [],
+    "title": "WebSocket Echo"
+  },
+  "whereami": {
+    "description": "Return Cloudflare request.cf geolocation, colo, ASN, and edge metadata — where-am-I API for Workers and agents",
+    "tags": [
+      "network",
+      "geolocation",
+      "colo",
+      "request-cf",
+      "asn",
+      "edge-metadata"
+    ],
+    "bindings": [],
+    "title": "Where Am I?"
+  },
+  "workflows-pipeline-demo": {
+    "description": "Durable fetch → AI summarize → R2 pipeline with Cloudflare Workflows — durable multi-step orchestration reference",
+    "tags": [
+      "stateful",
+      "workflows",
+      "ai",
+      "r2",
+      "orchestration",
+      "pipeline",
+      "durable"
+    ],
+    "bindings": [
+      "WORKFLOW",
+      "AI",
+      "R2"
+    ],
+    "title": "Workflows Pipeline Demo"
+  }
+}

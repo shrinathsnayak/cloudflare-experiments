@@ -1,11 +1,13 @@
 ---
 title: "Smart Placement Probe"
-description: "Demonstrate Workers Smart Placement by probing origin latency from the colo"
-icon: "MapPin"
+description: "Demonstrate Workers Smart Placement by probing origin latency from the serving colo — place compute near your backend"
 tags:
-  - networking
+  - network
   - placement
-status: new
+  - smart-placement
+  - latency
+  - performance
+  - colo
 ---
 
 Demonstrate **Workers Smart Placement** by fetching an origin URL and reporting latency alongside the request colo. `wrangler.json` sets `"placement": { "mode": "smart" }` so Cloudflare can place the Worker closer to back-end origins based on traffic patterns.

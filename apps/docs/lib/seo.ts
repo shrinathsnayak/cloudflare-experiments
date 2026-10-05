@@ -113,11 +113,23 @@ export function createRootMetadata(): Metadata {
 export function createDocsPageMetadata(page: NonNullable<DocsPage>): Metadata {
   const canonical = absoluteUrl(page.url);
   const image = getPageImage(page).url;
+  const pageTags = page.data.tags ?? [];
+  const pageBindings = page.data.bindings ?? [];
+  const keywords = Array.from(
+    new Set([
+      ...siteKeywords,
+      page.data.title,
+      ...pageTags,
+      ...pageBindings,
+      "Cloudflare Workers experiment",
+      "deployable reference",
+    ]),
+  );
 
   return {
     title: page.data.title,
     description: page.data.description,
-    keywords: siteKeywords,
+    keywords,
     alternates: {
       canonical,
       types: {
@@ -175,12 +187,14 @@ export function createWebsiteJsonLd() {
 
 export function createDocsPageJsonLd(page: NonNullable<DocsPage>) {
   const url = absoluteUrl(page.url);
+  const keywords = [...(page.data.tags ?? []), ...(page.data.bindings ?? [])];
 
   return {
     "@context": "https://schema.org",
     "@type": "TechArticle",
     headline: page.data.title,
     description: page.data.description,
+    keywords: keywords.length > 0 ? keywords.join(", ") : undefined,
     url,
     inLanguage: "en-US",
     isPartOf: {

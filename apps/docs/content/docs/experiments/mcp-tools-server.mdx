@@ -1,14 +1,16 @@
 ---
 title: "MCP Tools Server"
-description: "Remote MCP server on Workers with the Agents SDK McpAgent, exposing DNS, HTTP headers, uptime, and hashing tools to AI clients"
-icon: "Wrench"
+description: "Remote MCP server on Workers with Agents SDK McpAgent — expose DNS, headers, uptime, and hash tools to Cursor and Claude"
 tags:
   - ai
   - mcp
+  - agents
   - durable-objects
+  - tools
+  - cursor
+  - model-context-protocol
 bindings:
   - DO
-status: new
 ---
 
 A remote **Model Context Protocol (MCP)** server built with the Agents SDK `McpAgent`. Each MCP session runs in its own SQLite-backed **Durable Object**, and clients such as Cursor, Claude Desktop, or the MCP Inspector connect over **Streamable HTTP** at `/mcp`.

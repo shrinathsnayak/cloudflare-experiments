@@ -1,11 +1,16 @@
 ---
 title: "Cron Heartbeat"
-description: "Reference implementation for Cron Triggers - scheduled tasks with run metadata stored in KV"
-icon: "Clock"
+description: "Cron Triggers reference: scheduled Worker runs with heartbeat metadata stored in KV — pattern for periodic edge jobs"
 tags:
   - stateful
+  - cron
+  - kv
+  - scheduled
+  - heartbeat
+  - jobs
 bindings:
   - KV
+  - CRON
 ---
 
 A minimal reference for **Cron Triggers**: a `scheduled()` handler runs every 5 minutes and writes run metadata to **Workers KV**. An HTTP route reads that metadata back.

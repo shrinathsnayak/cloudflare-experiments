@@ -1,9 +1,19 @@
 ---
-title: ML-KEM
-description: Post-quantum ML-KEM-768 key encapsulation with Web Crypto at the edge
+title: "ML-KEM (Post-Quantum)"
+description: "Post-quantum ML-KEM-768 (Kyber) key encapsulation with Web Crypto at the edge — PQC demo for quantum-resistant key exchange"
+tags:
+  - edge
+  - crypto
+  - post-quantum
+  - ml-kem
+  - kyber
+  - pqc
+  - web-crypto
+  - security
+status: new
 ---
 
-Post-quantum key encapsulation using ML-KEM-768 (Module-Lattice-Based Key-Encapsulation Mechanism) with the Web Crypto API. This experiment demonstrates generating a key pair, encapsulating a shared secret, and decapsulating to verify the cryptographic operation.
+**ML-KEM** (formerly **Kyber**) is NIST's post-quantum key encapsulation standard. This Worker demonstrates **ML-KEM-768** with the Web Crypto API on Cloudflare Workers: generate a key pair, encapsulate a shared secret, and decapsulate to verify — a pasteable PQC reference for quantum-resistant key exchange at the edge.
 
 ## API Reference
 
@@ -61,6 +71,14 @@ curl https://ml-kem.example.workers.dev/keygen
 - Shared secrets are truncated in response for readability
 - No persistent storage or key management
 
+## Use in your project
+
+<UseInYourProject
+  experiment="ml-kem"
+  platform={["Web Crypto (`crypto.subtle`)", "`webcrypto_modern_algorithms` flag"]}
+  files={["src/lib/mlkem.ts", "examples/usage.ts"]}
+/>
+
 ## Deployment
 
 <Steps>
@@ -71,6 +89,7 @@ curl https://ml-kem.example.workers.dev/keygen
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/ml-kem)
 
 The Worker is live once deployment succeeds.
+
 </Step>
 
 <Step>
@@ -81,6 +100,7 @@ curl https://ml-kem.your-subdomain.workers.dev/keygen
 ```
 
 You should see a JSON response with `secretsMatch: true`.
+
 </Step>
 
 </Steps>
@@ -124,7 +144,19 @@ No bindings or secrets required.
 ## Next Steps
 
 <Cards>
-  <Card title="Crypto Hash" href="/experiments/crypto-hash" description="SHA digests with Web Crypto" />
-  <Card title="JWT Inspector" href="/experiments/jwt-inspector" description="Decode and verify JWTs" />
-  <Card title="One-Time Secret" href="/experiments/one-time-secret" description="Self-destructing secrets with AES-GCM" />
+  <Card
+    title="Crypto Hash"
+    href="/experiments/crypto-hash"
+    description="SHA digests with Web Crypto"
+  />
+  <Card
+    title="JWT Inspector"
+    href="/experiments/jwt-inspector"
+    description="Decode and verify JWTs"
+  />
+  <Card
+    title="One-Time Secret"
+    href="/experiments/one-time-secret"
+    description="Self-destructing secrets with AES-GCM"
+  />
 </Cards>

@@ -1,10 +1,13 @@
 ---
 title: "DNS Propagation Checker"
-description: "Compare DNS answers from Cloudflare, Google, and Quad9 resolvers in parallel via DoH"
-icon: "GlobeCheck"
+description: "Compare DNS answers from Cloudflare, Google, and Quad9 DoH resolvers in parallel — debug DNS propagation and mismatches"
 tags:
   - network
   - dns
+  - doh
+  - propagation
+  - resolver
+  - debugging
 ---
 
 Query **DNS-over-HTTPS** resolvers (Cloudflare 1.1.1.1, Google 8.8.8.8, Quad9) in parallel for a domain and record type. Reports whether answers agree, each resolver's values, and response time.

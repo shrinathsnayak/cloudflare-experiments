@@ -1,13 +1,14 @@
 ---
 title: "Access JWT Validator"
-description: "Verify Cloudflare Zero Trust Access JWTs in a Worker with jose, the team JWKS, and a reusable Hono middleware"
-icon: "ShieldUser"
+description: "Verify Cloudflare Zero Trust Access JWTs in a Worker with jose, team JWKS, and reusable Hono middleware — edge auth for protected APIs"
 tags:
   - edge
   - security
   - zero-trust
-bindings: []
-status: new
+  - jwt
+  - access
+  - auth
+  - middleware
 ---
 
 Verify **Cloudflare Access** JWTs inside a Worker. The token comes from the `Cf-Access-Jwt-Assertion` header, or from the `CF_Authorization` cookie if the header is missing. The Worker checks it with [`jose`](https://github.com/panva/jose) against your team's public keys at `https://<team>.cloudflareaccess.com/cdn-cgi/access/certs`, with **issuer = team domain** and **audience = the application's AUD tag**.

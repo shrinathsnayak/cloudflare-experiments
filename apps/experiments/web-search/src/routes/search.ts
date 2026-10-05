@@ -1,10 +1,11 @@
 import { Hono } from "hono";
 import type { Env } from "../types/env";
+import { searchWeb, type SearchProvider } from "../lib/search";
 import { jsonSuccess, jsonError } from "../utils/response";
 
 interface SearchRequest {
   query: string;
-  provider?: "ceramic" | "exa" | "linkup";
+  provider?: SearchProvider;
   limit?: number;
 }
 
@@ -38,36 +39,19 @@ app.post("/search", async (c) => {
     const accountId = c.env.AI_GATEWAY_ACCOUNT_ID || "demo";
     const gatewayId = c.env.AI_GATEWAY_ID || "web-search-demo";
 
-    const gatewayUrl = `https://gateway.ai.cloudflare.com/v1/${accountId}/${gatewayId}/web-search/${provider}`;
-
-    const response = await fetch(gatewayUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query,
-        limit,
-      }),
+    const results = await searchWeb({
+      query,
+      provider,
+      limit,
+      accountId,
+      gatewayId,
     });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      return jsonError(
-        c,
-        `Web Search API error: ${response.status} ${errorText}`,
-        "SEARCH_ERROR",
-        502
-      );
-    }
-
-    const data = await response.json();
 
     return jsonSuccess(c, {
       query,
       provider,
       limit,
-      results: data,
+      results,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

@@ -35,7 +35,7 @@ export type HomeCategory = {
 };
 
 /** Homepage shows at most this many "New" badges so the label keeps meaning. */
-export const maxFeaturedNewBadges = 2;
+export const maxFeaturedNewBadges = 4;
 
 export const homePrinciples = [
   {
@@ -110,28 +110,30 @@ export const featuredExperiments: HomeExperiment[] = [
     description: "Geolocation, colo, ASN, and timezone from request.cf",
   },
   {
-    slug: "link-shortener",
-    title: "Link Shortener",
-    description: "Short links with D1 as the source of truth and KV as a cache",
-  },
-  {
-    slug: "rag-mini-search",
-    title: "RAG Mini Search",
-    description: "Grounded Q&A with Vectorize retrieval and Workers AI",
-  },
-  {
-    slug: "mcp-tools-server",
-    title: "MCP Tools Server",
-    description: "Remote MCP server with DNS, headers, and uptime tools for AI clients",
+    slug: "clef-decision",
+    title: "Clef Decision",
+    description: "Workers AI decision probabilities with Clef models",
     status: "new",
   },
   {
-    slug: "one-time-secret",
-    title: "One-Time Secret",
-    description: "Self-destructing secret links with AES-GCM and Durable Objects",
+    slug: "web-search",
+    title: "Web Search",
+    description: "Web Search API through AI Gateway",
     status: "new",
   },
-];
+  {
+    slug: "radar-one-question",
+    title: "Radar One Question",
+    description: "Query Cloudflare Radar for domain or ASN facts",
+    status: "new",
+  },
+  {
+    slug: "ml-kem",
+    title: "ML-KEM",
+    description: "Post-quantum ML-KEM-768 key encapsulation",
+    status: "new",
+  },
+]
 
 export const homeCategories: HomeCategory[] = [
   {
@@ -205,60 +207,52 @@ export const homeCategories: HomeCategory[] = [
         slug: "chat-agent",
         title: "Chat Agent",
         description: "Durable DO chat with optional Workers AI",
-        status: "new",
       },
       {
         slug: "ai-search-demo",
         title: "AI Search Demo",
         description: "Managed RAG via Cloudflare AI Search",
-        status: "new",
       },
       {
         slug: "ai-batch-infer",
         title: "AI Batch Infer",
         description: "Async batch embeddings with queueRequest",
-        status: "new",
       },
       {
         slug: "mcp-tools-server",
         title: "MCP Tools Server",
         description: "Remote MCP tools for AI clients",
-        status: "new",
       },
       {
         slug: "receipt-parser",
         title: "Receipt Parser",
         description: "Receipts to JSON via Workers AI",
-        status: "new",
       },
       {
         slug: "article-to-audio",
         title: "Article to Audio",
         description: "Listen to any article as MP3",
-        status: "new",
       },
       {
         slug: "natural-language-calendar",
         title: "Natural Language Calendar",
         description: "Plain English to .ics invite",
-        status: "new",
       },
       {
         slug: "newsletter-digest",
         title: "Newsletter Digest",
         description: "AI-summarized daily newsletter digest",
-        status: "new",
       },
       {
         slug: "clef-decision",
         title: "Clef Decision",
-        description: "Workers AI decision probabilities with Clef models",
+        description: "Jev-compatible Clef decision model on Workers AI",
         status: "new",
       },
       {
         slug: "web-search",
         title: "Web Search",
-        description: "Web Search API through AI Gateway",
+        description: "AI Gateway web search (Ceramic, Exa, Linkup)",
         status: "new",
       },
     ],
@@ -343,7 +337,6 @@ export const homeCategories: HomeCategory[] = [
         slug: "browser-cdp-inspect",
         title: "Browser CDP Inspect",
         description: "Title, cookies, and performance via Puppeteer",
-        status: "new",
       },
       {
         slug: "readability-extractor",
@@ -354,19 +347,16 @@ export const homeCategories: HomeCategory[] = [
         slug: "browser-markdown-scrape",
         title: "Browser Markdown Scrape",
         description: "Markdown + CSS scrape via quickAction",
-        status: "new",
       },
       {
         slug: "accessibility-auditor",
         title: "Accessibility Auditor",
         description: "axe-core WCAG audit + alt text",
-        status: "new",
       },
       {
         slug: "privacy-tracker-scanner",
         title: "Privacy Tracker Scanner",
         description: "Pre-consent tracker detection",
-        status: "new",
       },
     ],
   },
@@ -443,18 +433,16 @@ export const homeCategories: HomeCategory[] = [
         slug: "smart-placement-probe",
         title: "Smart Placement Probe",
         description: "Origin latency with Smart Placement",
-        status: "new",
       },
       {
         slug: "domain-expiry-reminder",
         title: "Domain Expiry Reminder",
         description: "Domain and TLS expiry email alerts",
-        status: "new",
       },
       {
         slug: "radar-one-question",
         title: "Radar One Question",
-        description: "Query Cloudflare Radar for domain or ASN facts",
+        description: "Radar domain rank or ASN fact for agents",
         status: "new",
       },
     ],
@@ -474,7 +462,6 @@ export const homeCategories: HomeCategory[] = [
         slug: "image-converter",
         title: "Image Converter",
         description: "Convert, resize, watermark via Images binding",
-        status: "new",
       },
       {
         slug: "turnstile-verify",
@@ -486,7 +473,6 @@ export const homeCategories: HomeCategory[] = [
         slug: "access-jwt-validator",
         title: "Access JWT Validator",
         description: "Verify Cloudflare Access JWTs",
-        status: "new",
       },
       {
         slug: "rate-limiter-demo",
@@ -502,48 +488,41 @@ export const homeCategories: HomeCategory[] = [
         slug: "flagship-rollout",
         title: "Flagship Rollout",
         description: "Edge feature flags via Flagship",
-        status: "new",
       },
       {
         slug: "secrets-store-demo",
         title: "Secrets Store Demo",
         description: "Account-scoped Secrets Store binding",
-        status: "new",
       },
       {
         slug: "tail-logger",
         title: "Tail Logger",
         description: "Tail Worker traces stored in KV",
-        status: "new",
       },
       {
         slug: "webrtc-relay",
         title: "WebRTC Relay",
         description: "Realtime TURN credentials for WebRTC",
-        status: "new",
       },
       {
         slug: "stream-video-demo",
         title: "Stream Video Demo",
         description: "Direct upload URLs and signed playback tokens",
-        status: "new",
       },
       {
         slug: "static-assets-spa",
         title: "Static Assets SPA",
         description: "SPA with ASSETS binding and run_worker_first",
-        status: "new",
       },
       {
         slug: "static-form-backend",
         title: "Static Form Backend",
         description: "Turnstile forms for static sites",
-        status: "new",
       },
       {
         slug: "ml-kem",
         title: "ML-KEM",
-        description: "Post-quantum ML-KEM-768 key encapsulation",
+        description: "Post-quantum Kyber / ML-KEM-768 key exchange",
         status: "new",
       },
     ],
@@ -559,25 +538,21 @@ export const homeCategories: HomeCategory[] = [
         slug: "dynamic-worker-runner",
         title: "Dynamic Worker Runner",
         description: "Sandboxed JS via Worker Loader",
-        status: "new",
       },
       {
         slug: "container-echo",
         title: "Container Echo",
         description: "Echo payloads via Cloudflare Containers",
-        status: "new",
       },
       {
         slug: "code-sandbox",
         title: "Code Sandbox",
         description: "Isolated JS execution with Sandbox SDK",
-        status: "new",
       },
       {
         slug: "user-script-dispatcher",
         title: "User Script Dispatcher",
         description: "Workers for Platforms style dispatch",
-        status: "new",
       },
     ],
   },
@@ -620,19 +595,16 @@ export const homeCategories: HomeCategory[] = [
         slug: "event-pipeline",
         title: "Event Pipeline",
         description: "Pipelines ingest with R2 fallback",
-        status: "new",
       },
       {
         slug: "artifact-workspace",
         title: "Artifact Workspace",
         description: "Artifacts-style file workspace on R2",
-        status: "new",
       },
       {
         slug: "r2-sql-query",
         title: "R2 SQL Query",
         description: "SQL over Iceberg via R2 SQL HTTP API",
-        status: "new",
       },
     ],
   },
@@ -652,7 +624,6 @@ export const homeCategories: HomeCategory[] = [
         slug: "do-sqlite-notes",
         title: "DO SQLite Notes",
         description: "Per-user notes with DO sql.exec",
-        status: "new",
       },
       {
         slug: "cron-heartbeat",
@@ -699,13 +670,11 @@ export const homeCategories: HomeCategory[] = [
         slug: "transactional-email",
         title: "Transactional Email",
         description: "Send mail via Email Service binding",
-        status: "new",
       },
       {
         slug: "one-time-secret",
         title: "One-Time Secret",
         description: "Self-destructing secret links",
-        status: "new",
       },
     ],
   },

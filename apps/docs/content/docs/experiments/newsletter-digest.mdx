@@ -1,18 +1,19 @@
 ---
 title: "Newsletter Digest"
-description: "Forward newsletters to an Email Routing address and get one Workers AI-summarized digest email per day, stored in D1"
-icon: "Newspaper"
+description: "Forward newsletters to Email Routing and get one Workers AI-summarized daily digest — email + AI + cron pipeline"
 tags:
   - email
   - ai
   - workers-ai
   - stateful
+  - digest
+  - cron
+  - summarization
 bindings:
   - AI
   - D1
   - CRON
   - EMAIL
-status: new
 ---
 
 Forward newsletters to an **Email Routing** address and get one digest email per day instead. An `email()` handler parses each message with `postal-mime`, summarizes it with **Workers AI**, and stores it in **D1**; a daily **Cron Trigger** sends one digest grouped by sender via the `send_email` binding.

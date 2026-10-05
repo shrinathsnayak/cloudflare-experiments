@@ -93,20 +93,20 @@ Or copy `.cursor/skills/experiment-docs/template.mdx` to `apps/docs/content/docs
 
 Required sections (in order):
 
-| Section                  | Content                                                                   |
-| ------------------------ | ------------------------------------------------------------------------- |
-| Frontmatter              | `title`, `description` (matches worker; description ≤ ~160 chars for SEO) |
-| Intro                    | 1–2 sentences: what it does + primary Cloudflare capability               |
-| Features                 | Optional bullet list of capabilities                                      |
-| API Reference            | One `### METHOD /path` per route; params, examples, errors                |
-| Use Cases                | 3–5 bullet points                                                         |
-| Limitations              | Timeouts, size limits, local vs deployed behavior                         |
-| Use in your project      | Optional: `<UseInYourProject>` + core snippet + wire-up (small lib only)  |
-| Deployment               | `<Steps>` with deploy button, deploy note, test curl                      |
-| Local Development        | `cd apps/experiments/<name>`, install, dev, test curl                     |
-| Configuration            | Optional: `wrangler.json` bindings, secrets, dependencies                 |
-| Cloudflare Features Used | Bullets linking to Cloudflare docs                                        |
-| Next Steps               | Optional `<Cards>` linking related docs                                   |
+| Section                  | Content                                                                                                                                                                                                                                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontmatter              | `title`, `description`, `tags`, `bindings`, and `status: new` for experiments in the latest [What's New](/changelog) batch (description ≤ ~160 chars for SEO; tags include category + discoverability aliases like `jev` for Clef). Update `apps/docs/lib/experiment-docs-meta.ts` when tags/bindings change. |
+| Intro                    | 1–2 sentences: what it does + primary Cloudflare capability                                                                                                                                                                                                                                                   |
+| Features                 | Optional bullet list of capabilities                                                                                                                                                                                                                                                                          |
+| API Reference            | One `### METHOD /path` per route; params, examples, errors                                                                                                                                                                                                                                                    |
+| Use Cases                | 3–5 bullet points                                                                                                                                                                                                                                                                                             |
+| Limitations              | Timeouts, size limits, local vs deployed behavior                                                                                                                                                                                                                                                             |
+| Use in your project      | Optional: `<UseInYourProject>` + core snippet + wire-up (small lib only)                                                                                                                                                                                                                                      |
+| Deployment               | `<Steps>` with deploy button, deploy note, test curl                                                                                                                                                                                                                                                          |
+| Local Development        | `cd apps/experiments/<name>`, install, dev, test curl                                                                                                                                                                                                                                                         |
+| Configuration            | Optional: `wrangler.json` bindings, secrets, dependencies                                                                                                                                                                                                                                                     |
+| Cloudflare Features Used | Bullets linking to Cloudflare docs                                                                                                                                                                                                                                                                            |
+| Next Steps               | Optional `<Cards>` linking related docs                                                                                                                                                                                                                                                                       |
 
 Optional middle sections (between API Reference and Use Cases): Implementation Details, Technical Details, Architecture, Setup, etc.
 
@@ -134,7 +134,22 @@ For **new** experiments only:
 - Deploy URL pattern:
   `https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/<name>`
 
-### 5. Verify
+### 5. Rotate sidebar / homepage "New" badges
+
+**Source of truth:** the newest dated section in `apps/docs/content/docs/changelog.mdx` ([What's New](/changelog)).
+
+When shipping new experiments:
+
+1. Read the latest What's New entry and collect every experiment named there that has a docs page.
+2. Add `status: new` to each of those MDX frontmatters (`apps/docs/content/docs/experiments/<name>.mdx`).
+3. **Remove** `status: new` from every older experiment that is not in that latest batch (do not leave previous cohorts tagged).
+4. Mirror the same set in `apps/docs/lib/home-content.ts`:
+   - `featuredExperiments` entries (homepage cards; capped by `maxFeaturedNewBadges`)
+   - matching `homeCategories` entries
+
+Sidebar badges come from MDX `status` via `statusBadgesPlugin` in `apps/docs/lib/source.tsx`. They are **not** inferred from dates or git history.
+
+### 6. Verify
 
 ```bash
 cd apps/docs && npm run build
@@ -184,6 +199,7 @@ Before finishing:
 - [ ] Deploy button URL uses `apps/experiments/<name>` path
 - [ ] Page listed in `meta.json` under correct category
 - [ ] New experiment (or notable user-facing change) listed in `apps/docs/content/docs/changelog.mdx`
+- [ ] `status: new` only on latest What's New cohort (older MDX + `home-content.ts` tags removed)
 - [ ] No Mintlify-only syntax (`<ParamField>`, `<Icon>`, etc.)
 - [ ] `npm run build` in `apps/docs` succeeds
 

@@ -1,13 +1,13 @@
 ---
 title: "Static Assets SPA"
-description: "Workers Static Assets with ASSETS binding and run_worker_first"
-icon: "LayoutDashboard"
+description: "Workers Static Assets with ASSETS binding and run_worker_first — SPA hosting pattern on Cloudflare Workers"
 tags:
+  - edge
   - assets
   - spa
-bindings:
-  - ASSETS
-status: new
+  - static
+  - hosting
+  - frontend
 ---
 
 Serve a static SPA from Workers **Static Assets** while `/api/*` routes run on the Worker first via `run_worker_first`. Uses the `ASSETS` binding for programmatic asset fetches.

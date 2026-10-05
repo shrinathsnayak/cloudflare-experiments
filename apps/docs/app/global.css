@@ -23,6 +23,31 @@
   gap: 0.5rem;
 }
 
+/* Let the notebook nav title shrink so it truncates instead of wrapping on mobile */
+#nd-subnav [data-header-body] > div:first-child {
+  min-width: 0;
+}
+
+/* Keep main navbars sticky and fully visible on mobile (home + docs).
+   Opaque background + overflow visible avoids the sticky clip glitch when
+   the disclaimer banner above scrolls away. */
+#nd-nav,
+#nd-subnav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  align-self: flex-start;
+  width: 100%;
+  overflow: visible;
+  background-color: var(--color-fd-background);
+  /* Contain backdrop-filter to the nav bar so it can't clip sticky content */
+  isolation: isolate;
+}
+
+#nd-nav > div {
+  overflow: visible;
+}
+
 .prose {
   font-family: var(--font-sans);
 }
@@ -38,13 +63,16 @@
   font-feature-settings: normal;
 }
 
-body {
-  background-color: var(--color-fd-background);
-}
-
 html {
   scroll-behavior: smooth;
-  scrollbar-gutter: stable;
+  /* Avoid a reserved scrollbar strip looking like an empty right gutter on mobile */
+  scrollbar-gutter: auto;
+  overflow-x: clip;
+}
+
+body {
+  background-color: var(--color-fd-background);
+  overflow-x: clip;
 }
 
 /* content-visibility on categories breaks TOC scrollspy for nested headings */

@@ -1,14 +1,16 @@
 ---
 title: "Code Sandbox"
-description: "Run a JavaScript snippet in an isolated Sandbox SDK container"
-icon: "Terminal"
+description: "Run untrusted JavaScript in an isolated Sandbox SDK container on Cloudflare — safe code execution for agents and demos"
 tags:
-  - sandbox
   - containers
+  - sandbox
+  - isolation
+  - code-execution
+  - agents
+  - durable-objects
 bindings:
-  - Sandbox
-  - Containers
-status: new
+  - CONTAINERS
+  - DO
 ---
 
 Run a JavaScript snippet in an isolated environment using the **Cloudflare Sandbox SDK** (`@cloudflare/sandbox`) backed by Containers and a Durable Object.

@@ -1,9 +1,17 @@
 ---
-title: Radar One Question
-description: Query Cloudflare Radar for one fact about a domain or ASN
+title: "Radar One Question"
+description: "Ask Cloudflare Radar one fact about a domain rank or ASN org/location — Internet intelligence API demo for agents"
+tags:
+  - network
+  - radar
+  - asn
+  - domain-rank
+  - internet-intelligence
+  - api
+status: new
 ---
 
-Query the Cloudflare Radar API to retrieve information about a domain's global ranking or an Autonomous System Number's (ASN) organization and location.
+One-shot **Cloudflare Radar** lookup for agents and tools: ask for a domain's global rank **or** an ASN's organization and location. Useful as an Internet-intelligence building block without pulling the full Radar API surface.
 
 ## API Reference
 
@@ -78,6 +86,14 @@ curl https://radar-one-question.example.workers.dev/radar?asn=13335
 - No persistent storage or caching
 - Rate limits determined by Cloudflare Radar API
 
+## Use in your project
+
+<UseInYourProject
+  experiment="radar-one-question"
+  platform={["Fetch API", "Cloudflare Radar API"]}
+  files={["src/lib/radar.ts", "examples/usage.ts"]}
+/>
+
 ## Deployment
 
 <Steps>
@@ -88,6 +104,7 @@ curl https://radar-one-question.example.workers.dev/radar?asn=13335
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/radar-one-question)
 
 No bindings or secrets required.
+
 </Step>
 
 <Step>
@@ -102,6 +119,7 @@ Or query an ASN:
 ```bash
 curl "https://radar-one-question.your-subdomain.workers.dev/radar?asn=13335"
 ```
+
 </Step>
 
 </Steps>
@@ -130,7 +148,15 @@ curl "http://localhost:8787/radar?domain=cloudflare.com"
 ## Next Steps
 
 <Cards>
-  <Card title="URL DNS Lookup" href="/experiments/url-dns-lookup" description="DNS records via DoH" />
+  <Card
+    title="URL DNS Lookup"
+    href="/experiments/url-dns-lookup"
+    description="DNS records via DoH"
+  />
   <Card title="Whereami" href="/experiments/whereami" description="Request geolocation metadata" />
-  <Card title="Email Auth Checker" href="/experiments/email-auth-checker" description="SPF, DMARC, and DKIM analysis" />
+  <Card
+    title="Email Auth Checker"
+    href="/experiments/email-auth-checker"
+    description="SPF, DMARC, and DKIM analysis"
+  />
 </Cards>

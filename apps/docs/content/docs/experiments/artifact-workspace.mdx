@@ -1,13 +1,15 @@
 ---
 title: "Artifact Workspace"
-description: "Store versioned filesystem artifacts (Artifacts-style workspace on R2)"
-icon: "FolderOpen"
+description: "Versioned filesystem-style artifact workspace on R2 — store, list, and retrieve build or agent artifacts like a remote FS"
 tags:
+  - storage
   - r2
   - artifacts
+  - filesystem
+  - agents
+  - workspace
 bindings:
   - R2
-status: new
 ---
 
 Artifacts-style versioned filesystem workspace. Cloudflare Artifacts bindings are still evolving, so this experiment uses an **R2 bucket** behind a typed `ArtifactStore` interface until a stable Artifacts binding is available.

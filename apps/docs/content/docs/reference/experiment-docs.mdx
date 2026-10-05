@@ -17,6 +17,18 @@ Every worker under `apps/experiments/<name>/` should have a matching docs page a
 
 Docs are **not** generated automatically on deploy. When you add or change an experiment, update its MDX page in the same PR (or immediately after).
 
+## SEO, tags, and AI discovery
+
+Edit `title`, `description`, `tags`, and `bindings` in each experiment's MDX frontmatter. Keep `apps/docs/lib/experiment-docs-meta.ts` in sync when you change tags or bindings. Optional reference catalog: `apps/docs/data/experiment-seo.json`.
+
+Tag guidelines:
+
+1. **Primary category first** — one of `ai`, `scraping`, `browser`, `network`, `edge`, `storage`, `stateful`, `containers`, `email`, `security` (used by docs search chips).
+2. **Product / binding tags** — e.g. `workers-ai`, `durable-objects`, `vectorize`, `browser-rendering`.
+3. **Discoverability aliases** — names people or agents actually search for when the Cloudflare product is obscure (e.g. Clef → `jev`, `systemone`, `decision-model`; ML-KEM → `kyber`, `post-quantum`).
+
+Descriptions should be ~120–160 characters and mention the searchable alias plus the Cloudflare capability. Intros can expand on that for humans and LLM crawlers (`/llms.txt`, `/llms-full.txt`, per-page markdown).
+
 ## Quick start: new experiment
 
 <Steps>
@@ -68,6 +80,20 @@ Docs are **not** generated automatically on deploy. When you add or change an ex
 
   <Step>
 
+### Rotate "New" badges from What's New
+
+    Use the **latest** What's New section as the source of truth:
+
+    1. Add `status: new` to the frontmatter of each new experiment page in that batch
+    2. Remove `status: new` from older experiment pages that are no longer in the latest batch
+    3. Keep `apps/docs/lib/home-content.ts` in sync (`featuredExperiments` and category entries; homepage shows at most `maxFeaturedNewBadges`)
+
+    Badges are manual — they are not derived from ship date.
+
+  </Step>
+
+  <Step>
+
 ### Update root README (new experiments only)
 
     Add a row to the experiments table in the root `README.md` with name, description, and deploy link.
@@ -95,10 +121,12 @@ Docs are **not** generated automatically on deploy. When you add or change an ex
 ---
 title: "Human Readable Name"
 description: "One sentence for SEO and page header (≤ ~160 characters)"
+# Only for experiments in the latest What's New batch:
+# status: new
 ---
 ```
 
-Use the same description as `GET /` returns in `src/index.ts` when possible.
+Use the same description as `GET /` returns in `src/index.ts` when possible. Add `status: new` only while the experiment is in the current What's New cohort, then remove it when the next batch ships.
 
 ### Required sections
 
@@ -227,6 +255,7 @@ Before merging:
 - [ ] Binding setup matches `wrangler.json` and `src/types/env.d.ts`
 - [ ] Page entry exists in `meta.json`
 - [ ] New experiment or notable user-facing change listed on [What's New](/changelog)
+- [ ] `status: new` only on the latest What's New cohort (older badges cleared; `home-content.ts` matched)
 - [ ] Deploy URL uses `apps/experiments/<name>`
 - [ ] `apps/docs` build passes
 
@@ -237,6 +266,7 @@ The **`experiment-docs`** skill (`.cursor/skills/experiment-docs/SKILL.md`) inst
 - Run the scaffold script
 - Follow the template at `.cursor/skills/experiment-docs/template.mdx`
 - Update `meta.json`, README, and [What's New](/changelog)
+- Rotate `status: new` badges from the latest What's New batch
 - Verify the docs build
 
 Invoke it when adding or updating experiment documentation.

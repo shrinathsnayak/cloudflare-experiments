@@ -1,16 +1,18 @@
 ---
 title: "Domain Expiry Reminder"
-description: "Track domain registration (RDAP) and TLS certificate (CT logs) expiry in D1, with daily cron email reminders at 30, 7, and 1 days left"
-icon: "CalendarClock"
+description: "Track domain RDAP and TLS certificate expiry in D1 with daily cron emails at 30/7/1 days — domain and cert monitoring"
 tags:
   - network
   - monitoring
   - tls
+  - rdap
+  - email
+  - cron
+  - certificates
 bindings:
   - D1
   - CRON
   - EMAIL
-status: new
 ---
 
 Never let a domain or TLS certificate expire. Registration expiry comes from **RDAP**, certificate expiry from **Certificate Transparency** logs, watched domains live in **D1**, and a daily **Cron Trigger** emails reminders through the `send_email` binding.

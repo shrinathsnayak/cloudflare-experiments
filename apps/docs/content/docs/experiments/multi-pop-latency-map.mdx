@@ -1,10 +1,13 @@
 ---
 title: "Multi-PoP Latency Map"
-description: "Measure fetch latency and report the Cloudflare colo that served the Worker invocation"
-icon: "Timer"
+description: "Measure fetch latency and report the Cloudflare colo that served the Worker — edge PoP latency visibility for any URL"
 tags:
   - network
   - latency
+  - colo
+  - performance
+  - pop
+  - monitoring
 ---
 
 Fetch a target URL from the edge and report response time plus the **Cloudflare colo** (`cf.colo`) that handled the Worker invocation. Documents honestly that each request runs in a **single PoP** - not a global multi-region sweep.

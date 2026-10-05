@@ -1,13 +1,15 @@
 ---
 title: "AI Search Demo"
-description: "Query Cloudflare AI Search (managed RAG) from a Worker"
-icon: "Search"
+description: "Query Cloudflare AI Search (managed RAG) from a Worker — grounded answers with retrieval over your indexed content"
 tags:
   - ai
   - rag
+  - ai-search
+  - retrieval
+  - workers-ai
+  - knowledge-base
 bindings:
   - AI
-status: new
 ---
 
 Query **Cloudflare AI Search** (managed RAG, formerly AutoRAG) from a Worker via the Workers AI binding using `env.AI.autorag(name).aiSearch({ query })`.

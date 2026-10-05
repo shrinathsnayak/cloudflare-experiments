@@ -1,15 +1,38 @@
 ---
-title: Clef Decision
-description: Workers AI decision probabilities with Clef or Clef-Flash models
+title: "Clef Decision (Jev-compatible)"
+description: "Jev / System One API-compatible decision model on Workers AI — Clef & Clef-Flash return probabilities for noul/choice questions without free-form text"
+tags:
+  - ai
+  - workers-ai
+  - decision-model
+  - jev
+  - systemone
+  - clef
+  - agents
+  - classification
+  - structured-output
+bindings:
+  - AI
+status: new
 ---
 
-Query Workers AI Clef models to get decision probabilities based on a state description and typed questions (binary `noul` or multiple-choice `choice`).
+**Clef** is Cloudflare's open-source **decision model** on Workers AI — in the same family as Typesafe's **Jev** / **System One** API. Instead of generating free-form text, it takes a state plus typed questions and returns a **probability for every allowed answer** so agents can act without parsing LLM prose.
+
+This experiment is a deployable Worker reference for `@cf/cloudflare/clef` and `@cf/cloudflare/clef-flash`: post a state and `noul` (binary) or `choice` (multiple-choice) questions, get structured probabilities back. Existing Jev integrations can switch by changing the endpoint and model.
+
+## Features
+
+- Jev / System One-style decision API on Workers AI (Clef and Clef-Flash)
+- Binary (`noul`) and multiple-choice (`choice`) questions with probability distributions
+- No free-form generation — bounded outputs agents can route on immediately
+- Stateless edge Worker — under ~60s, no storage required
+- Pasteable `src/lib/decision.ts` core for your own project
 
 ## API Reference
 
 ### `POST /decision`
 
-Call Workers AI Clef or Clef-Flash to answer structured decision questions and return probability distributions.
+Call Workers AI Clef or Clef-Flash to answer structured decision questions and return probability distributions. Compatible with Jev-style state + typed questions workflows.
 
 **Request body**
 
@@ -66,7 +89,7 @@ curl -X POST https://clef-decision.example.workers.dev/decision \
   ],
   "answers": [
     { "type": "noul", "probability": 0.73 },
-    { "type": "choice", "probabilities": [0.15, 0.65, 0.20] }
+    { "type": "choice", "probabilities": [0.15, 0.65, 0.2] }
   ]
 }
 ```
@@ -84,11 +107,11 @@ curl -X POST https://clef-decision.example.workers.dev/decision \
 
 ## Use Cases
 
-- Decision support systems with probabilistic outputs
-- Multi-step reasoning workflows requiring structured answers
-- A/B test predictions and scenario modeling
-- Educational demos of Workers AI decision capabilities
-- Building chat agents with structured decision making
+- **Agent routing** — escalate, auto-resolve, or assign a ticket without a human in the loop
+- **Jev / System One alternative** — drop-in decision model on Workers AI with Clef or Clef-Flash
+- Support triage, invoice workflows, and security incident classification
+- Multi-step agent graphs that need bounded yes/no or choice probabilities
+- Fast edge decisions where LLM free-form text would be slow or hard to parse
 
 ## Limitations
 
@@ -96,7 +119,16 @@ curl -X POST https://clef-decision.example.workers.dev/decision \
 - Question complexity limited by model context window
 - Probability outputs are model-generated estimates, not guarantees
 - No persistent storage or decision history
-- Clef models are optimized for structured decision questions (not open-ended chat)
+- Optimized for structured decision questions — not open-ended chat or free-form generation
+
+## Use in your project
+
+<UseInYourProject
+  experiment="clef-decision"
+  bindings={["Workers AI (AI binding)"]}
+  platform={["Workers AI"]}
+  files={["src/lib/decision.ts", "examples/usage.ts"]}
+/>
 
 ## Deployment
 
@@ -108,6 +140,7 @@ curl -X POST https://clef-decision.example.workers.dev/decision \
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/clef-decision)
 
 The Workers AI binding is automatically provisioned.
+
 </Step>
 
 <Step>
@@ -121,6 +154,7 @@ curl -X POST https://clef-decision.your-subdomain.workers.dev/decision \
     "questions": [{ "type": "noul", "question": "Will it rain?" }]
   }'
 ```
+
 </Step>
 
 </Steps>
@@ -173,7 +207,19 @@ No additional secrets required.
 ## Next Steps
 
 <Cards>
-  <Card title="Cloud AI Proxy" href="/experiments/cloud-ai-proxy" description="Call any Workers AI model" />
-  <Card title="AI Website Summary" href="/experiments/ai-website-summary" description="Summarize webpages with Workers AI" />
-  <Card title="Chat Agent" href="/experiments/chat-agent" description="Durable chat agent with Workers AI" />
+  <Card
+    title="Cloud AI Proxy"
+    href="/experiments/cloud-ai-proxy"
+    description="Call any Workers AI model"
+  />
+  <Card
+    title="AI Website Summary"
+    href="/experiments/ai-website-summary"
+    description="Summarize webpages with Workers AI"
+  />
+  <Card
+    title="Chat Agent"
+    href="/experiments/chat-agent"
+    description="Durable chat agent with Workers AI"
+  />
 </Cards>

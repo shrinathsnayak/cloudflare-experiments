@@ -1,13 +1,13 @@
 ---
 title: "R2 SQL Query"
-description: "Query Apache Iceberg tables via the R2 SQL HTTP API"
-icon: "Database"
+description: "Query Apache Iceberg tables via the Cloudflare R2 SQL HTTP API — analytics SQL over object storage from a Worker"
 tags:
   - storage
-  - sql
   - r2
-bindings: []
-status: new
+  - sql
+  - iceberg
+  - analytics
+  - data-lake
 ---
 
 Query **Apache Iceberg** tables managed by R2 Data Catalog using the **R2 SQL HTTP API**. There is no Workers binding - this experiment uses account secrets and `fetch`. Without credentials it returns sample rows with `mode: "demo"`.

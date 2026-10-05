@@ -34,6 +34,16 @@ function mergeOptimizeDepsExclude(packages: readonly string[]): Plugin {
   };
 }
 
+/**
+ * Vinext's MDX proxy only treats plugins named `mdx` or `@mdx-js/rollup` as
+ * "user MDX". Fumadocs registers `fumadocs-mdx*`, so without this stub vinext
+ * throws on content MDX HMR: "Encountered MDX module … no MDX plugin".
+ * No-op transform — fumadocs-mdx owns content under `content/docs`.
+ */
+function vinextFumadocsMdxCompat(): Plugin {
+  return { name: "mdx" };
+}
+
 export default defineConfig({
   // postcss.config.mjs stays for `next build`; Vite uses the Tailwind plugin instead.
   css: { postcss: {} },
@@ -43,6 +53,7 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     mdx(),
+    vinextFumadocsMdxCompat(),
     vinext(),
     cloudflare({
       viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },

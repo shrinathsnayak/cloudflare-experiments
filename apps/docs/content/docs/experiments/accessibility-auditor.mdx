@@ -1,15 +1,17 @@
 ---
 title: "Accessibility Auditor"
-description: "Run axe-core WCAG 2.1 AA audits with Browser Rendering and suggest alt text for unlabeled images with a Workers AI vision model"
-icon: "Accessibility"
+description: "Run axe-core WCAG 2.1 AA accessibility audits with Browser Rendering and suggest alt text for unlabeled images via Workers AI vision"
 tags:
   - browser
   - ai
   - accessibility
+  - wcag
+  - axe-core
+  - a11y
+  - workers-ai
 bindings:
   - BROWSER
   - AI
-status: new
 ---
 
 Audit any page for WCAG 2.0/2.1 **A + AA** issues by injecting [axe-core](https://github.com/dequelabs/axe-core) into a **Browser Rendering** session, then optionally describe images that are missing alt text with a **Workers AI** vision model.

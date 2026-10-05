@@ -1,10 +1,13 @@
 ---
 title: "Webhook Signature Verifier"
-description: "Verify HMAC-SHA256 webhook signatures with timing-safe comparison at the edge"
-icon: "Signature"
+description: "Verify HMAC-SHA256 webhook signatures with timing-safe comparison at the edge — Stripe/GitHub-style webhook auth"
 tags:
   - edge
   - security
+  - webhooks
+  - hmac
+  - signatures
+  - auth
 ---
 
 Accept a raw payload, secret, signature header value, and algorithm. Computes the expected HMAC (Stripe/GitHub `sha256=` hex style) and returns whether it matches using a **timing-safe compare**.

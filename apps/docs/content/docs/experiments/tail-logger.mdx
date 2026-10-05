@@ -1,13 +1,15 @@
 ---
 title: "Tail Logger"
-description: "Tail Worker that stores recent traces from another Worker in KV"
-icon: "ScrollText"
+description: "Tail Worker that stores recent traces from another Worker in KV — live log tail and debugging pattern"
 tags:
+  - stateful
   - tail
+  - logging
+  - observability
   - kv
+  - debugging
 bindings:
   - KV
-status: new
 ---
 
 A **Tail Worker** that receives `TraceItem` batches from producer Workers, keeps the last 50 events in **Workers KV**, and exposes them over HTTP for inspection.

@@ -1,14 +1,15 @@
 ---
 title: "User Script Dispatcher"
-description: "Workers for Platforms style dispatch via DispatchNamespace or KV handlers"
-icon: "Waypoints"
+description: "Workers for Platforms-style dispatch via Dispatch Namespace or KV-stored handlers — multi-tenant user Worker routing"
 tags:
+  - edge
   - platforms
+  - dispatch
+  - multi-tenant
+  - workers-for-platforms
   - kv
 bindings:
   - KV
-  - Dispatch Namespace
-status: new
 ---
 
 Workers for Platforms style **dispatch** - register customers and run tenant response handlers via a `DispatchNamespace` binding, with a KV fallback for local demos. Stored scripts return a fixed JSON response (safe demo - no dynamic JS eval).

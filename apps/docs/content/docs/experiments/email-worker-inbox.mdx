@@ -1,10 +1,15 @@
 ---
 title: "Email Worker Inbox"
-description: "Receive inbound emails with Email Workers, store them in KV, and inspect over HTTP"
-icon: "Mail"
+description: "Receive inbound email with Email Workers, store messages in KV, and inspect them over HTTP — edge inbox pattern"
 tags:
   - email
   - kv
+  - inbound
+  - email-workers
+  - inbox
+  - storage
+bindings:
+  - KV
 ---
 
 Process inbound mail with the Cloudflare **Email Workers** `email` handler, parse MIME with `postal-mime`, store message summaries in **Workers KV**, and inspect them over HTTP.

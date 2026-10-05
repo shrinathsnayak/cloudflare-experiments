@@ -1,9 +1,13 @@
 ---
 title: "Turnstile Verify"
-description: "Verify Cloudflare Turnstile tokens via the siteverify API"
-icon: "ShieldCheck"
+description: "Verify Cloudflare Turnstile tokens via the siteverify API — bot protection for forms and APIs on Workers"
 tags:
   - edge
+  - security
+  - turnstile
+  - captcha
+  - bot-protection
+  - auth
 ---
 
 Verify [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/) tokens server-side by calling the siteverify API from a Worker. This experiment uses the `TURNSTILE_SECRET_KEY` environment secret - there is no Turnstile Worker binding.

@@ -1,14 +1,19 @@
 ---
 title: "Website Change Tracker"
-description: "Scheduled Browser Rendering snapshots with R2 storage and D1 diff history"
-icon: "GitCompare"
+description: "Scheduled Browser Rendering snapshots with R2 storage and D1 diff history — detect website changes over time"
 tags:
   - network
   - monitoring
+  - browser
+  - change-detection
+  - r2
+  - d1
+  - cron
 bindings:
   - D1
   - R2
   - BROWSER
+  - CRON
 ---
 
 Register URLs for on-demand and **Cron**-scheduled snapshots. Rendered text is stored in **R2**, content hashes and diff summaries in **D1**. View change history per tracked URL.

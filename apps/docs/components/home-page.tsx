@@ -27,7 +27,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 const homeInteractiveCardClass =
-  "group flex flex-col rounded-xl border border-fd-border bg-fd-background p-4 transition-colors hover:border-brand/40 hover:bg-fd-accent/40";
+  "group flex min-w-0 flex-col rounded-xl border border-fd-border bg-fd-background p-4 transition-colors hover:border-brand/40 hover:bg-fd-accent/40";
 
 function HoverRevealArrow({ size = "sm" }: { size?: "sm" | "md" }) {
   const iconSize = size === "sm" ? "size-3.5" : "size-4";
@@ -204,7 +204,7 @@ function DocLinkCard({ link }: { link: HomeDocLink }) {
 
 function PageShell({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={`mx-auto w-full max-w-(--fd-layout-width) px-6 ${className ?? ""}`}>
+    <div className={`mx-auto w-full min-w-0 max-w-(--fd-layout-width) px-6 ${className ?? ""}`}>
       {children}
     </div>
   );

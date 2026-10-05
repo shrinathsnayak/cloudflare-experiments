@@ -1,9 +1,19 @@
 ---
-title: Web Search
-description: Web Search API through AI Gateway with ceramic, exa, or linkup providers
+title: "Web Search"
+description: "Web Search API through Cloudflare AI Gateway with Ceramic, Exa, or Linkup — agent-ready search results from the edge"
+tags:
+  - ai
+  - search
+  - ai-gateway
+  - ceramic
+  - exa
+  - linkup
+  - agents
+  - web-search
+status: new
 ---
 
-Query the Cloudflare Web Search API through AI Gateway to search the web from the edge using ceramic, exa, or linkup providers.
+Agent-ready **web search** from a Cloudflare Worker: call the Web Search API through **AI Gateway** using **Ceramic**, **Exa**, or **Linkup** providers. Use it when an agent needs live search results without wiring each search vendor separately.
 
 ## API Reference
 
@@ -84,6 +94,14 @@ curl -X POST https://web-search.example.workers.dev/search \
 - No persistent storage or search history
 - Rate limits determined by AI Gateway and search provider quotas
 
+## Use in your project
+
+<UseInYourProject
+  experiment="web-search"
+  platform={["AI Gateway", "Web Search API"]}
+  files={["src/lib/search.ts", "examples/usage.ts"]}
+/>
+
 ## Deployment
 
 <Steps>
@@ -103,6 +121,7 @@ Set your AI Gateway credentials in `wrangler.json` or as secrets:
 ```
 
 If not set, the Worker defaults to demo values (limited functionality).
+
 </Step>
 
 <Step>
@@ -111,6 +130,7 @@ If not set, the Worker defaults to demo values (limited functionality).
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/web-search)
 
 Update environment variables in the dashboard after deployment.
+
 </Step>
 
 <Step>
@@ -125,6 +145,7 @@ curl -X POST https://web-search.your-subdomain.workers.dev/search \
     "limit": 5
   }'
 ```
+
 </Step>
 
 </Steps>
@@ -168,7 +189,19 @@ Set these in `wrangler.json` under `vars` or as secrets via the Cloudflare dashb
 ## Next Steps
 
 <Cards>
-  <Card title="AI Website Summary" href="/experiments/ai-website-summary" description="Summarize webpages with Workers AI" />
-  <Card title="RAG Mini Search" href="/experiments/rag-mini-search" description="Grounded Q&A with Vectorize" />
-  <Card title="Cloud AI Proxy" href="/experiments/cloud-ai-proxy" description="Call any Workers AI model" />
+  <Card
+    title="AI Website Summary"
+    href="/experiments/ai-website-summary"
+    description="Summarize webpages with Workers AI"
+  />
+  <Card
+    title="RAG Mini Search"
+    href="/experiments/rag-mini-search"
+    description="Grounded Q&A with Vectorize"
+  />
+  <Card
+    title="Cloud AI Proxy"
+    href="/experiments/cloud-ai-proxy"
+    description="Call any Workers AI model"
+  />
 </Cards>

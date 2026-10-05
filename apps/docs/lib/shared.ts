@@ -11,7 +11,7 @@ export function siteTitle(experimentCount: number): string {
 }
 
 export function siteDescription(experimentCount: number): string {
-  return `${experimentCount} open-source Cloudflare Workers you can deploy in one click - reference implementations for Workers AI, D1, R2, Durable Objects, Browser Rendering, and more, each with tests and API docs.`;
+  return `${experimentCount} open-source Cloudflare Workers you can deploy in one click — pasteable reference implementations for Workers AI (including Clef decision models / Jev-compatible APIs), MCP, RAG, D1, R2, Durable Objects, Browser Rendering, and edge APIs. Built for developers and AI agents.`;
 }
 
 export const themeColor = { light: "#ffffff", dark: "#0a0a0a" } as const;
@@ -23,9 +23,19 @@ export const siteKeywords = [
   "Browser Rendering",
   "Cloudflare R2",
   "Cloudflare D1",
+  "Durable Objects",
+  "Vectorize",
+  "AI Gateway",
+  "MCP server",
+  "decision model",
+  "Jev alternative",
+  "Clef Workers AI",
+  "llms.txt",
   "serverless",
   "developer tools",
   "edge platform",
+  "reference implementation",
+  "AI agents",
 ];
 export const siteUrl = "https://cloudflare-experiments.com";
 export const docsRoute = "/docs";

@@ -1,15 +1,12 @@
 import { Hono } from "hono";
 import type { Env } from "../types/env";
+import { runDecision, type DecisionModel, type DecisionQuestion } from "../lib/decision";
 import { jsonSuccess, jsonError } from "../utils/response";
-
-type Question =
-  | { type: "noul"; question: string }
-  | { type: "choice"; question: string; choices: string[] };
 
 interface DecisionRequest {
   state: string;
-  questions: Question[];
-  model?: "@cf/cloudflare/clef" | "@cf/cloudflare/clef-flash";
+  questions: DecisionQuestion[];
+  model?: DecisionModel;
 }
 
 const app = new Hono<{ Bindings: Env }>();
@@ -35,17 +32,8 @@ app.post("/decision", async (c) => {
   }
 
   try {
-    const result = await c.env.AI.run(model, {
-      state,
-      questions,
-    });
-
-    return jsonSuccess(c, {
-      model,
-      state,
-      questions,
-      answers: result,
-    });
+    const result = await runDecision(c.env, state, questions, model);
+    return jsonSuccess(c, result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return jsonError(c, `Workers AI error: ${message}`, "AI_ERROR", 502);

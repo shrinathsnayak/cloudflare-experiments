@@ -1,12 +1,13 @@
 ---
 title: "Dynamic Worker Runner"
-description: "Execute untrusted JavaScript via Dynamic Workers with no network access"
-icon: "CodeXml"
+description: "Execute untrusted JavaScript via Dynamic Workers with no network access — isolate and run user code safely"
 tags:
+  - edge
   - dynamic-workers
-bindings:
-  - Worker Loader
-status: new
+  - isolation
+  - sandbox
+  - code-execution
+  - security
 ---
 
 Run untrusted JavaScript as an **ES module Worker** using the **Worker Loader** API. Loaded workers run with `globalOutbound: null` so they cannot make network requests.

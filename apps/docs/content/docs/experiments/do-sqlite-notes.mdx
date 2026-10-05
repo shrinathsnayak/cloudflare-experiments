@@ -1,13 +1,15 @@
 ---
 title: "DO SQLite Notes"
-description: "Per-user notes stored in SQLite-backed Durable Objects via sql.exec"
-icon: "Database"
+description: "Per-user notes in SQLite-backed Durable Objects via sql.exec — structured storage pattern for stateful Workers"
 tags:
+  - stateful
   - durable-objects
   - sqlite
+  - notes
+  - storage
+  - sql
 bindings:
   - DO
-status: new
 ---
 
 Store and retrieve per-user notes in **SQLite-backed Durable Objects**. Each `userId` maps to its own Durable Object stub; notes live in a `notes` table via `storage.sql.exec`.
