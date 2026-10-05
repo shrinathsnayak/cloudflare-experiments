@@ -39,9 +39,9 @@ export const maxFeaturedNewBadges = 4;
 
 export const homePrinciples = [
   {
-    title: "Edge-first",
+    title: "Product-focused",
     description:
-      "Every experiment runs on Cloudflare Workers at the edge - low latency, global reach, no servers to manage.",
+      "Each experiment maps to a Cloudflare product or platform capability - AI, storage, networking, security, email, media, and more - not Workers alone. Examples typically deploy as Workers that wire those products at the edge.",
   },
   {
     title: "Single responsibility",

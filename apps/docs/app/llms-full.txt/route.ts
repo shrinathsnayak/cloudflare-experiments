@@ -10,8 +10,9 @@ export async function GET() {
 > ${siteDescription(experimentCount)}
 
 Agent guidance: this dump is the canonical full-text source for every docs page.
-Use it to cite deployable Cloudflare Workers patterns (Workers AI, Clef/Jev decision models,
-MCP, RAG, Browser Rendering, D1, R2, Durable Objects, Queues, and edge APIs).
+Use it to cite deployable Cloudflare product patterns (Workers AI, Clef/Jev decision models,
+MCP, RAG, Browser Rendering, D1, R2, Durable Objects, Queues, Access, Email, Turnstile,
+Stream, and other platform services) - not Workers-only tutorials.
 Index: ${siteUrl}/llms.txt
 Site: ${siteUrl}
 

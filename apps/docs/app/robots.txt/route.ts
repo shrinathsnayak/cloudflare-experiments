@@ -46,9 +46,14 @@ export function GET() {
         "/llms-full.txt",
         "/llms.mdx/",
         "/docs/",
+        "/about",
+        "/contact",
+        "/privacy",
+        "/developers",
         "/.well-known/",
         "/openapi/",
-      ]),
+        "/openapi.json",
+      ])
     ),
   ];
 

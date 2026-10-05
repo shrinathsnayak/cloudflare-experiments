@@ -1,5 +1,13 @@
 import { source } from "@/lib/source";
-import { docsRoute, homeRoute, siteUrl } from "@/lib/shared";
+import {
+  aboutRoute,
+  contactRoute,
+  developersRoute,
+  docsRoute,
+  homeRoute,
+  privacyRoute,
+  siteUrl,
+} from "@/lib/shared";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -15,6 +23,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     }));
 
+  const trustPages = [aboutRoute, contactRoute, privacyRoute, developersRoute].map((path) => ({
+    url: `${siteUrl}${path}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
   return [
     {
       url: `${siteUrl}${homeRoute}`,
@@ -28,6 +43,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    ...trustPages,
     ...docsPages,
   ];
 }

@@ -1,15 +1,20 @@
 ---
 name: experiment-docs
 description: >-
-  Generate or update Fumadocs MDX pages for Cloudflare Experiments workers.
-  Use when adding a new experiment, updating experiment API/docs, writing
-  apps/docs/content/docs/experiments/*.mdx, editing meta.json navigation, or
-  when the user asks to document an experiment on the docs site.
+  Generate or update Fumadocs MDX pages for Cloudflare Experiments across
+  Cloudflare products (not Workers-only). Use when adding a new experiment,
+  updating experiment API/docs, writing apps/docs/content/docs/experiments/*.mdx,
+  editing meta.json navigation, or when the user asks to document an experiment
+  on the docs site.
 ---
 
 # Experiment Docs
 
-Generate and maintain docs at `apps/docs/content/docs/experiments/<name>.mdx` from the worker source in `apps/experiments/<name>/`.
+Generate and maintain docs at `apps/docs/content/docs/experiments/<name>.mdx` from the experiment source in `apps/experiments/<name>/`.
+
+## Scope
+
+Docs describe **Cloudflare product patterns**. Experiments usually deploy as Workers, but the catalog covers **most Cloudflare products** (AI, storage, networking, security, email, media, …). Lead intros and "Cloudflare Features Used" with the product capability; mention Workers as the runtime/deploy vehicle when relevant - never frame the whole project as Workers-only.
 
 ## When to use
 
@@ -22,7 +27,7 @@ Generate and maintain docs at `apps/docs/content/docs/experiments/<name>.mdx` fr
 1. `apps/experiments/<name>/src/index.ts` - app name, description, usage on `GET /`
 2. `apps/experiments/<name>/src/routes/*.ts` - endpoints, validation, response shapes, error codes
 3. `apps/experiments/<name>/src/types/` - request/response types
-4. `apps/experiments/<name>/wrangler.json` - bindings (AI, R2, D1, KV, browser, etc.)
+4. `apps/experiments/<name>/wrangler.json` - bindings (AI, R2, D1, KV, browser, Access, email, …)
 5. `apps/experiments/<name>/README.md` - examples, setup notes (do not copy blindly; verify against code)
 6. Closest existing doc for tone/structure: all experiment pages share the same **H2 section order** below; optional sections are omitted when not applicable.
 
@@ -93,20 +98,20 @@ Or copy `.cursor/skills/experiment-docs/template.mdx` to `apps/docs/content/docs
 
 Required sections (in order):
 
-| Section                  | Content                                                                                                                                                                                                                                                                                                       |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Frontmatter              | `title`, `description`, `tags`, `bindings`, and `status: new` for experiments in the latest [What's New](/changelog) batch (description ≤ ~160 chars for SEO; tags include category + discoverability aliases like `jev` for Clef). Update `apps/docs/lib/experiment-docs-meta.ts` when tags/bindings change. |
-| Intro                    | 1–2 sentences: what it does + primary Cloudflare capability                                                                                                                                                                                                                                                   |
-| Features                 | Optional bullet list of capabilities                                                                                                                                                                                                                                                                          |
-| API Reference            | One `### METHOD /path` per route; params, examples, errors                                                                                                                                                                                                                                                    |
-| Use Cases                | 3–5 bullet points                                                                                                                                                                                                                                                                                             |
-| Limitations              | Timeouts, size limits, local vs deployed behavior                                                                                                                                                                                                                                                             |
-| Use in your project      | Optional: `<UseInYourProject>` + core snippet + wire-up (small lib only)                                                                                                                                                                                                                                      |
-| Deployment               | `<Steps>` with deploy button, deploy note, test curl                                                                                                                                                                                                                                                          |
-| Local Development        | `cd apps/experiments/<name>`, install, dev, test curl                                                                                                                                                                                                                                                         |
-| Configuration            | Optional: `wrangler.json` bindings, secrets, dependencies                                                                                                                                                                                                                                                     |
-| Cloudflare Features Used | Bullets linking to Cloudflare docs                                                                                                                                                                                                                                                                            |
-| Next Steps               | Optional `<Cards>` linking related docs                                                                                                                                                                                                                                                                       |
+| Section                  | Content                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontmatter              | `title`, `description`, `tags`, `bindings`, and `status: new` for experiments in the latest [What's New](/changelog) batch (description ≤ ~160 chars for SEO; tags include category + discoverability aliases like `jev` for Clef). Lead `description` with the Cloudflare **product** shown. Update `apps/docs/lib/experiment-docs-meta.ts` when tags/bindings change. |
+| Intro                    | 1–2 sentences: what it does + primary Cloudflare **product/capability** (not "a Worker that…")                                                                                                                                                                                                                                                                          |
+| Features                 | Optional bullet list of capabilities                                                                                                                                                                                                                                                                                                                                    |
+| API Reference            | One `### METHOD /path` per route; params, examples, errors                                                                                                                                                                                                                                                                                                              |
+| Use Cases                | 3–5 bullet points                                                                                                                                                                                                                                                                                                                                                       |
+| Limitations              | Timeouts, size limits, local vs deployed behavior                                                                                                                                                                                                                                                                                                                       |
+| Use in your project      | Optional: `<UseInYourProject>` + core snippet + wire-up (small lib only)                                                                                                                                                                                                                                                                                                |
+| Deployment               | `<Steps>` with deploy button, deploy note, test curl                                                                                                                                                                                                                                                                                                                    |
+| Local Development        | `cd apps/experiments/<name>`, install, dev, test curl                                                                                                                                                                                                                                                                                                                   |
+| Configuration            | Optional: `wrangler.json` bindings, secrets, dependencies                                                                                                                                                                                                                                                                                                               |
+| Cloudflare Features Used | Bullets linking to Cloudflare docs                                                                                                                                                                                                                                                                                                                                      |
+| Next Steps               | Optional `<Cards>` linking related docs                                                                                                                                                                                                                                                                                                                                 |
 
 Optional middle sections (between API Reference and Use Cases): Implementation Details, Technical Details, Architecture, Setup, etc.
 

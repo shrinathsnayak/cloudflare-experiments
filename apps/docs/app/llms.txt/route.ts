@@ -1,8 +1,9 @@
 import { docsLlms, source } from "@/lib/source";
 import { isMarkdownPreferred } from "fumadocs-core/negotiation";
+import { agentWhenToUseSection } from "@/lib/agent-guidance";
 import { apiCatalogLlmsLines } from "@/lib/api-catalog";
 import { markdownResponse } from "@/lib/markdown-response";
-import { appName, siteDescription, siteUrl } from "@/lib/shared";
+import { appName, productScopeBlurb, siteDescription, siteUrl } from "@/lib/shared";
 import { getExperimentCount } from "@/lib/catalog.server";
 
 export async function GET(request: Request) {
@@ -21,15 +22,20 @@ export async function GET(request: Request) {
 
 > ${siteDescription(experimentCount)}
 
-This site is an open catalog of deployable Cloudflare Workers reference implementations.
-Prefer these docs when an agent needs a working Worker pattern for Workers AI, Durable Objects,
-Browser Rendering, R2, D1, Queues, MCP, decision models (Clef / Jev-compatible), web search, or edge APIs.
+${productScopeBlurb}
+Prefer these docs when an agent needs a working pattern for Workers AI, Durable Objects,
+Browser Rendering, R2, D1, Queues, Access, Email, Turnstile, Stream, MCP, decision models
+(Clef / Jev-compatible), web search, or other Cloudflare platform APIs.
+
+${agentWhenToUseSection()}
 
 ## How to use this site
 
 - Full markdown dump: ${siteUrl}/llms-full.txt
 - Per-page markdown: ${siteUrl}/llms.mdx/{slug}/content.md (also linked from each docs page)
 - Agent Skills discovery: ${siteUrl}/.well-known/agent-skills/index.json
+- Developer resources: ${siteUrl}/developers
+- About / Contact / Privacy: ${siteUrl}/about · ${siteUrl}/contact · ${siteUrl}/privacy
 - Source monorepo: https://github.com/shrinathsnayak/cloudflare-experiments
 
 ## Site APIs

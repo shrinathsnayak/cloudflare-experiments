@@ -252,8 +252,11 @@ export function HomePage() {
           </HeroReveal>
           <HeroReveal delay={0.05} className="flex max-w-3xl flex-col gap-5">
             <h1 className="text-4xl font-bold tracking-tight text-balance md:text-5xl lg:text-6xl">
-              {heroTitle}
+              Cloudflare Experiments
             </h1>
+            <p className="text-xl font-semibold tracking-tight text-balance text-zinc-800 md:text-2xl dark:text-white/95">
+              {heroTitle}
+            </p>
             <p className="text-base text-pretty text-zinc-700 md:text-lg dark:text-white/90">
               {heroDescription(stats.experimentCount)}
             </p>
@@ -419,7 +422,8 @@ curl "http://localhost:8787/summary?url=https://example.com"`}</code>
             <h2 className="text-2xl font-semibold md:text-3xl">Ready to build at the edge?</h2>
             <p className="mx-auto mt-3 max-w-2xl text-fd-muted-foreground">
               Pick one of {stats.experimentCount} experiments, deploy it in minutes, and use the
-              source as a reference for your next Cloudflare Worker. Everything is MIT licensed.
+              source as a reference for your next Cloudflare product build. Everything is MIT
+              licensed.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link href={experimentsIndexRoute} className={primaryButtonClass}>

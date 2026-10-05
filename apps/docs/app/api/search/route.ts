@@ -1,4 +1,5 @@
 import { docsSearch } from "@/lib/search";
+import { jsonMethodNotAllowed } from "@/lib/api-error";
 import { enforceApiRateLimit } from "@/lib/rate-limit";
 import { SEARCH_CACHE_CONTROL, applySecurityHeaders } from "@/lib/security-headers";
 
@@ -17,4 +18,20 @@ export async function GET(request: Request) {
     statusText: response.statusText,
     headers,
   });
+}
+
+export function POST() {
+  return jsonMethodNotAllowed(["GET"]);
+}
+
+export function PUT() {
+  return jsonMethodNotAllowed(["GET"]);
+}
+
+export function PATCH() {
+  return jsonMethodNotAllowed(["GET"]);
+}
+
+export function DELETE() {
+  return jsonMethodNotAllowed(["GET"]);
 }

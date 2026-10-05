@@ -25,7 +25,7 @@ export function getMcpServerCard() {
       version: MCP_SERVER_INFO.version,
     },
     description:
-      "Search and read Cloudflare Workers experiment documentation over MCP (Streamable HTTP).",
+      "Search and read Cloudflare product experiment documentation over MCP (Streamable HTTP).",
     documentationUrl: `${siteUrl}/docs`,
     url: `${siteUrl}${MCP_TRANSPORT_ENDPOINT}`,
     transport: {

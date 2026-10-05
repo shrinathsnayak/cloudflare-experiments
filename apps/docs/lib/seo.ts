@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { getExperimentCount } from "@/lib/catalog.server";
-import { siteIcons } from "@/lib/logo";
+import { logoPathPublic, siteIcons } from "@/lib/logo";
+import { buildOrganizationJsonLd } from "@/lib/organization";
 import { getPageImage, getPageMarkdownUrl, type source } from "@/lib/source";
 import {
   appName,
+  brandProductName,
   docsRoute,
   gitConfig,
   githubProfileUrl,
@@ -35,6 +37,13 @@ export const rootViewport: Viewport = {
     { media: "(prefers-color-scheme: dark)", color: themeColor.dark },
   ],
 };
+
+export function createOrganizationJsonLd() {
+  return buildOrganizationJsonLd({
+    description: siteDescription(getExperimentCount()),
+    logoUrl: absoluteUrl(logoPathPublic),
+  });
+}
 
 export function createRootMetadata(): Metadata {
   const ogImage = "/opengraph-image";
@@ -121,9 +130,11 @@ export function createDocsPageMetadata(page: NonNullable<DocsPage>): Metadata {
       page.data.title,
       ...pageTags,
       ...pageBindings,
-      "Cloudflare Workers experiment",
+      "Cloudflare product experiment",
+      "Cloudflare Experiments",
+      "Cloudflare platform",
       "deployable reference",
-    ]),
+    ])
   );
 
   return {
@@ -162,32 +173,39 @@ export function createDocsPageMetadata(page: NonNullable<DocsPage>): Metadata {
 }
 
 export function createWebsiteJsonLd() {
+  const organization = createOrganizationJsonLd();
   return {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: appName,
-    description: siteDescription(getExperimentCount()),
-    url: siteUrl,
-    inLanguage: "en-US",
-    publisher: {
-      "@type": "Organization",
-      name: appName,
-      url: siteUrl,
-    },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${siteUrl}/api/search?query={search_term_string}`,
+    "@graph": [
+      {
+        "@type": "WebSite",
+        name: appName,
+        alternateName: brandProductName,
+        description: siteDescription(getExperimentCount()),
+        url: siteUrl,
+        inLanguage: "en-US",
+        publisher: { "@id": `${siteUrl}/#organization` },
+        potentialAction: {
+          "@type": "SearchAction",
+          target: {
+            "@type": "EntryPoint",
+            urlTemplate: `${siteUrl}/api/search?query={search_term_string}`,
+          },
+          "query-input": "required name=search_term_string",
+        },
       },
-      "query-input": "required name=search_term_string",
-    },
+      {
+        "@id": `${siteUrl}/#organization`,
+        ...organization,
+      },
+    ],
   };
 }
 
 export function createDocsPageJsonLd(page: NonNullable<DocsPage>) {
   const url = absoluteUrl(page.url);
   const keywords = [...(page.data.tags ?? []), ...(page.data.bindings ?? [])];
+  const organization = createOrganizationJsonLd();
 
   return {
     "@context": "https://schema.org",
@@ -207,11 +225,7 @@ export function createDocsPageJsonLd(page: NonNullable<DocsPage>) {
       name: gitConfig.user,
       url: githubProfileUrl,
     },
-    publisher: {
-      "@type": "Organization",
-      name: appName,
-      url: siteUrl,
-    },
+    publisher: organization,
     mainEntityOfPage: {
       "@type": "WebPage",
       "@id": url,

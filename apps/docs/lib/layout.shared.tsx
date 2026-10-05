@@ -2,7 +2,14 @@ import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 import { Globe } from "lucide-react";
 import { AppLogo } from "@/components/app-logo";
 import { BuyMeACoffeeLink } from "@/components/buy-me-a-coffee-link";
-import { docsRoute, getBuyMeACoffeeUrl, githubRepoUrl, homeRoute, portfolioUrl } from "./shared";
+import {
+  docsRoute,
+  developersRoute,
+  getBuyMeACoffeeUrl,
+  githubRepoUrl,
+  homeRoute,
+  portfolioUrl,
+} from "./shared";
 
 const nav = {
   title: <AppLogo />,
@@ -73,6 +80,12 @@ export const homeLayoutOptions: BaseLayoutProps = {
       text: "Documentation",
       url: docsRoute,
       active: "nested-url",
+    },
+    {
+      type: "main",
+      text: "Developers",
+      url: developersRoute,
+      active: "url",
     },
     {
       type: "main",

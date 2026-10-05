@@ -1,11 +1,15 @@
 import { AppLogo } from "@/components/app-logo";
 import {
+  aboutRoute,
   appName,
+  contactRoute,
+  developersRoute,
   docsRoute,
   experimentsIndexRoute,
   githubRepoUrl,
   homeRoute,
   portfolioUrl,
+  privacyRoute,
 } from "@/lib/shared";
 import Link from "next/link";
 
@@ -23,14 +27,17 @@ const footerColumns = [
     title: "Docs",
     links: [
       { label: "Introduction", href: docsRoute },
+      { label: "Developer resources", href: developersRoute },
       { label: "Philosophy", href: `${docsRoute}/philosophy` },
       { label: "Contributing", href: `${docsRoute}/contributing` },
-      { label: "Deployment", href: `${docsRoute}/reference/deployment` },
     ],
   },
   {
     title: "Project",
     links: [
+      { label: "About", href: aboutRoute },
+      { label: "Contact", href: contactRoute },
+      { label: "Privacy", href: privacyRoute },
       { label: "GitHub", href: githubRepoUrl, external: true },
       { label: "License (MIT)", href: `${githubRepoUrl}/blob/main/LICENSE`, external: true },
       { label: "Portfolio", href: portfolioUrl, external: true },
@@ -49,9 +56,9 @@ export function SiteFooter() {
           >
             <AppLogo />
           </Link>
-          <p className="mt-4 text-sm text-zinc-600 dark:text-white/75">
-            Deployable Cloudflare Workers experiments - reference implementations you can clone,
-            run, and ship.
+          <p className="mt-4 text-sm text-zinc-600 dark:text-white/75 leading-6">
+            Deployable Cloudflare product experiments - reference implementations across Workers AI,
+            D1, R2, Durable Objects, Browser Rendering, and more. Clone, run, and ship.
           </p>
           <p className="mt-3 text-xs text-zinc-500 dark:text-white/50">
             Not affiliated with or endorsed by Cloudflare, Inc.
@@ -92,9 +99,7 @@ export function SiteFooter() {
 
       <div className="border-t border-fd-border">
         <div className="mx-auto flex w-full max-w-(--fd-layout-width) flex-col gap-2 px-6 py-4 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between dark:text-white/50">
-          <p>
-            {appName}. MIT licensed.
-          </p>
+          <p>{appName}. MIT licensed.</p>
           <p>
             Built with{" "}
             <a
@@ -105,7 +110,7 @@ export function SiteFooter() {
             >
               Fumadocs
             </a>{" "}
-            on Cloudflare Workers patterns.
+            for Cloudflare product patterns.
           </p>
         </div>
       </div>

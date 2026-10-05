@@ -4,9 +4,12 @@
  */
 export const HOMEPAGE_DISCOVERY_LINKS = [
   '</.well-known/api-catalog>; rel="api-catalog"',
+  '</openapi.json>; rel="service-desc"; type="application/json"',
   '</.well-known/agent-skills/index.json>; rel="describedby"; type="application/json"',
   '</llms.txt>; rel="describedby"; type="text/plain"',
   '</docs>; rel="service-doc"; type="text/html"',
+  '</developers>; rel="service-doc"; type="text/html"',
+  '</sitemap.xml>; rel="sitemap"',
 ] as const;
 
 export function applyDiscoveryLinkHeaders(headers: Headers): void {

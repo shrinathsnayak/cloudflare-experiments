@@ -7,17 +7,19 @@ alwaysApply: true
 
 ## Philosophy
 
-- **Edge-first**: Experiments run on Cloudflare Workers at the edge.
-- **Stateless**: Prefer fetch + in-memory processing; avoid KV/D1/R2 unless the experiment explicitly needs them.
+- **Product-first**: Each experiment demonstrates one specific **Cloudflare product or platform capability** (Workers AI, D1, R2, Durable Objects, Browser Rendering, Access, Email, Turnstile, Stream, Queues, …). This catalog covers **most Cloudflare products**, not Workers alone.
+- **Workers as the usual vehicle**: Experiments typically ship as Cloudflare Workers that wire those products together at the edge. Prefer that packaging unless the product requires a different surface.
+- **Edge-first**: Prefer edge execution; low latency, global reach.
+- **Stateless by default**: Prefer fetch + in-memory processing; add KV/D1/R2/etc. when the product experiment needs them.
 - **Under 60 seconds**: Each request path should complete within ~60 seconds.
-- **Single responsibility**: Each experiment demonstrates one specific Cloudflare capability.
+- **Single responsibility**: One experiment, one Cloudflare capability.
 
 ## Monorepo layout
 
 This repo is a **Turborepo** monorepo under `apps/`:
 
 - `apps/docs/` - Fumadocs documentation site (Next.js)
-- `apps/experiments/<name>/` - Cloudflare Worker experiments
+- `apps/experiments/<name>/` - Independently deployable product experiments (usually Workers)
 
 Run from the repo root:
 
@@ -28,7 +30,7 @@ Run from the repo root:
 
 ## Folder Structure
 
-Every Worker experiment lives under `apps/experiments/<name>/`. Use this layout only; do not add extra top-level dirs (e.g. no `app/`, `server/`).
+Every experiment lives under `apps/experiments/<name>/`. Use this layout only; do not add extra top-level dirs (e.g. no `app/`, `server/`).
 
 ### Required layout
 

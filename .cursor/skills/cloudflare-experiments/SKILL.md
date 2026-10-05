@@ -1,9 +1,20 @@
 ---
 name: cloudflare-experiments
-description: Scaffolds and documents new Cloudflare Experiments. Use when adding a new experiment, copying an experiment structure, or updating root or experiment READMEs and deploy buttons.
+description: >-
+  Scaffolds and documents new Cloudflare Experiments across Cloudflare products
+  (not Workers-only). Use when adding a new experiment, copying an experiment
+  structure, or updating root or experiment READMEs and deploy buttons.
 ---
 
 # Cloudflare Experiments
+
+## Scope (read this first)
+
+This monorepo is a catalog of **deployable reference implementations across Cloudflare products** - Workers AI, Durable Objects, D1, R2, KV, Queues, Workflows, Browser Rendering, Vectorize, Hyperdrive, Access, Email, Turnstile, Stream, Rate Limiting, Analytics Engine, and more.
+
+It is **not** a Workers-only project. Workers are usually how examples ship and how products are wired together at the edge; each experiment still maps to a specific **Cloudflare product or platform capability**.
+
+When writing docs, READMEs, agent guidance, or marketing copy: say **Cloudflare products / platform**, list concrete products, and only mention Workers as the typical deploy vehicle.
 
 ## When to use
 
@@ -14,17 +25,17 @@ description: Scaffolds and documents new Cloudflare Experiments. Use when adding
 ## Adding a new experiment
 
 1. **Scaffold**: Copy an existing experiment folder (e.g. `apps/experiments/is-it-down`) to `apps/experiments/<new-name>`. Keep the same layout: `src/index.ts`, `src/routes/`, `src/lib/`, `src/utils/`, `src/constants/`, `src/types/`, `package.json`, `wrangler.json`, `tsconfig.json`, `README.md`.
-2. **Implement**: Replace route logic, add any bindings in `wrangler.json` and type them in `src/types/env.d.ts`. Do not share code with other experiments.
+2. **Implement**: Replace route logic, add any bindings in `wrangler.json` and type them in `src/types/env.d.ts`. Do not share code with other experiments. Name the experiment after the **product capability** it demonstrates.
 3. **Tests**: Add `test/` with Vitest smoke + unit/route tests per experiment standards.
-4. **Document**: Update the root [README.md](README.md) experiments table with name, description, and deploy link. In the experiment’s README, document purpose, API (query params, response shape), run locally, and deploy button.
-5. **Docs site**: Add or update the Fumadocs page - run `node apps/docs/scripts/scaffold-experiment-doc.mjs <name>`, fill TODOs from source, add to `apps/docs/content/docs/meta.json`. Follow the [experiment-docs skill](.cursor/skills/experiment-docs/SKILL.md) or [Experiment Documentation Guide](/reference/experiment-docs).
+4. **Document**: Update the root [README.md](README.md) experiments table with name, description, and deploy link. In the experiment’s README, document purpose, API (query params, response shape), run locally, and deploy button. Lead with the Cloudflare product(s) shown, not "a Worker that…".
+5. **Docs site**: Add or update the Fumadocs page - run `node apps/docs/scripts/scaffold-experiment-doc.mjs <name>`, fill TODOs from source, add to `apps/docs/content/docs/meta.json`. Follow the [experiment-docs skill](.cursor/skills/experiment-docs/SKILL.md) or [Experiment Documentation Guide](/reference/experiment-docs). Keep site-wide positioning product-first (`apps/docs/lib/shared.ts` `productScopeBlurb`).
 6. **Deploy button**: In the experiment README use:
    `[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/<owner>/cloudflare-experiments/tree/main/apps/experiments/<name>)`
    Replace `<owner>` and `<name>` with the real repo owner and experiment folder name.
 
 ## Experiment structure reminder
 
-- `src/index.ts`: Hono app, mount routes, `export default { fetch: app.fetch }`.
+- `src/index.ts`: Hono app, mount routes, `export default { fetch: app.fetch }` (typical Worker entry).
 - `src/routes/*.ts`: Route handlers; use `jsonError` / `jsonSuccess` from utils for consistent responses.
-- `src/types/env.d.ts`: Env/bindings types.
+- `src/types/env.d.ts`: Env/bindings types for the Cloudflare products used.
 - Root `package.json` provides Turborepo, Prettier, and ESLint; each experiment is otherwise self-contained.

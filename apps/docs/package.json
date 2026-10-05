@@ -9,6 +9,8 @@
     "preview": "npm run build && vite preview",
     "deploy": "npm run build && wrangler deploy",
     "deploy:version": "npm run build && wrangler versions upload",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "postinstall": "fumadocs-mdx && node scripts/generate-logo-data.mjs && node scripts/generate-agent-skills.mjs"
   },
   "dependencies": {
@@ -42,6 +44,7 @@
     "typescript": "^6.0.3",
     "vinext": "^1.0.1",
     "vite": "^8.0.16",
+    "vitest": "^3.2.7",
     "wrangler": "^4.146.0"
   }
 }

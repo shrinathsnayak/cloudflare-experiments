@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isMarkdownPreferred, rewritePath } from "fumadocs-core/negotiation";
 import { applyDiscoveryLinkHeaders } from "@/lib/discovery-links";
-import { docsContentRoute, docsRoute, homeRoute } from "@/lib/shared";
+import { markdownNotFoundResponse } from "@/lib/not-found-markdown";
+import { docsContentRoute, docsRoute, homeRoute, trustPagePaths } from "@/lib/shared";
 import {
   DOCS_CACHE_CONTROL,
   MARKDOWN_CACHE_CONTROL,
@@ -92,7 +93,7 @@ export default function proxy(request: NextRequest) {
   const agentSkillMd = pathname.match(AGENT_SKILLS_MD_RE);
   if (agentSkillMd) {
     return NextResponse.rewrite(
-      new URL(`/well-known/agent-skills/${agentSkillMd[1]}/SKILL.md`, request.nextUrl),
+      new URL(`/well-known/agent-skills/${agentSkillMd[1]}/SKILL.md`, request.nextUrl)
     );
   }
 
@@ -105,6 +106,16 @@ export default function proxy(request: NextRequest) {
     if (isHomePath(pathname)) {
       return rewriteMarkdown(request, "/llms.txt", { discoveryLinks: true });
     }
+
+    // Trust / developer HTML pages keep HTML even when Accept prefers markdown.
+    if ((trustPagePaths as readonly string[]).includes(pathname)) {
+      const response = withSecurityHeaders(NextResponse.next());
+      response.headers.set("Vary", "Accept");
+      return response;
+    }
+
+    // Unknown path + Accept: text/markdown → agent-recoverable Markdown 404.
+    return markdownNotFoundResponse(pathname);
   }
 
   const response = withSecurityHeaders(

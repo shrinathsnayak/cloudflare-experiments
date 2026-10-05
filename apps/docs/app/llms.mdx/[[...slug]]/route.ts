@@ -1,6 +1,6 @@
 import { docsLlms, source } from "@/lib/source";
+import { markdownNotFoundResponse } from "@/lib/not-found-markdown";
 import { markdownResponse } from "@/lib/markdown-response";
-import { notFound } from "next/navigation";
 
 export async function GET(_req: Request, { params }: RouteContext<"/llms.mdx/[[...slug]]">) {
   const { slug } = await params;
@@ -8,7 +8,10 @@ export async function GET(_req: Request, { params }: RouteContext<"/llms.mdx/[[.
   const slugs = slug?.slice(0, -1) ?? [];
   if (slugs.at(-1) === "index") slugs.pop();
   const page = source.getPage(slugs);
-  if (!page) notFound();
+  if (!page) {
+    const pathname = `/docs${slugs.length ? `/${slugs.join("/")}` : ""}`;
+    return markdownNotFoundResponse(pathname);
+  }
 
   return markdownResponse(await docsLlms.page(page));
 }
