@@ -1,0 +1,11 @@
+{
+  "name": "k2-mini-stream",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

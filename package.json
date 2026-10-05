@@ -25,5 +25,8 @@
     "typescript-eslint": "^8.15.0",
     "vite": "^8.3.2"
   },
-  "packageManager": "npm@10.9.2"
+  "packageManager": "npm@10.9.2",
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "^1.2.1"
+  }
 }

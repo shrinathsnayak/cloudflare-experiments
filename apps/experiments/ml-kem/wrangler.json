@@ -1,0 +1,12 @@
+{
+  "name": "ml-kem",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-03-01",
+  "compatibility_flags": ["webcrypto_modern_algorithms"],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
+}

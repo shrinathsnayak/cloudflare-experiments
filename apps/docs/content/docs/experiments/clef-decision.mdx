@@ -1,0 +1,179 @@
+---
+title: Clef Decision
+description: Workers AI decision probabilities with Clef or Clef-Flash models
+---
+
+Query Workers AI Clef models to get decision probabilities based on a state description and typed questions (binary `noul` or multiple-choice `choice`).
+
+## API Reference
+
+### `POST /decision`
+
+Call Workers AI Clef or Clef-Flash to answer structured decision questions and return probability distributions.
+
+**Request body**
+
+```json
+{
+  "state": "Short description of the current state or context",
+  "questions": [
+    {
+      "type": "noul",
+      "question": "Will it rain tomorrow?"
+    },
+    {
+      "type": "choice",
+      "question": "What color is the sky?",
+      "choices": ["blue", "gray", "red"]
+    }
+  ],
+  "model": "@cf/cloudflare/clef"
+}
+```
+
+**Fields**
+
+- **`state`** `string` (required) - Context or state description
+- **`questions`** `array` (required) - Array of question objects
+  - **`type`** `string` - `"noul"` (binary) or `"choice"` (multiple-choice)
+  - **`question`** `string` - The question text
+  - **`choices`** `string[]` - For `choice` type, the list of possible answers
+- **`model`** `string` (optional) - Model name, defaults to `@cf/cloudflare/clef`. Also supports `@cf/cloudflare/clef-flash`
+
+**Example request**
+
+```bash
+curl -X POST https://clef-decision.example.workers.dev/decision \
+  -H "Content-Type: application/json" \
+  -d '{
+    "state": "The weather forecast shows clouds moving in.",
+    "questions": [
+      { "type": "noul", "question": "Will it rain?" },
+      { "type": "choice", "question": "When?", "choices": ["today", "tomorrow", "next week"] }
+    ]
+  }'
+```
+
+**Example response**
+
+```json
+{
+  "model": "@cf/cloudflare/clef",
+  "state": "The weather forecast shows clouds moving in.",
+  "questions": [
+    { "type": "noul", "question": "Will it rain?" },
+    { "type": "choice", "question": "When?", "choices": ["today", "tomorrow", "next week"] }
+  ],
+  "answers": [
+    { "type": "noul", "probability": 0.73 },
+    { "type": "choice", "probabilities": [0.15, 0.65, 0.20] }
+  ]
+}
+```
+
+**Error responses**
+
+- `400` - Invalid JSON body or missing required fields
+- `502` - Workers AI error
+
+**Error codes**
+
+- `INVALID_JSON` - Request body is not valid JSON
+- `INVALID_REQUEST` - Missing or invalid `state` or `questions`
+- `AI_ERROR` - Workers AI returned an error
+
+## Use Cases
+
+- Decision support systems with probabilistic outputs
+- Multi-step reasoning workflows requiring structured answers
+- A/B test predictions and scenario modeling
+- Educational demos of Workers AI decision capabilities
+- Building chat agents with structured decision making
+
+## Limitations
+
+- Requires Workers AI binding (must deploy or use `--remote` locally)
+- Question complexity limited by model context window
+- Probability outputs are model-generated estimates, not guarantees
+- No persistent storage or decision history
+- Clef models are optimized for structured decision questions (not open-ended chat)
+
+## Deployment
+
+<Steps>
+
+<Step>
+### Deploy to Cloudflare Workers
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/clef-decision)
+
+The Workers AI binding is automatically provisioned.
+</Step>
+
+<Step>
+### Test your deployment
+
+```bash
+curl -X POST https://clef-decision.your-subdomain.workers.dev/decision \
+  -H "Content-Type: application/json" \
+  -d '{
+    "state": "The weather forecast shows clouds.",
+    "questions": [{ "type": "noul", "question": "Will it rain?" }]
+  }'
+```
+</Step>
+
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/clef-decision
+npm install
+npm run dev
+```
+
+The Worker runs at `http://localhost:8787` with `--remote` for AI binding access.
+
+**Test locally**
+
+```bash
+curl -X POST http://localhost:8787/decision \
+  -H "Content-Type: application/json" \
+  -d '{
+    "state": "test state",
+    "questions": [{ "type": "noul", "question": "Is this working?" }]
+  }'
+```
+
+## Configuration
+
+### Bindings
+
+This experiment requires a Workers AI binding declared in `wrangler.json`:
+
+```json
+{
+  "ai": [
+    {
+      "binding": "AI"
+    }
+  ]
+}
+```
+
+No additional secrets required.
+
+## Cloudflare Features Used
+
+- [Workers](https://developers.cloudflare.com/workers/) - Edge compute platform
+- [Workers AI](https://developers.cloudflare.com/workers-ai/) - Run AI models at the edge
+- Workers AI Clef decision API - Structured decision probabilities
+
+## Next Steps
+
+<Cards>
+  <Card title="Cloud AI Proxy" href="/experiments/cloud-ai-proxy" description="Call any Workers AI model" />
+  <Card title="AI Website Summary" href="/experiments/ai-website-summary" description="Summarize webpages with Workers AI" />
+  <Card title="Chat Agent" href="/experiments/chat-agent" description="Durable chat agent with Workers AI" />
+</Cards>

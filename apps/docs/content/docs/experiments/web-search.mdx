@@ -1,0 +1,174 @@
+---
+title: Web Search
+description: Web Search API through AI Gateway with ceramic, exa, or linkup providers
+---
+
+Query the Cloudflare Web Search API through AI Gateway to search the web from the edge using ceramic, exa, or linkup providers.
+
+## API Reference
+
+### `POST /search`
+
+Search the web via AI Gateway's Web Search API integration.
+
+**Request body**
+
+```json
+{
+  "query": "cloudflare workers edge computing",
+  "provider": "ceramic",
+  "limit": 5
+}
+```
+
+**Fields**
+
+- **`query`** `string` (required) - Search query
+- **`provider`** `string` (optional) - Search provider: `ceramic`, `exa`, or `linkup`. Defaults to `ceramic`
+- **`limit`** `number` (optional) - Maximum results to return. Defaults to `5`
+
+**Example request**
+
+```bash
+curl -X POST https://web-search.example.workers.dev/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "cloudflare workers edge computing",
+    "provider": "ceramic",
+    "limit": 5
+  }'
+```
+
+**Example response**
+
+```json
+{
+  "query": "cloudflare workers edge computing",
+  "provider": "ceramic",
+  "limit": 5,
+  "results": [
+    {
+      "url": "https://workers.cloudflare.com",
+      "title": "Cloudflare Workers",
+      "snippet": "Deploy serverless code instantly across the globe..."
+    }
+  ]
+}
+```
+
+**Error responses**
+
+- `400` - Invalid JSON, missing `query`, or invalid `provider`
+- `502` - Web Search API error
+
+**Error codes**
+
+- `INVALID_JSON` - Request body is not valid JSON
+- `INVALID_REQUEST` - Missing or invalid `query` field
+- `INVALID_PROVIDER` - Provider is not one of: ceramic, exa, linkup
+- `SEARCH_ERROR` - Web Search API returned an error
+
+## Use Cases
+
+- Building AI chat agents with web search capabilities
+- Research tools that need current web data
+- Content discovery and aggregation workflows
+- Search-augmented generation (RAG) pipelines
+- Educational demos of multi-provider search APIs
+
+## Limitations
+
+- Requires AI Gateway configuration (account ID and gateway ID)
+- Web Search API is in beta (Oct 2 2026) - availability and limits may change
+- Results limited by the provider's capabilities and coverage
+- No persistent storage or search history
+- Rate limits determined by AI Gateway and search provider quotas
+
+## Deployment
+
+<Steps>
+
+<Step>
+### Configure AI Gateway
+
+Set your AI Gateway credentials in `wrangler.json` or as secrets:
+
+```json
+{
+  "vars": {
+    "AI_GATEWAY_ACCOUNT_ID": "your-account-id",
+    "AI_GATEWAY_ID": "your-gateway-id"
+  }
+}
+```
+
+If not set, the Worker defaults to demo values (limited functionality).
+</Step>
+
+<Step>
+### Deploy to Cloudflare Workers
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/shrinathsnayak/cloudflare-experiments/tree/main/apps/experiments/web-search)
+
+Update environment variables in the dashboard after deployment.
+</Step>
+
+<Step>
+### Test your deployment
+
+```bash
+curl -X POST https://web-search.your-subdomain.workers.dev/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "cloudflare workers",
+    "provider": "ceramic",
+    "limit": 5
+  }'
+```
+</Step>
+
+</Steps>
+
+## Local Development
+
+```bash
+cd apps/experiments/web-search
+npm install
+npm run dev
+```
+
+The Worker runs at `http://localhost:8787` with `--remote` for Web Search API access.
+
+**Test locally**
+
+```bash
+curl -X POST http://localhost:8787/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "cloudflare workers",
+    "provider": "ceramic"
+  }'
+```
+
+## Configuration
+
+### Environment Variables
+
+- **`AI_GATEWAY_ACCOUNT_ID`** - Your Cloudflare account ID
+- **`AI_GATEWAY_ID`** - Your AI Gateway ID
+
+Set these in `wrangler.json` under `vars` or as secrets via the Cloudflare dashboard.
+
+## Cloudflare Features Used
+
+- [Workers](https://developers.cloudflare.com/workers/) - Edge compute platform
+- [AI Gateway](https://developers.cloudflare.com/ai-gateway/) - Unified API gateway for AI services
+- Web Search API (Oct 2026 beta) - Search the web via ceramic, exa, or linkup providers
+
+## Next Steps
+
+<Cards>
+  <Card title="AI Website Summary" href="/experiments/ai-website-summary" description="Summarize webpages with Workers AI" />
+  <Card title="RAG Mini Search" href="/experiments/rag-mini-search" description="Grounded Q&A with Vectorize" />
+  <Card title="Cloud AI Proxy" href="/experiments/cloud-ai-proxy" description="Call any Workers AI model" />
+</Cards>
