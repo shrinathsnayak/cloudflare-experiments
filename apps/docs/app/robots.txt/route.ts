@@ -50,6 +50,7 @@ export function GET() {
         "/contact",
         "/privacy",
         "/developers",
+        "/blogs",
         "/.well-known/",
         "/openapi/",
         "/openapi.json",

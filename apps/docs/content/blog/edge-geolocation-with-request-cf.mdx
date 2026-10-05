@@ -1,0 +1,113 @@
+---
+title: Edge geolocation with request.cf on Cloudflare Workers
+description: Deep guide to Cloudflare request.cf - country, colo, ASN, TLS, bot score signals - product patterns, privacy, Radar pairing, and the Where Am I experiment.
+date: 2026-09-25
+updated: 2026-10-05
+readingMinutes: 17
+keywords:
+  - request.cf
+  - Cloudflare geolocation
+  - Workers colo
+  - ASN lookup
+  - edge location API
+  - IncomingRequestCfProperties
+experiments:
+  - whereami
+  - radar-one-question
+  - multi-pop-latency-map
+  - rate-limiter-demo
+---
+
+Every request that hits a [Cloudflare Worker](https://developers.cloudflare.com/workers/) can expose rich network metadata on **`request.cf`** ([IncomingRequestCfProperties](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties)): country, colo, ASN, timezone, TLS version, and more. For many personalization, compliance, and debugging features, that is enough - no third-party geo IP database required.
+
+The [Where Am I](/docs/experiments/whereami) experiment returns those fields as JSON so you can explore what Cloudflare attaches in your colo and copy the pattern into products.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [Workers](https://developers.cloudflare.com/workers/) | Read and expose `request.cf` | Edge runtime |
+| [Request `cf` properties](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties) | Geo / network / TLS metadata | Runtime API |
+| [Cloudflare Radar](https://developers.cloudflare.com/radar/) | Enrich ASN / internet insights | Radar |
+| [Cloudflare Radar API](https://developers.cloudflare.com/radar/get-started/) | Programmatic queries | API |
+| [Rate limiting](https://developers.cloudflare.com/waf/rate-limiting-rules/) / Worker limiters | Abuse controls using ASN signals | WAF / Workers |
+| [Bot management signals](https://developers.cloudflare.com/bots/) (plan-dependent) | Bot score fields when enabled | Bots |
+
+## What you get without a geo database
+
+Typical fields teams use (availability can depend on request path and account features - always check the live object):
+
+| Field | Use |
+| --- | --- |
+| `country` | Content licensing, currency defaults |
+| `colo` | Support “which POP served this?” |
+| `asn` | Abuse review, VPN heuristics |
+| `timezone` | Localize timestamps |
+| `city` / region (when present) | Coarse localization |
+| TLS fields | Debug modern client requirements |
+
+Treat values as **hints**, not legal identity. VPNs, mobile carriers, and corporate egress will skew country. Document that in product UX and privacy policies.
+
+## The smallest useful API
+
+Where Am I is intentionally tiny:
+
+```txt
+GET / → JSON of selected request.cf fields (+ request basics)
+```
+
+Ideal for:
+
+- Teaching how edge context works on [Workers](https://developers.cloudflare.com/workers/)
+- Debugging “why is this user in the wrong locale?”
+- Smoke-testing deployments from different networks
+
+```bash
+curl -fsSL https://<your-worker>/ | jq .
+```
+
+Call it from home, a phone hotspot, and a cloud shell - watch `colo` and `country` change.
+
+## Product patterns on top of request.cf
+
+1. **Locale bootstrap** - default language/currency from `country`, allow override
+2. **Abuse signals** - log ASN + path for review; pair with [Rate Limiter Demo](/docs/experiments/rate-limiter-demo) concepts or [WAF rate limiting](https://developers.cloudflare.com/waf/rate-limiting-rules/)
+3. **Support tooling** - show customers which colo served an error page
+4. **Radar enrichment** - ask network questions via [Radar One Question](/docs/experiments/radar-one-question) against [Cloudflare Radar](https://developers.cloudflare.com/radar/)
+5. **Latency maps** - compare POPs with [Multi-POP Latency Map](/docs/experiments/multi-pop-latency-map)
+
+### Privacy and compliance notes
+
+- Prefer coarse fields (`country`, `colo`) over storing raw IPs when possible
+- Declare what you log; set retention
+- Do not treat `country` as GDPR “adequate” proof of residency alone
+- Bot-related scores may be plan-gated - see [Bots documentation](https://developers.cloudflare.com/bots/)
+
+## Local vs production
+
+`request.cf` behavior can differ in local `wrangler` versus production. Always validate field presence on a deployed Worker before building hard dependencies. The [Workers Request docs](https://developers.cloudflare.com/workers/runtime-apis/request/) are the source of truth for property names.
+
+## Deploy Where Am I
+
+1. Skim [IncomingRequestCfProperties](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties)
+2. Open [Where Am I](/docs/experiments/whereami)
+3. One-click Deploy or run with [Wrangler](https://developers.cloudflare.com/workers/wrangler/)
+4. Hit the root endpoint from two networks
+5. Copy only the fields your product needs
+
+You learn `request.cf` with a live API instead of reading property tables alone - then keep Workers as the vehicle and Cloudflare’s edge metadata as the product capability you are actually shipping.
+## Production checklist
+
+1. List which `request.cf` fields you actually need - drop the rest.
+2. Validate field presence in production (local `wrangler` can differ).
+3. Document VPN/carrier caveats in UX copy.
+4. Keep PII out of analytics; prefer country/colo/ASN aggregates.
+5. Combine with [Radar](https://developers.cloudflare.com/radar/) only when enrichment is worth the extra call.
+
+## FAQ
+
+### Is country GDPR-grade location proof?
+No. Treat it as a hint for defaults, not legal residency evidence.
+
+### Why is colo null sometimes?
+Not every execution path exposes every property. Guard with optional chaining and defaults. See [IncomingRequestCfProperties](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties).

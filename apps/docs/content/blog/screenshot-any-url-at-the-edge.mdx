@@ -1,0 +1,221 @@
+---
+title: How to take a screenshot of any URL at the edge
+description: A deep guide to capturing PNG screenshots with Cloudflare Browser Rendering on Workers - architecture, bindings, waits, caching, auth, pitfalls, and a deployable Screenshot API experiment.
+date: 2026-09-15
+updated: 2026-10-05
+readingMinutes: 20
+featured: true
+keywords:
+  - Cloudflare Browser Rendering
+  - screenshot API
+  - headless Chrome
+  - edge screenshot
+  - Workers Browser Rendering
+  - OG image generation
+  - Cloudflare Puppeteer
+experiments:
+  - screenshot-api
+  - browser-links
+  - browser-markdown-scrape
+  - pdf-api
+  - r2-storage
+  - edge-cache
+---
+
+Marketing sites, QA bots, social previews, and agent toolchains all need a reliable answer to one question: **what does this URL look like right now?** Running Chromium yourself means managing browsers, scaling screenshots, and paying for idle capacity. [Cloudflare Browser Rendering](https://developers.cloudflare.com/browser-rendering/) runs headless Chrome on Cloudflare’s network so a [Worker](https://developers.cloudflare.com/workers/) can open a page and return a PNG without operating a browser farm.
+
+This guide goes deep on architecture, product choices, waits, caching, auth, and failure modes - then points you at the [Screenshot API](/docs/experiments/screenshot-api) experiment as a tested starting point.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [Workers](https://developers.cloudflare.com/workers/) | HTTP API, validation, response streaming | Runtime + routing |
+| [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) | Headless Chromium at the edge | Binding + REST options |
+| [@cloudflare/puppeteer](https://developers.cloudflare.com/browser-rendering/puppeteer/) | Drive navigation, viewport, screenshot | Puppeteer API on Workers |
+| [Workers bindings](https://developers.cloudflare.com/workers/runtime-apis/bindings/) | Wire `browser` into `env` | `wrangler.json` |
+| [R2](https://developers.cloudflare.com/r2/) (optional) | Persist hot screenshots | Object storage |
+| [Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/) (optional) | Short-TTL HIT/MISS for identical URLs | `caches.default` |
+
+Workers remain the orchestration layer. Browser Rendering is the product that actually paints pixels. Everything else is optional hardening.
+
+## Why screenshots belong at the edge
+
+A screenshot path is usually:
+
+1. Accept a target URL
+2. Launch or reuse a browser session
+3. Navigate and wait for a usable paint
+4. Capture a viewport (or full page)
+5. Return image bytes - or upload to object storage
+
+Steps 2–4 dominate cost and failure rate if you own the browser. Browser Rendering moves that into Cloudflare’s platform. Your Worker stays thin: **validate → call the binding → stream or store the result**.
+
+**Good fits**
+
+- Open Graph / link-preview pipelines when `og:image` is missing or stale
+- Visual regression hooks for staging URLs
+- Support tools (“show me what the customer sees”)
+- Agent tools that need pixels, not just HTML
+
+**Poor fits**
+
+- Capturing authenticated apps without a deliberate login strategy
+- Pixel-perfect print layouts (prefer [PDF generation via Browser Rendering](https://developers.cloudflare.com/browser-rendering/) / the [PDF API](/docs/experiments/pdf-api) experiment)
+- Scraping private intranet URLs Cloudflare cannot reach
+
+If you only need title / Open Graph tags from static HTML, prefer [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) via [Metadata Extractor](/docs/experiments/website-metadata-extractor) - it is cheaper than launching Chromium.
+
+## End-to-end architecture
+
+```txt
+Client
+  → Worker (validate url, auth, rate limit)
+    → Browser Rendering (navigate + screenshot)
+      → PNG bytes
+        → optional R2 put / Cache API put
+          → Response image/png or JSON error
+```
+
+Keep the public contract boring so clients and agents stay simple:
+
+| Concern | Recommendation |
+| --- | --- |
+| Input | `url` query/body, `http`/`https` only |
+| Output | `image/png` on success; JSON `{ error, code }` on failure |
+| Timeouts | Fail before the Worker’s practical limit (~60s for this catalog) |
+| Auth | Add before public exposure ([Access](https://developers.cloudflare.com/cloudflare-one/identity/authorization-cookie/application-token/), signed URLs, or secrets) |
+| Abuse | Rate limits + allowlists for destination hosts when possible |
+
+The [Screenshot API](/docs/experiments/screenshot-api) experiment follows that shape: single responsibility, typed env, route-level validation before the browser is touched.
+
+Example once deployed:
+
+```bash
+curl -fsSL "https://<your-worker>/screenshot?url=https://example.com" \
+  -o example.png
+```
+
+Invalid schemes or missing params should return `4xx` JSON, not a truncated PNG.
+
+## Bindings and Wrangler setup
+
+Browser Rendering is declared as a Worker binding (see [Browser Rendering / Workers binding](https://developers.cloudflare.com/browser-rendering/workers-binding/)). Conceptually:
+
+```jsonc
+// wrangler.json (shape varies by experiment version - verify in the package)
+{
+  "browser": {
+    "binding": "BROWSER"
+  }
+}
+```
+
+Type the binding in `src/types/env.d.ts`, then call it from a route after validation. Prefer the experiment’s lib helpers over inventing a new Puppeteer wrapper on day one - [Wrangler](https://developers.cloudflare.com/workers/wrangler/) + the binding is already the hard part for first deploy.
+
+Locally, follow Browser Rendering’s local development notes in the product docs; some browser features behave differently in `wrangler` vs production. Always verify a real deploy before committing to an SLA.
+
+## Navigation, waits, and viewport strategy
+
+### Wait for the right moment
+
+SPAs and marketing pages often paint late. Waiting only for `load` can capture empty shells. The [@cloudflare/puppeteer](https://developers.cloudflare.com/browser-rendering/puppeteer/) docs cover wait strategies (`networkidle`, selectors, timeouts). When you fork the experiment:
+
+- Prefer a selector that marks “content ready” for your target class of sites
+- Cap total wait time so one slow origin cannot pin your Worker
+- Treat timeouts as structured `FETCH_ERROR` / `BROWSER_TIMEOUT` style codes
+
+### Cap what you render
+
+Unbounded full-page captures blow up memory and time. Start with a fixed viewport (for example 1280×720) and only enable full-page when the product truly needs scroll height.
+
+### Block noise when you control the page
+
+Heavy third-party tags inflate time-to-screenshot. Where allowed, block known tracker domains or wait past cookie banners with a selector. Keep that logic product-specific - do not bake aggressive blocking into a generic public API without disclosure.
+
+## Caching and persistence
+
+Identical marketing URLs are requested often. Two complementary Cloudflare products help:
+
+1. **[Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/)** - short TTL for identical cache keys (URL + viewport + wait mode). See [Edge Cache](/docs/experiments/edge-cache).
+2. **[R2](https://developers.cloudflare.com/r2/)** - durable objects for screenshots you want to reuse or serve later. See [R2 Storage](/docs/experiments/r2-storage).
+
+A practical policy:
+
+- Cache key: `sha256(url + viewport + fullPage flag)`
+- TTL: minutes for volatile pages; hours for rarely changing marketing pages
+- On HIT, skip Browser Rendering entirely
+- On MISS, screenshot → optionally `R2.put` → `cache.put` → return
+
+Never cache personalized or authenticated captures under a shared key.
+
+## Auth, abuse, and cost control
+
+Browser Rendering is metered. A public unauthenticated screenshot endpoint will be scraped.
+
+Hardening ideas that map cleanly onto Cloudflare:
+
+- [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/) / service tokens for internal tools
+- HMAC-signed URLs with short expiry for partner integrations
+- [Rate Limiting](https://developers.cloudflare.com/waf/rate-limiting-rules/) or a Worker-side limiter ([Rate Limiter Demo](/docs/experiments/rate-limiter-demo))
+- Destination allowlists (only your domains) for preview generators
+- Max concurrent browser sessions per customer
+
+Log `colo` from [`request.cf`](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties) when debugging regional failures - see [Where Am I](/docs/experiments/whereami).
+
+## Related Browser Rendering experiments
+
+Once screenshots work, nearby patterns unlock richer tools without reinventing Chromium:
+
+| Goal | Experiment | Product focus |
+| --- | --- | --- |
+| PNG of a URL | [Screenshot API](/docs/experiments/screenshot-api) | Browser Rendering |
+| Links after JS | [Browser Links](/docs/experiments/browser-links) | Browser Rendering |
+| Rendered → markdown | [Browser Markdown Scrape](/docs/experiments/browser-markdown-scrape) | Browser Rendering |
+| Print-style PDF | [PDF API](/docs/experiments/pdf-api) | Browser Rendering |
+| CDP inspect | [Browser CDP Inspect](/docs/experiments/browser-cdp-inspect) | Browser Rendering + CDP |
+
+## Common failure modes
+
+| Symptom | Likely cause | Mitigation |
+| --- | --- | --- |
+| Blank PNG | Waited too early / SPA shell | Stronger wait; Browser Rendering wait APIs |
+| Timeout | Slow origin or heavy page | Lower viewport; block assets; fail fast |
+| `INVALID_URL` | Bad scheme or empty input | Shared `validateUrl` helper |
+| Auth walls | Login required | Session cookies / dedicated auth flow |
+| Flaky fonts | CDN font latency | Longer wait or self-host fonts on target |
+
+## Deploy the reference
+
+1. Open [Screenshot API](/docs/experiments/screenshot-api)
+2. Read the official [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) binding docs once
+3. One-click Deploy (or clone `apps/experiments/screenshot-api` and use [Wrangler](https://developers.cloudflare.com/workers/wrangler/))
+4. Confirm the browser binding in the Cloudflare dashboard
+5. Hit `/screenshot?url=https://example.com` and save the PNG
+6. Layer Cache API / R2 / auth before exposing publicly
+
+You get a tested Worker with clear error codes instead of a blank Puppeteer template. Fork the lib helpers into your app when the experiment’s shape matches your needs - and keep Browser Rendering as the named product capability, with Workers as the vehicle that wires it.
+## End-to-end checklist before production
+
+1. Confirm the [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) binding is present in the dashboard and `wrangler.json`.
+2. Decide viewport defaults (width, height, device scale) and document them in your API.
+3. Pick a wait strategy per page class (marketing vs SPA vs docs).
+4. Add destination allowlists or signed URLs before opening the endpoint publicly.
+5. Cache identical captures with the [Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/) or persist to [R2](https://developers.cloudflare.com/r2/).
+6. Emit structured metrics: latency, timeout rate, colo, destination host.
+7. Load-test concurrent captures - Browser Rendering capacity is finite.
+8. Document retention for stored PNGs (privacy + cost).
+
+## FAQ
+
+### Do I need Puppeteer locally?
+For learning, deploy the experiment and call it remotely. Local Browser Rendering support depends on current [Wrangler](https://developers.cloudflare.com/workers/wrangler/) + product docs - always verify against the live binding.
+
+### Can I screenshot authenticated pages?
+Yes, but you must supply cookies/headers deliberately and never log secrets. Treat auth captures as sensitive data.
+
+### Screenshot vs PDF?
+Use PNG for previews and visual QA. Use [PDF API](/docs/experiments/pdf-api) / Browser Rendering PDF when print layout matters.
+
+### What about full-page captures?
+They are slower and heavier. Default to viewport; enable full-page only when the product requires scroll height.

@@ -19,7 +19,7 @@ export const SECURITY_HEADERS = [
       // Next/Fumadocs hydrate with inline bootstrapping; Traks loads same-origin `/t.js`.
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https://deploy.workers.cloudflare.com",
+      "img-src 'self' data: https://deploy.workers.cloudflare.com https://images.unsplash.com",
       "font-src 'self' data:",
       "connect-src 'self'",
       "frame-ancestors 'none'",

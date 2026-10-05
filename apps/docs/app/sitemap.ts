@@ -1,6 +1,7 @@
-import { source } from "@/lib/source";
+import { getAllBlogPosts, blogPostPath } from "@/lib/blogs";
 import {
   aboutRoute,
+  blogsRoute,
   contactRoute,
   developersRoute,
   docsRoute,
@@ -8,6 +9,7 @@ import {
   privacyRoute,
   siteUrl,
 } from "@/lib/shared";
+import { source } from "@/lib/source";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -30,6 +32,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+  const blogPages = [
+    {
+      url: `${siteUrl}${blogsRoute}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    },
+    ...getAllBlogPosts().map((post) => ({
+      url: `${siteUrl}${blogPostPath(post.slug)}`,
+      lastModified: new Date(post.dateModified),
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
+    })),
+  ];
+
   return [
     {
       url: `${siteUrl}${homeRoute}`,
@@ -43,6 +60,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.9,
     },
+    ...blogPages,
     ...trustPages,
     ...docsPages,
   ];

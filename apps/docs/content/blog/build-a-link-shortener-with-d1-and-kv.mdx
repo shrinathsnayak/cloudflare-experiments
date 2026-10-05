@@ -1,0 +1,121 @@
+---
+title: Build a link shortener with D1 and KV on Cloudflare
+description: Deep D1 + KV link shortener guide - schema, hot cache redirects, uniqueness, abuse controls, analytics, and the Link Shortener experiment.
+date: 2026-10-02
+updated: 2026-10-05
+readingMinutes: 19
+keywords:
+  - Cloudflare D1 link shortener
+  - Workers KV cache
+  - edge URL shortener
+  - D1 primary KV cache
+  - Cloudflare short links
+experiments:
+  - link-shortener
+  - d1-sql-playground
+  - kv-notes
+  - durable-counter
+  - rate-limiter-demo
+  - turnstile-verify
+---
+
+URL shorteners look trivial until you care about **correctness under load**: unique codes, fast redirects, analytics, and abuse controls. A proven Cloudflare pattern is:
+
+- **[D1](https://developers.cloudflare.com/d1/)** as the source of truth for mappings
+- **[KV](https://developers.cloudflare.com/kv/)** as a hot cache for redirects
+- A [Worker](https://developers.cloudflare.com/workers/) that creates links and resolves them at the edge
+
+The [Link Shortener](/docs/experiments/link-shortener) experiment implements that split so you can deploy a working shortener instead of reinventing the schema.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [D1](https://developers.cloudflare.com/d1/) | Durable mappings, uniqueness, listings | SQL database |
+| [D1 Workers API](https://developers.cloudflare.com/d1/worker-api/) | `env.DB.prepare` | Worker binding |
+| [Workers KV](https://developers.cloudflare.com/kv/) | Hot redirect cache | KV |
+| [KV Workers API](https://developers.cloudflare.com/kv/api/) | `get` / `put` with TTL | API |
+| [Workers](https://developers.cloudflare.com/workers/) | Create + redirect routes | Runtime |
+| [Durable Objects](https://developers.cloudflare.com/durable-objects/) (optional) | Strongly consistent click counters | State |
+| [Turnstile](https://developers.cloudflare.com/turnstile/) | Bot protection on public creates | Turnstile |
+| [Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) (optional) | Click analytics | Analytics |
+| [Queues](https://developers.cloudflare.com/queues/) (optional) | Async analytics fan-out | Queues |
+
+## Why D1 + KV together
+
+| Concern | Store | Docs |
+| --- | --- | --- |
+| Durable mapping, uniqueness, listings | **D1** | [D1](https://developers.cloudflare.com/d1/) |
+| Ultra-hot redirects | **KV** cache of D1 rows | [KV](https://developers.cloudflare.com/kv/) |
+| Click counters with strong consistency | Optional **Durable Object** | [Durable Objects](https://developers.cloudflare.com/durable-objects/) |
+
+KV alone is awkward for “list my links” and uniqueness constraints. D1 alone is fine for low QPS, but KV shines when the same slug is hit constantly worldwide. Official primers: [D1 get started](https://developers.cloudflare.com/d1/get-started/), [KV get started](https://developers.cloudflare.com/kv/get-started/).
+
+## Request flows
+
+### Create
+
+```txt
+POST { url } → validate → insert D1 → optionally warm KV → return code
+```
+
+Use transactions / unique constraints in D1 so two creates cannot race the same custom code ([D1 API](https://developers.cloudflare.com/d1/worker-api/)).
+
+### Resolve
+
+```txt
+GET /:code → KV get → on miss, D1 select → fill KV → 302 Location
+```
+
+Always validate destination URLs (`http`/`https` only) to avoid open redirects into dangerous schemes - same discipline as other catalog URL APIs.
+
+## Schema sketch
+
+Minimum viable tables:
+
+- `links(code PRIMARY KEY, url TEXT NOT NULL, created_at, expires_at, owner_id)`
+- Optional `clicks(code, ts, colo, asn)` or push clicks to [Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) / [Queues](https://developers.cloudflare.com/queues/)
+
+Explore SQL interactively with [D1 SQL Playground](/docs/experiments/d1-sql-playground) while you iterate. For simpler key/value notes without SQL, see [KV Notes](/docs/experiments/kv-notes).
+
+## Abuse and product extras
+
+- Rate-limit creates ([Rate Limiter Demo](/docs/experiments/rate-limiter-demo), [WAF rate limiting](https://developers.cloudflare.com/waf/rate-limiting-rules/))
+- [Turnstile](https://developers.cloudflare.com/turnstile/) on public create forms ([Turnstile Verify](/docs/experiments/turnstile-verify))
+- Expiration columns in D1 + KV TTLs that match
+- Custom codes with reservation rules
+- Soft-delete vs hard-delete for audit trails
+- Strongly consistent counters via [Durable Counter](/docs/experiments/durable-counter) patterns when KV increments are too lossy
+
+## Consistency notes
+
+KV is **eventually consistent** ([KV consistency](https://developers.cloudflare.com/kv/concepts/how-kv-works/)). After create:
+
+- Warm KV immediately from the create path
+- Accept that a redirect MISS may hit D1 briefly after write
+- On update/delete, delete the KV key explicitly
+
+D1 read replicas and latency characteristics are covered in [D1 read replication](https://developers.cloudflare.com/d1/best-practices/read-replication/) - design list UIs accordingly.
+
+## Deploy Link Shortener
+
+1. Provision D1 + KV ([bindings](https://developers.cloudflare.com/workers/runtime-apis/bindings/))
+2. Deploy [Link Shortener](/docs/experiments/link-shortener)
+3. Create a link, resolve it twice, confirm cache behavior
+4. Add Turnstile / auth before exposing create publicly
+5. Add analytics when product metrics matter
+
+You get a real two-storage edge pattern - not a toy in-memory map - that matches how many production Cloudflare apps actually split durability ([D1](https://developers.cloudflare.com/d1/)) and speed ([KV](https://developers.cloudflare.com/kv/)).
+## Production checklist
+
+1. Unique constraint on codes in [D1](https://developers.cloudflare.com/d1/).
+2. Warm [KV](https://developers.cloudflare.com/kv/) on create; delete KV keys on update/delete.
+3. Validate destinations (`http`/`https` only).
+4. Protect create with auth + [Turnstile](https://developers.cloudflare.com/turnstile/).
+5. Align KV TTLs with link expiration columns.
+6. Decide analytics path (D1 rows vs [Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/) vs Queues).
+
+## FAQ
+
+### KV said miss right after create - is D1 wrong?
+KV is eventually consistent. Warm on write and tolerate a brief D1 fallback.

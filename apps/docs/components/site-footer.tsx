@@ -2,6 +2,7 @@ import { AppLogo } from "@/components/app-logo";
 import {
   aboutRoute,
   appName,
+  blogsRoute,
   contactRoute,
   developersRoute,
   docsRoute,
@@ -18,6 +19,7 @@ const footerColumns = [
     title: "Explore",
     links: [
       { label: "Experiments", href: experimentsIndexRoute },
+      { label: "Blog", href: blogsRoute },
       { label: "Quick start", href: `${docsRoute}/quickstart` },
       { label: "Self-Hosted", href: `${docsRoute}/self-hosted` },
       { label: "What's New", href: `${docsRoute}/changelog` },

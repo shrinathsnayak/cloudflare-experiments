@@ -1,0 +1,133 @@
+---
+title: "Object storage on Cloudflare R2: list, get, put, delete"
+description: Deep guide to Cloudflare R2 on Workers - bindings, CRUD APIs, presigned uploads, lifecycle, caching, SQL-over-R2, and the R2 Storage experiment.
+date: 2026-09-28
+updated: 2026-10-05
+readingMinutes: 20
+featured: true
+keywords:
+  - Cloudflare R2
+  - object storage Worker
+  - S3 compatible R2
+  - edge file storage
+  - R2 API example
+  - Workers R2 binding
+  - R2 presigned URL
+experiments:
+  - r2-storage
+  - d1-sql-playground
+  - kv-notes
+  - r2-sql-query
+  - presigned-r2-upload
+  - edge-cache
+---
+
+**[Cloudflare R2](https://developers.cloudflare.com/r2/)** is S3-compatible object storage that pairs naturally with [Workers](https://developers.cloudflare.com/workers/): store blobs next to your compute and avoid classic egress fees when Workers read the bucket. Typical uses include user uploads, generated screenshots, model artifacts, and caches for heavier experiment outputs.
+
+This guide covers the CRUD mental model, binding setup, auth, lifecycle, adjacent products (KV, D1, Cache API, R2 SQL), and the [R2 Storage](/docs/experiments/r2-storage) experiment.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [R2](https://developers.cloudflare.com/r2/) | Object storage buckets | Product home |
+| [R2 Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/) | `put` / `get` / `list` / `delete` from Workers | Binding API |
+| [Workers](https://developers.cloudflare.com/workers/) | HTTP facade + validation | Runtime |
+| [Workers bindings](https://developers.cloudflare.com/workers/runtime-apis/bindings/) | `r2_buckets` in wrangler | Config |
+| [Presigned URLs](https://developers.cloudflare.com/r2/api/s3/presigned-urls/) | Browser-direct uploads | S3 API |
+| [R2 lifecycle](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) | Expire temp objects | Lifecycle |
+| [D1](https://developers.cloudflare.com/d1/) | Structured metadata about objects | SQL |
+| [KV](https://developers.cloudflare.com/kv/) | Tiny pointers / hot flags | Key-value |
+| [Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/) | Short-TTL HTTP cache in front of gets | Cache |
+
+## When R2 is the right store
+
+| Need | Prefer | Why |
+| --- | --- | --- |
+| Files, images, PDFs, archives | **[R2](https://developers.cloudflare.com/r2/)** | Object semantics + size |
+| Structured rows / SQL | **[D1](https://developers.cloudflare.com/d1/)** ([playground](/docs/experiments/d1-sql-playground)) | Queries, joins |
+| Small string configs | **[KV](https://developers.cloudflare.com/kv/)** ([KV Notes](/docs/experiments/kv-notes)) | Ultra-simple get/put |
+| Strongly consistent per-entity state | **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** | Single-threaded entity |
+
+Do not force multi-MB blobs into KV. Do not force ad-hoc JSON files into R2 when D1 fits.
+
+## Worker + R2 binding pattern
+
+Declare the bucket in `wrangler.json` (see [R2 bindings](https://developers.cloudflare.com/r2/api/workers/workers-api-usage/)), type it in `env.d.ts`, then call the binding:
+
+```ts
+await env.BUCKET.put(key, body, {
+  httpMetadata: { contentType: "image/png" },
+});
+
+const object = await env.BUCKET.get(key);
+if (object === null) {
+  // 404 with stable code
+}
+```
+
+Official reference: [Workers API reference](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/). The [R2 Storage](/docs/experiments/r2-storage) experiment wraps these calls behind HTTP so you can explore keys from curl before folding helpers into your app.
+
+### Suggested HTTP surface
+
+| Method | Path | Action |
+| --- | --- | --- |
+| `PUT` | `/objects/:key` | Upload body |
+| `GET` | `/objects/:key` | Download object |
+| `DELETE` | `/objects/:key` | Delete |
+| `GET` | `/objects` | List with prefix/cursor |
+
+Validate keys (no path traversal, length limits, charset). Return `404` with a stable code when missing. Stream large bodies when possible instead of buffering entire objects in memory.
+
+## Presigned uploads for browsers
+
+For large browser uploads, prefer **direct-to-R2** with [presigned URLs](https://developers.cloudflare.com/r2/api/s3/presigned-urls/) so the Worker does not proxy gigabytes. The [Presigned R2 Upload](/docs/experiments/presigned-r2-upload) experiment shows that flow.
+
+Pattern:
+
+1. Authenticated Worker mints a short-lived upload URL
+2. Browser `PUT`s the file to R2
+3. Worker records metadata in [D1](https://developers.cloudflare.com/d1/) if needed
+
+## Production hardening checklist
+
+1. **Auth** - never leave public put/delete open
+2. **Content-Type** - persist `httpMetadata` on put ([Workers API](https://developers.cloudflare.com/r2/api/workers/workers-api-reference/))
+3. **Size limits** - reject oversized bodies early in the Worker
+4. **Prefixes** - namespace per tenant (`tenantId/…`)
+5. **Lifecycle** - [object lifecycles](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) for temp objects
+6. **SQL over objects** - analytics-style queries via [R2 SQL Query](/docs/experiments/r2-sql-query) when applicable
+7. **Hot reads** - optional [Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/) in front ([Edge Cache](/docs/experiments/edge-cache))
+
+Pair R2 with [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) or [Workers AI](https://developers.cloudflare.com/workers-ai/): generate a screenshot or audio file, then `put` for reuse.
+
+## S3 compatibility notes
+
+R2’s [S3-compatible API](https://developers.cloudflare.com/r2/api/s3/api/) matters when you use existing SDKs, rclone, or tooling outside Workers. Inside Workers, prefer the native binding for lower friction. Know which path you are on so credentials and endpoints stay correct.
+
+## Deploy the experiment
+
+1. Create an R2 bucket ([get started](https://developers.cloudflare.com/r2/get-started/))
+2. Deploy [R2 Storage](/docs/experiments/r2-storage) with the bucket binding
+3. Exercise put → get → list → delete
+4. Add [Presigned R2 Upload](/docs/experiments/presigned-r2-upload) if browsers upload large files
+5. Copy `src/lib` helpers into your product Worker
+
+You leave with a tested binding usage pattern and clear error responses - the boring foundation most edge apps need before fancier storage features.
+## Production checklist
+
+1. Create buckets per environment (dev/staging/prod).
+2. Namespace keys by tenant: `tenantId/objectId`.
+3. Never expose anonymous put/delete.
+4. Prefer [presigned URLs](https://developers.cloudflare.com/r2/api/s3/presigned-urls/) for large browser uploads.
+5. Set [lifecycle rules](https://developers.cloudflare.com/r2/buckets/object-lifecycles/) for temp objects.
+6. Store relational metadata in [D1](https://developers.cloudflare.com/d1/), not only object keys.
+7. Decide CORS carefully when browsing directly to R2.
+
+## FAQ
+
+### R2 vs KV for files?
+[KV](https://developers.cloudflare.com/kv/) is for small values with eventual consistency. Multi-MB files belong in [R2](https://developers.cloudflare.com/r2/).
+
+### Do Workers pay egress to read R2?
+A major R2 value proposition is no egress fees for many common Cloudflare data-transfer paths - confirm current pricing on the [R2 pricing page](https://developers.cloudflare.com/r2/pricing/) before budgeting.

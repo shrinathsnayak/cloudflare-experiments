@@ -58,11 +58,24 @@ export const aboutRoute = "/about";
 export const contactRoute = "/contact";
 export const privacyRoute = "/privacy";
 export const developersRoute = "/developers";
+export const blogsRoute = "/blogs";
 export const docsImageRoute = "/og";
 export const docsContentRoute = "/llms.mdx";
 
 /** Static marketing / trust pages that must not be treated as Markdown 404s. */
-export const trustPagePaths = [aboutRoute, contactRoute, privacyRoute, developersRoute] as const;
+export const trustPagePaths = [
+  aboutRoute,
+  contactRoute,
+  privacyRoute,
+  developersRoute,
+  blogsRoute,
+] as const;
+
+/** True for exact trust pages or any path under `/blogs` (index + posts). */
+export function isTrustOrBlogPath(pathname: string): boolean {
+  if ((trustPagePaths as readonly string[]).includes(pathname)) return true;
+  return pathname === blogsRoute || pathname.startsWith(`${blogsRoute}/`);
+}
 
 /** Public contact channels (no private email inbox required). */
 export const contactChannels = {

@@ -1,10 +1,15 @@
 import type { Metadata, Viewport } from "next";
+import type { BlogPostMeta } from "@/lib/blog-meta";
+import { blogPostPath } from "@/lib/blog-meta";
+import { getAllBlogPosts } from "@/lib/blogs";
+import { blogIndexDescription, buildBlogIndexJsonLd, buildBlogPostJsonLd } from "@/lib/blog-schema";
 import { getExperimentCount } from "@/lib/catalog.server";
 import { logoPathPublic, siteIcons } from "@/lib/logo";
 import { buildOrganizationJsonLd } from "@/lib/organization";
 import { getPageImage, getPageMarkdownUrl, type source } from "@/lib/source";
 import {
   appName,
+  blogsRoute,
   brandProductName,
   docsRoute,
   gitConfig,
@@ -255,4 +260,93 @@ export function createDocsBreadcrumbJsonLd(page: NonNullable<DocsPage>) {
       item: crumb.url,
     })),
   };
+}
+
+export function createBlogIndexMetadata(): Metadata {
+  const title = `Blog - Cloudflare product guides and experiments`;
+  const description = blogIndexDescription();
+  const canonical = absoluteUrl(blogsRoute);
+
+  return {
+    title,
+    description,
+    keywords: [
+      ...siteKeywords,
+      "Cloudflare blog",
+      "Workers tutorials",
+      "edge computing guides",
+      "Cloudflare product tutorials",
+    ],
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: "website",
+      siteName: appName,
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
+
+export function createBlogPostMetadata(post: BlogPostMeta): Metadata {
+  const canonical = absoluteUrl(blogPostPath(post.slug));
+  const keywords = Array.from(new Set([...siteKeywords, ...post.keywords, post.title]));
+  const images = post.cover
+    ? [
+        {
+          url: post.cover.src,
+          width: 1600,
+          height: 900,
+          alt: post.cover.alt,
+        },
+      ]
+    : undefined;
+
+  return {
+    title: post.title,
+    description: post.description,
+    keywords,
+    authors: [{ name: gitConfig.user, url: githubProfileUrl }],
+    alternates: { canonical },
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      url: canonical,
+      type: "article",
+      siteName: appName,
+      locale: "en_US",
+      publishedTime: post.datePublished,
+      modifiedTime: post.dateModified,
+      authors: [githubProfileUrl],
+      tags: post.keywords,
+      images,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: images?.map((image) => image.url),
+    },
+  };
+}
+
+export function createBlogIndexJsonLd() {
+  return buildBlogIndexJsonLd({
+    description: siteDescription(getExperimentCount()),
+    logoUrl: absoluteUrl(logoPathPublic),
+    posts: getAllBlogPosts(),
+  });
+}
+
+export function createBlogPostJsonLd(post: BlogPostMeta) {
+  return buildBlogPostJsonLd(post, {
+    description: siteDescription(getExperimentCount()),
+    logoUrl: absoluteUrl(logoPathPublic),
+  });
 }

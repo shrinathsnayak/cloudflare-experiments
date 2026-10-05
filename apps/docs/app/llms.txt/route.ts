@@ -35,6 +35,7 @@ ${agentWhenToUseSection()}
 - Per-page markdown: ${siteUrl}/llms.mdx/{slug}/content.md (also linked from each docs page)
 - Agent Skills discovery: ${siteUrl}/.well-known/agent-skills/index.json
 - Developer resources: ${siteUrl}/developers
+- Blog (guides → experiments): ${siteUrl}/blogs
 - About / Contact / Privacy: ${siteUrl}/about · ${siteUrl}/contact · ${siteUrl}/privacy
 - Source monorepo: https://github.com/shrinathsnayak/cloudflare-experiments
 

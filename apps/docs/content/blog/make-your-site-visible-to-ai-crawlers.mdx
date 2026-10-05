@@ -1,0 +1,130 @@
+---
+title: Make your site visible to AI crawlers and agents
+description: Deep agent/SEO discoverability guide - robots.txt, llms.txt, sitemaps, OpenAPI, MCP, metadata, security headers, and Cloudflare-ready audit experiments.
+date: 2026-10-05
+updated: 2026-10-05
+readingMinutes: 20
+featured: true
+keywords:
+  - llms.txt
+  - AI crawler robots.txt
+  - GPTBot allow
+  - agent discoverability
+  - Cloudflare AI bots
+  - OpenAPI for agents
+  - MCP server
+experiments:
+  - ai-bot-visibility
+  - website-to-llms-txt
+  - robots-sitemap-inspector
+  - website-metadata-extractor
+  - security-headers-grader
+  - ai-website-summary
+---
+
+AI assistants and crawlers increasingly decide whether your docs are usable from **machine-readable surfaces**: `robots.txt`, sitemaps, `llms.txt`, OpenAPI, MCP, and clean metadata. If those are missing or contradictory, agents skip you - even when the HTML is excellent.
+
+This catalog dogfoods those surfaces (`/llms.txt`, `/openapi.json`, `/developers`, MCP). You can audit and generate them with focused experiments running on [Cloudflare Workers](https://developers.cloudflare.com/workers/).
+
+## Cloudflare products that help (directly or as the runtime)
+
+| Product / surface | Role | Docs |
+| --- | --- | --- |
+| [Workers](https://developers.cloudflare.com/workers/) | Host robots, llms.txt, APIs, audits | Edge compute |
+| [Workers AI](https://developers.cloudflare.com/workers-ai/) | Optional summarization / tagging of pages | AI |
+| [AI Crawl Control](https://developers.cloudflare.com/ai-crawl-control/) | Manage AI crawler access at the edge (zone feature) | AI crawl control |
+| [Bot Fight Mode / Bots](https://developers.cloudflare.com/bots/) | Bot management signals | Bots |
+| [Cache](https://developers.cloudflare.com/cache/) | Cache machine-readable docs aggressively | CDN cache |
+| [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) | Extract metadata for previews | Runtime |
+| [Fetch](https://developers.cloudflare.com/workers/runtime-apis/fetch/) | Audit remote robots/sitemaps | Fetch |
+
+Also relevant: Cloudflare’s own guidance around AI crawlers and content signals evolves quickly - start from [AI Crawl Control](https://developers.cloudflare.com/ai-crawl-control/) and your zone’s bot settings.
+
+## The agent-friendly checklist
+
+1. **robots.txt** - allow the AI bots you want; do not accidentally blanket-deny
+2. **sitemap.xml** - list canonical URLs you want indexed
+3. **llms.txt** - short index of when-to-use + key links for LLM agents
+4. **Markdown alternatives** - `Accept: text/markdown` or per-page markdown routes
+5. **OpenAPI / API catalog** - for callable APIs ([OpenAPI](https://www.openapis.org/) on Workers)
+6. **MCP** - if you expose tools ([Model Context Protocol](https://modelcontextprotocol.io/))
+7. **Accurate metadata** - title, description, canonical, OG tags
+8. **Security headers** - trustworthy defaults without breaking embeds you need
+9. **Content-Signal / usage preferences** - declare search vs training preferences where you publish them
+
+## Experiments that help
+
+| Job | Experiment | Cloudflare angle |
+| --- | --- | --- |
+| See which AI bots robots.txt allows | [AI Bot Visibility](/docs/experiments/ai-bot-visibility) | Workers Fetch |
+| Generate llms.txt-style export | [Website to llms.txt](/docs/experiments/website-to-llms-txt) | Workers + parse |
+| Inspect robots + sitemap consistency | [Robots Sitemap Inspector](/docs/experiments/robots-sitemap-inspector) | Fetch |
+| Extract OG/meta | [Metadata Extractor](/docs/experiments/website-metadata-extractor) | [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) |
+| Grade security headers | [Security Headers Grader](/docs/experiments/security-headers-grader) | Fetch headers |
+| Summarize a URL for agents | [AI Website Summary](/docs/experiments/ai-website-summary) | [Workers AI](https://developers.cloudflare.com/workers-ai/) |
+
+## Practical robots.txt tips for AI
+
+- Be explicit per user-agent when policies differ (retrieval vs training)
+- Keep `Sitemap:` absolute
+- Do not `Disallow: /` for `*` if you want search/AI input - prefer path-level rules
+- Re-test after CDN or framework changes; generators often overwrite robots
+- Align robots with zone-level [AI Crawl Control](https://developers.cloudflare.com/ai-crawl-control/) so edge policy and file policy do not contradict
+
+[AI Bot Visibility](/docs/experiments/ai-bot-visibility) is the fastest way to see how popular crawlers interpret your file.
+
+## llms.txt that agents actually use
+
+A useful `llms.txt` is not a dump of every URL. Include:
+
+- One-paragraph product summary
+- **When to use / not to use**
+- Links to OpenAPI, MCP, full markdown dump
+- A curated experiment or doc list
+
+This site’s `/llms.txt` follows that shape. Generate starting material for arbitrary sites with [Website to llms.txt](/docs/experiments/website-to-llms-txt), then edit for accuracy.
+
+Hosting tip: serve `llms.txt` from a Worker or static assets with long cache and easy redeploys ([Workers static assets](https://developers.cloudflare.com/workers/static-assets/) when applicable).
+
+## OpenAPI + MCP for callable surfaces
+
+If agents should *call* you, not just read you:
+
+- Publish OpenAPI 3.x at a stable URL
+- Keep `operationId`s unique and descriptions concrete
+- Return JSON errors with `error` + `code` (+ hints)
+- Offer MCP when tool-calling clients are a target audience
+
+Workers are a natural host for these JSON surfaces ([Workers routing](https://developers.cloudflare.com/workers/configuration/routing/)).
+
+## Metadata and trust pages
+
+Agents and humans both use About / Contact / Privacy as trust anchors. Ensure:
+
+- Titles/descriptions via [Metadata Extractor](/docs/experiments/website-metadata-extractor) patterns
+- Security headers via [Security Headers Grader](/docs/experiments/security-headers-grader)
+- Canonical URLs that match the sitemap
+
+## Ship the audits
+
+1. Run [AI Bot Visibility](/docs/experiments/ai-bot-visibility) against your production origin
+2. Inspect robots/sitemap with [Robots Sitemap Inspector](/docs/experiments/robots-sitemap-inspector)
+3. Review zone settings in [AI Crawl Control](https://developers.cloudflare.com/ai-crawl-control/)
+4. Publish an `llms.txt` at the site root
+5. Ensure titles/descriptions via [Metadata Extractor](/docs/experiments/website-metadata-extractor)
+6. Recheck after each major docs deploy
+
+Agent discoverability is SEO for machines. These experiments turn it into a checklist you can automate - each one deploys as a small Worker on Cloudflare, and the products above are the levers you actually tune in the dashboard and docs.
+## Production checklist
+
+1. Align `robots.txt` with [AI Crawl Control](https://developers.cloudflare.com/ai-crawl-control/) zone settings.
+2. Publish `sitemap.xml` and `llms.txt`.
+3. Offer Markdown / OpenAPI / MCP where APIs exist.
+4. Keep About / Contact / Privacy findable.
+5. Re-audit after framework or CDN changes with [AI Bot Visibility](/docs/experiments/ai-bot-visibility).
+6. Cache machine-readable docs aggressively via [Cache](https://developers.cloudflare.com/cache/).
+
+## FAQ
+
+### Allow all AI bots?
+Only if that matches your content policy. Many teams allow retrieval bots and restrict training bots - be explicit per user-agent.

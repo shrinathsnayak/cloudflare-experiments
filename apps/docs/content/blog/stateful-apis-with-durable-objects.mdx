@@ -1,0 +1,126 @@
+---
+title: Stateful APIs at the edge with Durable Objects
+description: Deep Durable Objects guide on Cloudflare - IDs, storage, SQLite, alarms, WebSockets, when not to use DOs, and experiments from counter to chat.
+date: 2026-10-01
+updated: 2026-10-05
+readingMinutes: 21
+featured: true
+keywords:
+  - Durable Objects
+  - Cloudflare stateful Workers
+  - edge counter
+  - Durable Object tutorial
+  - coordination at the edge
+  - Workers SQLite
+  - Durable Object alarms
+experiments:
+  - durable-counter
+  - chat-agent
+  - do-sqlite-notes
+  - websocket-echo
+  - do-alarm-scheduler
+  - queue-job-visualizer
+---
+
+Stateless [Workers](https://developers.cloudflare.com/workers/) scale easily, but some features need **strongly consistent state**: counters, presence, turn-based games, per-document locks, or chat rooms. **[Durable Objects](https://developers.cloudflare.com/durable-objects/)** give you a single-threaded instance addressed by ID - the right primitive when “last write wins in [KV](https://developers.cloudflare.com/kv/)” is not enough.
+
+Start with the [Durable Counter](/docs/experiments/durable-counter) experiment, then graduate to richer DO apps in the catalog.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [Durable Objects](https://developers.cloudflare.com/durable-objects/) | Per-ID strongly consistent compute + storage | Product home |
+| [DO storage API](https://developers.cloudflare.com/durable-objects/api/storage-api/) | Key-value transactional storage | Storage |
+| [SQLite in Durable Objects](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/) | Relational state per object | SQLite |
+| [DO alarms](https://developers.cloudflare.com/durable-objects/api/alarms/) | Deferred work tied to an object | Alarms |
+| [Workers](https://developers.cloudflare.com/workers/) | Stub creation + HTTP/WebSocket entry | Runtime |
+| [WebSockets](https://developers.cloudflare.com/workers/runtime-apis/websockets/) | Realtime fanout via DO | WebSockets |
+| [Queues](https://developers.cloudflare.com/queues/) | Offload heavy work from the DO | Async jobs |
+
+## When to reach for Durable Objects
+
+Use a DO when you need **one logical entity** with serialized access:
+
+- Per-user or per-room state
+- Coordinating multiple clients over WebSockets
+- Alarms / deferred work tied to that entity
+- SQLite storage colocated with the object ([DO SQLite Notes](/docs/experiments/do-sqlite-notes))
+
+Prefer [KV](https://developers.cloudflare.com/kv/), [D1](https://developers.cloudflare.com/d1/), or [R2](https://developers.cloudflare.com/r2/) when entities are independent and eventual consistency is fine. Prefer [Queues](https://developers.cloudflare.com/queues/) / [Workflows](https://developers.cloudflare.com/workflows/) when the problem is async fan-out rather than a sticky entity.
+
+Official overview: [What are Durable Objects?](https://developers.cloudflare.com/durable-objects/concepts/what-are-durable-objects/)
+
+## Mental model
+
+```txt
+Client → Worker stub → idFromName("room-42") → Durable Object instance
+```
+
+All requests for the same ID hit the same instance. That is the feature: no distributed lock service for the common case.
+
+Read:
+
+- [Workers binding / how to access a DO](https://developers.cloudflare.com/durable-objects/get-started/)
+- [Object IDs and naming](https://developers.cloudflare.com/durable-objects/api/base/)
+
+The counter teaches:
+
+1. Exporting a DO class from the Worker
+2. Binding it in `wrangler.json`
+3. Getting a stub by name/id
+4. Reading/writing storage transactionally via the [storage API](https://developers.cloudflare.com/durable-objects/api/storage-api/)
+
+## From counter to real products
+
+| Pattern | Experiment | Cloudflare docs angle |
+| --- | --- | --- |
+| Increment / read / reset | [Durable Counter](/docs/experiments/durable-counter) | Storage API |
+| Chat + optional Workers AI | [Chat Agent](/docs/experiments/chat-agent) | DO + [Workers AI](https://developers.cloudflare.com/workers-ai/) |
+| Notes in DO SQLite | [DO SQLite Notes](/docs/experiments/do-sqlite-notes) | [SQLite storage](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/) |
+| WebSocket echo | [WebSocket Echo](/docs/experiments/websocket-echo) | [WebSockets](https://developers.cloudflare.com/workers/runtime-apis/websockets/) |
+| Alarms / scheduled DO work | [DO Alarm Scheduler](/docs/experiments/do-alarm-scheduler) | [Alarms](https://developers.cloudflare.com/durable-objects/api/alarms/) |
+| Queue jobs + DO view | [Queue Job Visualizer](/docs/experiments/queue-job-visualizer) | DO + [Queues](https://developers.cloudflare.com/queues/) |
+
+Copy one pattern at a time. A chat app that also invents a novel storage layer on day one is how experiments become unmaintainable.
+
+## Design tips from the product docs
+
+- **Name IDs carefully** - `idFromName` is a permanent partition key for that name ([ID docs](https://developers.cloudflare.com/durable-objects/api/base/))
+- **Keep handlers small** - do heavy AI/fetch work in the Worker or a [Queue](https://developers.cloudflare.com/queues/); coordinate in the DO
+- **Use storage transactions** for multi-key updates ([storage API](https://developers.cloudflare.com/durable-objects/api/storage-api/))
+- **Alarms** for deferred cleanup or digests instead of external cron when state-local ([alarms](https://developers.cloudflare.com/durable-objects/api/alarms/))
+- **Hibernation** - understand WebSocket hibernation if you build long-lived realtime ([WebSockets + hibernation](https://developers.cloudflare.com/durable-objects/best-practices/websockets/))
+
+## Anti-patterns
+
+- One global DO for all users (hotspot)
+- Storing large blobs in DO storage instead of [R2](https://developers.cloudflare.com/r2/)
+- Running multi-minute AI jobs inside the DO request path
+- Using DOs when a simple KV counter with lossy increments would do
+
+## Deploy the counter first
+
+1. Read [Durable Objects get started](https://developers.cloudflare.com/durable-objects/get-started/)
+2. Open [Durable Counter](/docs/experiments/durable-counter)
+3. Deploy and call increment a few times
+4. Confirm consistent reads for the same object id
+5. Open [Chat Agent](/docs/experiments/chat-agent) or [DO SQLite Notes](/docs/experiments/do-sqlite-notes) when you need a richer shape
+
+You learn DO addressing and storage with the smallest useful API, then compose realtime or SQLite without rewriting the foundation - Workers as the vehicle, Durable Objects as the product capability.
+## Production checklist
+
+1. Design ID scheme first (`idFromName` is forever for that name).
+2. Keep DO handlers short; offload heavy work to [Queues](https://developers.cloudflare.com/queues/).
+3. Use transactions for multi-key updates ([storage API](https://developers.cloudflare.com/durable-objects/api/storage-api/)).
+4. Prefer [SQLite in DOs](https://developers.cloudflare.com/durable-objects/api/sqlite-storage-api/) when you need relational queries per entity.
+5. Load-test hot IDs - one global DO is an anti-pattern.
+6. Plan alarms for cleanup ([alarms](https://developers.cloudflare.com/durable-objects/api/alarms/)).
+
+## FAQ
+
+### DO vs D1?
+[D1](https://developers.cloudflare.com/d1/) is shared SQL across requests. A Durable Object is a sticky single-threaded entity. Use D1 for catalogs; DOs for rooms, sessions, and locks.
+
+### Can I put blobs in DO storage?
+Small state yes; large files belong in [R2](https://developers.cloudflare.com/r2/).

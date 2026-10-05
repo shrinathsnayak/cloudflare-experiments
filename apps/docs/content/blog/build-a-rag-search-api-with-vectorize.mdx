@@ -1,0 +1,146 @@
+---
+title: Build a RAG search API with Vectorize and Workers AI
+description: Deep RAG on Cloudflare - Workers AI embeddings, Vectorize indexes, chunking, citations, AI Search vs DIY, batch ingest, and RAG Mini Search.
+date: 2026-10-05
+updated: 2026-10-05
+readingMinutes: 22
+featured: true
+keywords:
+  - Cloudflare Vectorize
+  - RAG Workers AI
+  - edge vector search
+  - retrieval augmented generation
+  - Workers embeddings
+  - AI Search
+experiments:
+  - rag-mini-search
+  - ai-search-demo
+  - text-similarity
+  - ai-batch-infer
+  - website-to-llms-txt
+  - ai-website-summary
+---
+
+**RAG** (retrieval-augmented generation) lets you answer questions from **your** documents instead of hoping the model memorized them. On Cloudflare, the usual spine is:
+
+1. Chunk and embed content with **[Workers AI](https://developers.cloudflare.com/workers-ai/)**
+2. Store vectors in **[Vectorize](https://developers.cloudflare.com/vectorize/)**
+3. Query top-k chunks at request time
+4. Ask a text model to answer using those chunks
+
+The [RAG Mini Search](/docs/experiments/rag-mini-search) experiment packages that pattern as a deployable reference.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [Workers AI](https://developers.cloudflare.com/workers-ai/) | Embedding + generation models | AI inference |
+| [Workers AI models](https://developers.cloudflare.com/workers-ai/models/) | Pick embedders / LLMs | Model catalog |
+| [Vectorize](https://developers.cloudflare.com/vectorize/) | Vector index + query | Vector DB |
+| [Vectorize Workers API](https://developers.cloudflare.com/vectorize/get-started/embeddings/) | Upsert / query from Workers | Get started |
+| [AI Search](https://developers.cloudflare.com/ai-search/) | Managed RAG alternative | Managed product |
+| [AI Gateway](https://developers.cloudflare.com/ai-gateway/) | Observability / cache | Gateway |
+| [Queues](https://developers.cloudflare.com/queues/) | Async ingest | Background jobs |
+| [R2](https://developers.cloudflare.com/r2/) | Store raw source docs | Objects |
+| [Workers](https://developers.cloudflare.com/workers/) | Query + ingest HTTP APIs | Runtime |
+
+## When RAG is worth it
+
+**Good fits**
+
+- Docs Q&A for a product catalog
+- Internal runbooks with citations
+- Per-tenant knowledge bases with isolated indexes / namespaces
+
+**Skip RAG when**
+
+- Keyword search or [Text Similarity](/docs/experiments/text-similarity) is enough
+- You only need a one-off URL summary ([AI Website Summary](/docs/experiments/ai-website-summary))
+- Documents change every second and you lack an ingest pipeline
+
+## Architecture
+
+```txt
+Ingest:  docs → chunk → embed (Workers AI) → Vectorize upsert
+Query:   question → embed → Vectorize query → prompt + chunks → Workers AI → answer
+```
+
+Keep ingestion off the hot path when possible ([AI Batch Infer](/docs/experiments/ai-batch-infer), [Queues](https://developers.cloudflare.com/queues/)). The query Worker should stay under ~60 seconds.
+
+Official Vectorize path: [Get started / embeddings](https://developers.cloudflare.com/vectorize/get-started/embeddings/).
+
+## Design choices that matter
+
+### Chunking
+
+- Prefer semantic chunks (roughly 200–800 tokens) over whole pages
+- Store `sourceUrl` / `title` metadata with each vector for citations ([metadata filters](https://developers.cloudflare.com/vectorize/reference/metadata-filtering/))
+- Re-embed on content change; include a content hash
+- Generate LLM-friendly text first with [Website to llms.txt](/docs/experiments/website-to-llms-txt) when sources are HTML
+
+### Retrieval
+
+- Start with top-k = 3–8
+- Filter by tenant/namespace metadata
+- Log empty retrievals - they produce hallucinations if you still call the LLM
+- Tune similarity metric to match how you created the index ([Vectorize indexes](https://developers.cloudflare.com/vectorize/best-practices/create-indexes/))
+
+### Generation
+
+- Instruct the model to say “I don’t know” when chunks are irrelevant
+- Return citations alongside the answer
+- Cap max tokens for predictable latency
+- Optionally front models with [AI Gateway](https://developers.cloudflare.com/ai-gateway/)
+
+## DIY Vectorize vs AI Search
+
+| Approach | Experiment | Product |
+| --- | --- | --- |
+| Full control over chunking/prompts | [RAG Mini Search](/docs/experiments/rag-mini-search) | [Vectorize](https://developers.cloudflare.com/vectorize/) + Workers AI |
+| Managed RAG | [AI Search Demo](/docs/experiments/ai-search-demo) | [AI Search](https://developers.cloudflare.com/ai-search/) |
+
+Use Mini Search when you need full control; use AI Search when operational simplicity wins.
+
+## Ingest at scale
+
+1. Accept documents via authenticated API
+2. Enqueue chunk jobs on [Queues](https://developers.cloudflare.com/queues/)
+3. Consumer embeds with Workers AI and upserts to Vectorize
+4. Store originals in [R2](https://developers.cloudflare.com/r2/) for reprocessing
+
+[AI Batch Infer](/docs/experiments/ai-batch-infer) demonstrates async embedding-oriented patterns you can adapt.
+
+## Evaluation checklist
+
+- Questions only your docs can answer (expect citations)
+- Questions outside the corpus (expect refusal)
+- Near-duplicate chunks (dedupe strategy)
+- Multi-tenant leakage tests (metadata filters)
+
+## Deploy RAG Mini Search
+
+1. Create a Vectorize index ([create indexes](https://developers.cloudflare.com/vectorize/best-practices/create-indexes/))
+2. Enable Workers AI binding ([Workers AI get started](https://developers.cloudflare.com/workers-ai/get-started/workers-wrangler/))
+3. Deploy [RAG Mini Search](/docs/experiments/rag-mini-search)
+4. Ingest a small doc set
+5. Ask a question that only your docs can answer
+6. Verify citations and empty-corpus behavior
+7. Compare with [AI Search Demo](/docs/experiments/ai-search-demo) if you want managed RAG
+
+You leave with a working RAG API on the edge - enough to validate product UX before investing in larger ingestion pipelines - built on Vectorize and Workers AI as first-class Cloudflare products.
+## Production checklist
+
+1. Create the [Vectorize](https://developers.cloudflare.com/vectorize/) index with the correct dimensions for your embedder.
+2. Store rich metadata for citations and tenant filters.
+3. Keep ingest async via [Queues](https://developers.cloudflare.com/queues/).
+4. Evaluate with questions inside and outside the corpus.
+5. Compare DIY vs [AI Search](https://developers.cloudflare.com/ai-search/) before building a large pipeline.
+6. Cap generation tokens and always return citations.
+
+## FAQ
+
+### Embeddings model changed - what now?
+You generally need a new index (or full re-embed). Pin model ids and treat changes as migrations.
+
+### How many chunks per query?
+Start with top-k 3–8. More chunks raise cost and can dilute the prompt.

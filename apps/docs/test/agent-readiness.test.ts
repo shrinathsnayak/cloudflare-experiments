@@ -1,9 +1,22 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { agentWhenToUseSection } from "../lib/agent-guidance";
 import { getSearchOpenApi, getSiteOpenApi } from "../lib/api-catalog";
 import { jsonApiError, jsonApiNotFound, jsonMethodNotAllowed } from "../lib/api-error";
+import { blogCovers, withUnsplashUtm } from "../lib/blog-covers";
+import { buildBlogIndexJsonLd, buildBlogPostJsonLd } from "../lib/blog-schema";
+import type { BlogPostMeta } from "../lib/blog-meta";
 import { buildNotFoundMarkdown } from "../lib/not-found-markdown";
-import { brandProductName, productScopeBlurb, siteDescription, siteTitle } from "../lib/shared";
+import { blogPageSchema } from "../lib/page-schema";
+import {
+  blogsRoute,
+  brandProductName,
+  isTrustOrBlogPath,
+  productScopeBlurb,
+  siteDescription,
+  siteTitle,
+} from "../lib/shared";
 import { buildOrganizationJsonLd } from "../lib/organization";
 
 describe("agent-friendly 404 markdown", () => {
@@ -13,6 +26,7 @@ describe("agent-friendly 404 markdown", () => {
     expect(body).toContain("llms.txt");
     expect(body).toContain("sitemap.xml");
     expect(body).toContain("/docs");
+    expect(body).toContain("/blogs");
     expect(body).toMatch(/^# 404 Not Found/m);
   });
 });
@@ -103,5 +117,136 @@ describe("Organization JSON-LD completeness helpers", () => {
     expect(org.contactPoint[0].email).toContain("@");
     expect(org.address["@type"]).toBe("PostalAddress");
     expect(org.address.addressCountry).toBe("IN");
+  });
+});
+
+function parseBlogFrontmatter(raw: string): Record<string, unknown> {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) throw new Error("missing frontmatter");
+  const yaml = match[1];
+  const data: Record<string, unknown> = {};
+  let currentKey: string | null = null;
+  let currentList: string[] | null = null;
+
+  for (const line of yaml.split(/\r?\n/)) {
+    if (/^\s+-\s+/.test(line) && currentKey && currentList) {
+      currentList.push(line.replace(/^\s+-\s+/, "").replace(/^["']|["']$/g, ""));
+      continue;
+    }
+    if (currentKey && currentList) {
+      data[currentKey] = currentList;
+      currentKey = null;
+      currentList = null;
+    }
+    const kv = line.match(/^([A-Za-z0-9_]+):\s*(.*)$/);
+    if (!kv) continue;
+    const [, key, value] = kv;
+    if (value === "" || value === "|" || value === ">") {
+      currentKey = key;
+      currentList = [];
+      continue;
+    }
+    if (value === "true" || value === "false") {
+      data[key] = value === "true";
+    } else if (/^\d+$/.test(value)) {
+      data[key] = Number(value);
+    } else {
+      data[key] = value.replace(/^["']|["']$/g, "");
+    }
+  }
+  if (currentKey && currentList) data[currentKey] = currentList;
+  return data;
+}
+
+describe("blog MDX content", () => {
+  const blogDir = join(process.cwd(), "content", "blog");
+  const files = readdirSync(blogDir).filter((name) => name.endsWith(".mdx"));
+
+  it("has detailed posts that each link experiments and Cloudflare product docs", () => {
+    expect(files.length).toBeGreaterThanOrEqual(8);
+    for (const file of files) {
+      const raw = readFileSync(join(blogDir, file), "utf8");
+      const parsed = blogPageSchema.safeParse(parseBlogFrontmatter(raw));
+      expect(parsed.success, `${file}: ${JSON.stringify(parsed.error?.issues ?? [])}`).toBe(true);
+      if (!parsed.success) continue;
+      expect(parsed.data.experiments.length).toBeGreaterThan(0);
+      expect(raw.length).toBeGreaterThan(4000);
+      expect(raw).toContain("developers.cloudflare.com");
+      expect(raw).toMatch(/## Cloudflare products/i);
+    }
+  });
+
+  it("registers an Unsplash cover with photographer backlinks for every post", () => {
+    expect(Object.keys(blogCovers).length).toBe(files.length);
+    for (const file of files) {
+      const slug = file.replace(/\.mdx$/, "");
+      const cover = blogCovers[slug];
+      expect(cover, slug).toBeDefined();
+      expect(cover.src).toMatch(/^https:\/\/images\.unsplash\.com\//);
+      expect(cover.photographer.length).toBeGreaterThan(2);
+      expect(cover.photographerUrl).toMatch(/^https:\/\/unsplash\.com\/@/);
+      expect(cover.unsplashUrl).toMatch(/^https:\/\/unsplash\.com\/photos\//);
+      expect(withUnsplashUtm(cover.photographerUrl)).toContain("utm_source=cloudflare_experiments");
+    }
+  });
+
+  it("builds Blog + ItemList JSON-LD for the index", () => {
+    const posts: BlogPostMeta[] = [
+      {
+        slug: "demo",
+        title: "Demo post",
+        description: "A demo description for schema tests.",
+        datePublished: "2026-10-05",
+        dateModified: "2026-10-05",
+        keywords: ["Cloudflare"],
+        readingMinutes: 5,
+        featured: true,
+        relatedExperiments: [
+          { slug: "whereami", title: "Where Am I", blurb: "request.cf demo" },
+        ],
+        url: `${blogsRoute}/demo`,
+      },
+    ];
+    const graph = buildBlogIndexJsonLd({
+      description: "Cloudflare Experiments catalog.",
+      logoUrl: "https://cloudflare-experiments.com/logo.png",
+      posts,
+    })["@graph"] as Array<Record<string, unknown>>;
+    const types = graph.map((node) => node["@type"]);
+    expect(types).toContain("Blog");
+    expect(types).toContain("ItemList");
+    expect(types).toContain("BreadcrumbList");
+  });
+
+  it("builds BlogPosting JSON-LD that abouts related experiments", () => {
+    const post: BlogPostMeta = {
+      slug: "screenshot-any-url-at-the-edge",
+      title: "How to take a screenshot of any URL at the edge",
+      description: "Capture PNG screenshots with Browser Rendering.",
+      datePublished: "2026-09-15",
+      dateModified: "2026-10-05",
+      keywords: ["Browser Rendering"],
+      readingMinutes: 9,
+      featured: true,
+      relatedExperiments: [
+        { slug: "screenshot-api", title: "Screenshot API", blurb: "PNG captures" },
+        { slug: "browser-links", title: "Browser Links", blurb: "Extract links" },
+      ],
+      url: `${blogsRoute}/screenshot-any-url-at-the-edge`,
+    };
+    const graph = buildBlogPostJsonLd(post, {
+      description: "Cloudflare Experiments catalog.",
+      logoUrl: "https://cloudflare-experiments.com/logo.png",
+    })["@graph"] as Array<Record<string, unknown>>;
+    const article = graph.find((node) => node["@type"] === "BlogPosting");
+    expect(article?.headline).toBe(post.title);
+    expect(Array.isArray(article?.about)).toBe(true);
+    expect((article?.about as unknown[]).length).toBe(2);
+  });
+
+  it("treats /blogs and post slugs as trust/blog HTML paths", () => {
+    expect(isTrustOrBlogPath(blogsRoute)).toBe(true);
+    expect(isTrustOrBlogPath(`${blogsRoute}/screenshot-any-url-at-the-edge`)).toBe(true);
+    expect(isTrustOrBlogPath("/docs")).toBe(false);
   });
 });

@@ -37,6 +37,10 @@ const config = {
         hostname: "deploy.workers.cloudflare.com",
         pathname: "/button",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
   async redirects() {

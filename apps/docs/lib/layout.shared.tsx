@@ -3,8 +3,8 @@ import { Globe } from "lucide-react";
 import { AppLogo } from "@/components/app-logo";
 import { BuyMeACoffeeLink } from "@/components/buy-me-a-coffee-link";
 import {
+  blogsRoute,
   docsRoute,
-  developersRoute,
   getBuyMeACoffeeUrl,
   githubRepoUrl,
   homeRoute,
@@ -45,25 +45,20 @@ const sharedLayout: Pick<BaseLayoutProps, "githubUrl" | "themeSwitch" | "searchT
   },
 };
 
-/** Docs notebook layout with top navbar ( /docs/* ) */
+/** Docs notebook layout ( /docs/* ) */
 export const docsLayoutOptions = {
   ...sharedLayout,
   nav: {
     ...nav,
-    mode: "top" as const,
+    // `auto` puts the logo + collapse control in the sidebar; links stay in the top bar.
+    mode: "auto" as const,
   },
   links: [
     {
       type: "main" as const,
-      text: "Home",
-      url: homeRoute,
-      active: "url" as const,
-    },
-    {
-      type: "main" as const,
-      text: "What's New",
-      url: `${docsRoute}/changelog`,
-      active: "url" as const,
+      text: "Blog",
+      url: blogsRoute,
+      active: "nested-url" as const,
     },
     ...buyMeACoffeeLinks,
     portfolioLink,
@@ -83,9 +78,9 @@ export const homeLayoutOptions: BaseLayoutProps = {
     },
     {
       type: "main",
-      text: "Developers",
-      url: developersRoute,
-      active: "url",
+      text: "Blog",
+      url: blogsRoute,
+      active: "nested-url",
     },
     {
       type: "main",

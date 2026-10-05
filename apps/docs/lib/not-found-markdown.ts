@@ -14,6 +14,7 @@ ${pathLine} ${productScopeBlurb}
 ## Where to go next
 
 - Docs: ${siteUrl}${docsRoute}
+- Blog: ${siteUrl}/blogs
 - Homepage: ${siteUrl}/
 - Agent index (llms.txt): ${siteUrl}/llms.txt
 - Full markdown dump: ${siteUrl}/llms-full.txt

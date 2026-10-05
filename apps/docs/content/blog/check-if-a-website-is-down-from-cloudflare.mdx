@@ -1,0 +1,149 @@
+---
+title: Check if a website is down from Cloudflare's network
+description: Build production-grade edge reachability checks on Cloudflare Workers - fetch timing, DNS pairing, cron alerts, error codes, and the Is It Down experiment.
+date: 2026-09-22
+updated: 2026-10-05
+readingMinutes: 18
+keywords:
+  - website down checker
+  - uptime from edge
+  - Cloudflare Workers fetch
+  - reachability API
+  - is it down
+  - edge monitoring
+  - Cron Triggers
+experiments:
+  - is-it-down
+  - response-headers
+  - url-dns-lookup
+  - uptime-monitor-alerts
+  - multi-pop-latency-map
+---
+
+When a site “looks down,” the truth often depends on **where you measure from**. Your laptop, a single VPS, and Cloudflare’s edge can all disagree. Probing from Cloudflare’s network gives a view closer to how many users reach origins through the edge - and it is straightforward to expose as a small [Worker](https://developers.cloudflare.com/workers/) API using the platform [Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/).
+
+This guide covers definitions of “down,” probe design, pairing diagnostics, scheduled alerts, and the [Is It Down](/docs/experiments/is-it-down) experiment you can deploy today.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [Workers](https://developers.cloudflare.com/workers/) | Timed probe API | Edge compute |
+| [Fetch](https://developers.cloudflare.com/workers/runtime-apis/fetch/) | Outbound HTTP from the edge | Runtime API |
+| [`request.cf`](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties) | Colo / network context for the probe itself | Request properties |
+| [Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/) | Scheduled uptime checks | Triggers |
+| [D1](https://developers.cloudflare.com/d1/) (optional) | Store check history | SQL |
+| [Email Workers / send_email](https://developers.cloudflare.com/email-routing/email-workers/send-email-workers/) | Alert delivery | Email |
+| [Radar](https://developers.cloudflare.com/radar/) (adjacent) | Broader internet health / ASN context | Radar API |
+
+## What “down” should mean
+
+Be explicit. For APIs and status tools, a useful definition is:
+
+- DNS resolves (optional separate check)
+- TCP/TLS succeeds
+- An HTTP response returns within a timeout
+- Optionally: status is not `5xx`
+
+A site can return `200` with a broken app, or `503` while intentionally in maintenance. Encode the policy in your JSON so clients do not guess.
+
+Example success payload:
+
+```json
+{
+  "url": "https://example.com",
+  "ok": true,
+  "status": 200,
+  "latencyMs": 142
+}
+```
+
+Document redirect policy: follow or not, and max hops. Open redirects and `file:` schemes must be rejected by URL validation.
+
+## Edge probe architecture
+
+```txt
+Client → Worker → timed fetch(url) → JSON { ok, status, latencyMs }
+```
+
+Worker responsibilities:
+
+1. Validate `url` (`http`/`https`) with a shared helper
+2. Time the request (performance marks or `Date.now()`)
+3. Catch network failures as structured errors (`FETCH_ERROR`)
+4. Never follow redirects into private or non-http(s) schemes
+5. Optionally attach probe colo from [`request.cf`](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties)
+
+Do **not** turn this into a full uptime SaaS on day one. Ship the probe, then add schedules and storage.
+
+## Pair diagnostics instead of one mega-endpoint
+
+When an origin fails, operators want more than a boolean. Compose focused Cloudflare-backed experiments:
+
+| Question | Experiment | Product angle |
+| --- | --- | --- |
+| Is it reachable? | [Is It Down](/docs/experiments/is-it-down) | Workers Fetch |
+| What headers came back? | [Response Headers](/docs/experiments/response-headers) | Fetch |
+| Does DNS look sane? | [URL DNS Lookup](/docs/experiments/url-dns-lookup) | DNS via Workers |
+| Cron + email alerts? | [Uptime Monitor Alerts](/docs/experiments/uptime-monitor-alerts) | [Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/) + [D1](https://developers.cloudflare.com/d1/) + email |
+| Multi-region latency? | [Multi-POP Latency Map](/docs/experiments/multi-pop-latency-map) | Workers across POPs |
+
+Wire them from a status page, chatops bot, or MCP tool. Each stays under ~60 seconds and single-purpose.
+
+## Scheduled monitoring with Cron Triggers
+
+[Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/) let a Worker run on a schedule without an external scheduler:
+
+```txt
+Cron → Worker scheduled handler → probe targets → write D1 → email on failure
+```
+
+That is the path [Uptime Monitor Alerts](/docs/experiments/uptime-monitor-alerts) demonstrates. Use the one-shot [Is It Down](/docs/experiments/is-it-down) API for ad-hoc checks and agent tools; use cron when you need history and pages.
+
+## Operational cautions
+
+- **Respect robots and ToS** for third-party targets; this is a diagnostic tool, not a scraper
+- **Rate-limit** public deployments - open probes get abused as free scanners
+- **Timeouts** beat hanging Workers; fail with `FETCH_ERROR`
+- **One colo ≠ global truth** - a single Worker invocation runs in one location; sample multiple regions if you need that story
+- **TLS and SNI** - some failures are certificate issues; pair with an SSL inspector experiment when needed
+
+## Error codes worth standardizing
+
+| Code | Meaning |
+| --- | --- |
+| `INVALID_URL` | Bad or missing URL |
+| `FETCH_ERROR` | Network / TLS / timeout |
+| `UNEXPECTED_STATUS` | Optional: non-2xx treated as down |
+
+Keep codes stable so dashboards and agents can branch without scraping English messages.
+
+## Deploy and verify
+
+1. Read [Workers Fetch](https://developers.cloudflare.com/workers/runtime-apis/fetch/) once for semantics (redirects, cf properties)
+2. Deploy [Is It Down](/docs/experiments/is-it-down)
+3. Call it with a known-good URL and a known-bad host
+4. Confirm JSON error codes for invalid input
+5. Graduate to [Uptime Monitor Alerts](/docs/experiments/uptime-monitor-alerts) when you need cron + history
+
+You get a tested reachability Worker with the same error conventions as the rest of the catalog - ready to embed in bigger monitoring flows built on Cloudflare products rather than a random VPS cron.
+## Production checklist
+
+1. Define “down” in writing (status codes, timeouts, redirect policy).
+2. Separate ad-hoc probes ([Is It Down](/docs/experiments/is-it-down)) from scheduled monitors ([Uptime Monitor Alerts](/docs/experiments/uptime-monitor-alerts) + [Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/)).
+3. Store history in [D1](https://developers.cloudflare.com/d1/) if humans need trends.
+4. Alert via email/webhook - avoid paging on single blips; require N failures.
+5. Rate-limit public probe APIs.
+6. Pair with DNS and header inspectors before declaring “origin broken.”
+
+## Multi-region truth
+
+A single Worker invocation sees one colo. If you need “down globally,” sample multiple regions or accept that your probe is “down from Cloudflare’s network in colo X.” Document that limitation next to the green/red badge.
+
+## FAQ
+
+### Is this a replacement for paid uptime SaaS?
+It is a building block. You own alerting, multi-region sampling, and SLAs. Many teams start here then graduate complexity only where needed.
+
+### Can I probe internal hosts?
+Only if the Worker can reach them (public internet or appropriately configured tunnels/services). Private RFC1918 targets usually fail from the public edge.

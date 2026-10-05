@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isMarkdownPreferred, rewritePath } from "fumadocs-core/negotiation";
 import { applyDiscoveryLinkHeaders } from "@/lib/discovery-links";
 import { markdownNotFoundResponse } from "@/lib/not-found-markdown";
-import { docsContentRoute, docsRoute, homeRoute, trustPagePaths } from "@/lib/shared";
+import { docsContentRoute, docsRoute, homeRoute, isTrustOrBlogPath } from "@/lib/shared";
 import {
   DOCS_CACHE_CONTROL,
   MARKDOWN_CACHE_CONTROL,
@@ -107,8 +107,8 @@ export default function proxy(request: NextRequest) {
       return rewriteMarkdown(request, "/llms.txt", { discoveryLinks: true });
     }
 
-    // Trust / developer HTML pages keep HTML even when Accept prefers markdown.
-    if ((trustPagePaths as readonly string[]).includes(pathname)) {
+    // Trust / developer / blog HTML pages keep HTML even when Accept prefers markdown.
+    if (isTrustOrBlogPath(pathname)) {
       const response = withSecurityHeaders(NextResponse.next());
       response.headers.set("Vary", "Accept");
       return response;

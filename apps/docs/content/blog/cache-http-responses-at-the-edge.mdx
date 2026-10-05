@@ -1,0 +1,115 @@
+---
+title: Cache HTTP responses at the edge with the Cache API
+description: Deep Workers Cache API guide - caches.default, cache keys, TTLs, vs CDN Cache Rules vs R2, HIT/MISS debugging, and the Edge Cache experiment.
+date: 2026-10-04
+updated: 2026-10-05
+readingMinutes: 18
+featured: true
+keywords:
+  - Workers Cache API
+  - edge caching
+  - Cloudflare cache HIT MISS
+  - caches.default
+  - HTTP caching Workers
+  - Cache Rules
+experiments:
+  - edge-cache
+  - r2-storage
+  - is-it-down
+  - screenshot-api
+---
+
+Not every response needs a fresh origin fetch. The **[Workers Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/)** (`caches.default`) lets you store `Response` objects at the edge with explicit cache keys - perfect for expensive GETs that are safe to reuse.
+
+The [Edge Cache](/docs/experiments/edge-cache) experiment demonstrates HIT/MISS behavior so you can see caching work before wiring it into production routes.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/) | Programmatic put/match in Workers | Runtime API |
+| [Workers](https://developers.cloudflare.com/workers/) | Decide what to cache | Runtime |
+| [Cache Rules](https://developers.cloudflare.com/cache/how-to/cache-rules/) | Zone-level CDN caching without code | CDN cache |
+| [Cache purge](https://developers.cloudflare.com/cache/how-to/purge-cache/) | Invalidate CDN/cache assets | Purge |
+| [R2](https://developers.cloudflare.com/r2/) | Durable object storage | Objects |
+| [KV](https://developers.cloudflare.com/kv/) | Tiny cached strings / flags | KV |
+
+## Cache API vs CDN cache vs R2
+
+| Tool | Role | When |
+| --- | --- | --- |
+| [Cache Rules](https://developers.cloudflare.com/cache/how-to/cache-rules/) / CDN cache | Cache based on URL + headers for zone traffic | Static assets, HTML at the zone |
+| **[Workers Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/)** | Programmatic put/match inside a Worker | Computed JSON, proxied APIs, custom keys |
+| [R2](https://developers.cloudflare.com/r2/) | Durable blobs | Screenshots, PDFs, long-lived artifacts |
+
+Use the Cache API when your Worker decides *what* to cache. Use Cache Rules when the zone can express the policy without custom code. Use R2 when you need durable objects, not a short TTL HTTP cache.
+
+See also: [How Cache works on Cloudflare](https://developers.cloudflare.com/cache/).
+
+## Minimal pattern
+
+```ts
+const cache = caches.default;
+const cacheKey = new Request(url, { method: "GET" });
+
+let response = await cache.match(cacheKey);
+if (response) {
+  return new Response(response.body, response);
+}
+
+const origin = await fetch(url);
+response = new Response(origin.body, origin);
+response.headers.set("Cache-Control", "s-maxage=60");
+ctx.waitUntil(cache.put(cacheKey, response.clone()));
+return response;
+```
+
+Details and caveats: [Cache · Workers](https://developers.cloudflare.com/workers/runtime-apis/cache/). The experiment surfaces HIT/MISS clearly so you can debug keys and TTLs without guessing.
+
+## Rules that prevent footguns
+
+1. **Only cache GET** (or idempotent reads you fully control)
+2. **Vary your cache key** on anything that changes the body (auth, locale, query)
+3. **Do not cache personalized private data** under a shared key
+4. **Set explicit TTLs** - accidental year-long caches hurt more than MISS latency
+5. **Purge strategy** - know how you will invalidate ([purge cache](https://developers.cloudflare.com/cache/how-to/purge-cache/) for CDN; key versioning for Cache API)
+6. **Clone responses** before put/return when bodies are one-shot streams
+
+## Pairing with other experiments
+
+| Scenario | Pattern |
+| --- | --- |
+| Cache proxied third-party JSON | [Edge Cache](/docs/experiments/edge-cache) |
+| Durable screenshot reuse | [Screenshot API](/docs/experiments/screenshot-api) + [R2](/docs/experiments/r2-storage) + optional Cache API |
+| Validate origin still up before caching | [Is It Down](/docs/experiments/is-it-down) |
+
+## Observability
+
+- Add `X-Cache: HIT|MISS` response headers in your Worker for browser DevTools
+- Log cache key hash + colo from [`request.cf`](https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties)
+- Alert on sudden MISS storms after deploys (often key-format changes)
+
+## Deploy Edge Cache
+
+1. Read [Workers Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/)
+2. Open [Edge Cache](/docs/experiments/edge-cache)
+3. Deploy and call the same URL twice
+4. Confirm HIT on the second request
+5. Change the cache key inputs and watch MISS return
+6. Port the helper into your proxy or API Worker
+7. Use [Cache Rules](https://developers.cloudflare.com/cache/how-to/cache-rules/) for pure static assets at the zone when code is unnecessary
+
+Caching is one of the highest-leverage edge features - this experiment makes HIT/MISS observable so you can ship it with confidence on Cloudflare’s Cache API.
+## Production checklist
+
+1. Cache only safe GETs.
+2. Include every body-affecting input in the cache key.
+3. Set explicit TTLs.
+4. Add `X-Cache: HIT|MISS` for debugging.
+5. Prefer [Cache Rules](https://developers.cloudflare.com/cache/how-to/cache-rules/) for static zone assets.
+6. Use [R2](https://developers.cloudflare.com/r2/) for durable artifacts, Cache API for short TTL HTTP responses.
+
+## FAQ
+
+### Why am I always missing?
+Key mismatch after deploys is the usual culprit - log the key hash. Also confirm you `clone()` before `put`.

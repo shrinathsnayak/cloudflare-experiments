@@ -23,6 +23,22 @@
   gap: 0.5rem;
 }
 
+/* Notebook auto-nav: put the sidebar collapse control on the left of the logo */
+#nd-sidebar > div:first-child > div.flex.justify-between {
+  justify-content: flex-start;
+  gap: 0.25rem;
+}
+
+#nd-sidebar > div:first-child > div.flex.justify-between > a {
+  order: 1;
+  min-width: 0;
+}
+
+#nd-sidebar > div:first-child > div.flex.justify-between > button {
+  order: 0;
+  margin-inline-end: 0.25rem;
+}
+
 /* Let the notebook nav title shrink so it truncates instead of wrapping on mobile */
 #nd-subnav [data-header-body] > div:first-child {
   min-width: 0;

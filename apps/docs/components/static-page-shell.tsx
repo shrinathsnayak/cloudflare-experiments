@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   aboutRoute,
   appName,
+  blogsRoute,
   brandProductName,
   contactRoute,
   developersRoute,
@@ -32,6 +33,9 @@ export function StaticPageShell({
       >
         <Link className="text-brand hover:underline" href={homeRoute}>
           Home
+        </Link>
+        <Link className="text-brand hover:underline" href={blogsRoute}>
+          Blog
         </Link>
         <Link className="text-brand hover:underline" href={docsRoute}>
           Docs

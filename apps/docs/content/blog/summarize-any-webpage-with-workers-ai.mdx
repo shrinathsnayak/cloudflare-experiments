@@ -1,0 +1,189 @@
+---
+title: Summarize any webpage with Workers AI
+description: Deep dive into edge URL summarization on Cloudflare - Workers AI models, fetch + extract, AI Gateway, prompts, errors, cost control, and the AI Website Summary experiment.
+date: 2026-09-18
+updated: 2026-10-05
+readingMinutes: 21
+featured: true
+keywords:
+  - Workers AI
+  - webpage summary
+  - Cloudflare AI
+  - edge LLM
+  - URL summarizer
+  - AI Gateway
+  - Workers AI models
+experiments:
+  - ai-website-summary
+  - ai-website-tag-generator
+  - rag-mini-search
+  - cloud-ai-proxy
+  - ai-gateway-dashboard
+  - browser-markdown-scrape
+---
+
+Support teams, research agents, and product features often need the **gist of a URL** without stuffing full HTML into a context window. A [Cloudflare Worker](https://developers.cloudflare.com/workers/) can fetch the page at the edge, extract readable text, and call **[Workers AI](https://developers.cloudflare.com/workers-ai/)** so retrieval and inference stay on Cloudflare’s network - no separate GPU box required.
+
+This post covers pipeline design, product choices ([AI Gateway](https://developers.cloudflare.com/ai-gateway/), embeddings, RAG), prompt and extraction quality, and the [AI Website Summary](/docs/experiments/ai-website-summary) experiment as a pasteable reference.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [Workers](https://developers.cloudflare.com/workers/) | Orchestrate fetch → extract → infer | Edge HTTP |
+| [Workers AI](https://developers.cloudflare.com/workers-ai/) | Text summarization models via `env.AI` | Models + binding |
+| [AI Gateway](https://developers.cloudflare.com/ai-gateway/) (optional) | Caching, analytics, provider routing | Gateway |
+| [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) | Cheap HTML extraction when static | Streaming parser |
+| [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) | JS-heavy pages before summarize | Headless Chrome |
+| [Vectorize](https://developers.cloudflare.com/vectorize/) | Next step: RAG over many docs | Vector DB |
+| [AI Search](https://developers.cloudflare.com/ai-search/) | Managed RAG alternative | Managed retrieval |
+
+## The minimal pipeline
+
+A reliable summarizer is four steps:
+
+1. **Validate** the URL (`http`/`https` only) - same discipline as other catalog APIs
+2. **Fetch** HTML with timeout and size cap ([Fetch API](https://developers.cloudflare.com/workers/runtime-apis/fetch/))
+3. **Extract** main text (strip nav, scripts, chrome)
+4. **Infer** with a Workers AI text model and return JSON
+
+```txt
+Client → Worker → fetch(url) → extract text → env.AI.run(model, …) → JSON
+```
+
+Keep the Worker under ~60 seconds end-to-end. Cap extracted characters so prompt size stays predictable and costs do not spike on pathological pages.
+
+## Why Workers AI fits this job
+
+From the [Workers AI docs](https://developers.cloudflare.com/workers-ai/):
+
+- **Colocated with fetch** - HTML retrieval and inference share the edge
+- **Binding-based** - `env.AI` avoids shipping long-lived provider keys for core Cloudflare models
+- **Composable** - same binding powers tags, translation, embeddings, speech, and image models elsewhere in the catalog
+
+When you outgrow “one model, one route,” look at:
+
+- [Cloud AI Proxy](/docs/experiments/cloud-ai-proxy) - generic model access patterns
+- [AI Gateway Dashboard](/docs/experiments/ai-gateway-dashboard) - cache/latency metadata through [AI Gateway](https://developers.cloudflare.com/ai-gateway/)
+- [Workers AI model catalog](https://developers.cloudflare.com/workers-ai/models/) - pick models by task and size
+
+## Designing the response contract
+
+Return structured JSON humans and agents can both consume:
+
+```json
+{
+  "url": "https://example.com/article",
+  "title": "Example article",
+  "summary": "…",
+  "model": "@cf/…"
+}
+```
+
+On failure, prefer stable codes aligned with the monorepo convention:
+
+| Code | When |
+| --- | --- |
+| `INVALID_URL` | Missing or non-http(s) URL |
+| `FETCH_ERROR` | Upstream fetch failed / timed out |
+| `EXTRACT_ERROR` | No usable text extracted |
+| `AI_ERROR` | Model binding / inference failed |
+
+Validate in the route, call lib helpers, return `jsonSuccess` / `jsonError`. Do not leak stack traces to clients.
+
+## Extraction quality matters more than model choice
+
+Garbage HTML in → vague summary out. Practical tips:
+
+- Prefer main-content heuristics over dumping `body` text
+- Drop `script`, `style`, `nav`, and footer blocks early ([HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) is ideal for streaming transforms)
+- Normalize whitespace; keep headings as soft section cues
+- If the page is JS-only, plain `fetch` misses the article - use [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) via [Browser Markdown Scrape](/docs/experiments/browser-markdown-scrape), then summarize the markdown
+
+For static marketing pages, [Metadata Extractor](/docs/experiments/website-metadata-extractor) may already give title + description without an LLM. Use Workers AI when you need a true synopsis, not just `og:description`.
+
+### Prompt sketch
+
+Keep prompts explicit and bounded:
+
+```txt
+Summarize the following webpage text in 5-8 sentences.
+Focus on facts; ignore navigation chrome.
+If the text is empty or unrelated to an article, say so.
+
+TEXT:
+…
+```
+
+Pin the model id in constants so rollouts are deliberate ([Workers AI models](https://developers.cloudflare.com/workers-ai/models/)).
+
+## AI Gateway: when to put it in front
+
+[AI Gateway](https://developers.cloudflare.com/ai-gateway/) adds:
+
+- Request analytics and error rates
+- Caching for identical prompts (great for repeated URLs)
+- Rate limiting and provider fallbacks in larger architectures
+
+For a single Workers AI binding on one experiment, Gateway is optional. For a product that fans out across models or teams, put Gateway early. The [AI Gateway Dashboard](/docs/experiments/ai-gateway-dashboard) experiment shows metadata you can surface in ops UIs.
+
+## From summary to a product surface
+
+Once summarization works, nearby experiments extend the same product family:
+
+| Goal | Experiment | Cloudflare product |
+| --- | --- | --- |
+| Topic tags for a URL | [AI Website Tag Generator](/docs/experiments/ai-website-tag-generator) | Workers AI |
+| Q&A over your corpus | [RAG Mini Search](/docs/experiments/rag-mini-search) | Workers AI + [Vectorize](https://developers.cloudflare.com/vectorize/) |
+| Managed RAG | [AI Search Demo](/docs/experiments/ai-search-demo) | [AI Search](https://developers.cloudflare.com/ai-search/) |
+| Generic model access | [Cloud AI Proxy](/docs/experiments/cloud-ai-proxy) | Workers AI |
+| Gateway observability | [AI Gateway Dashboard](/docs/experiments/ai-gateway-dashboard) | AI Gateway |
+
+A common product path: summarize → tag → embed → search. Each step stays a focused Worker you can deploy independently - matching the catalog’s single-responsibility rule.
+
+## Cost, latency, and safety
+
+- Cap input characters and max tokens
+- Cache summaries keyed by URL + content hash ([Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/) or [KV](https://developers.cloudflare.com/kv/))
+- Do not send secrets or private HTML to a model without a data policy
+- Rate-limit public endpoints; summarizers get abused as free proxies
+- Prefer allowlisted hosts for internal “summarize our docs” tools
+
+## Try the reference
+
+1. Skim [Workers AI get started](https://developers.cloudflare.com/workers-ai/get-started/workers-wrangler/)
+2. Open [AI Website Summary](/docs/experiments/ai-website-summary)
+3. Deploy with the button or `wrangler deploy` from `apps/experiments/ai-website-summary`
+4. Call the documented endpoint with a public article URL
+5. Inspect JSON summary and error paths
+6. Add AI Gateway, auth, or caching before production traffic
+
+You should have a working edge summarizer in minutes, then harden it for your traffic profile instead of starting from a blank AI template.
+## Production checklist
+
+1. Pin a model id from the [Workers AI model catalog](https://developers.cloudflare.com/workers-ai/models/).
+2. Cap extracted characters and max tokens.
+3. Cache by URL + content hash ([Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/) or [KV](https://developers.cloudflare.com/kv/)).
+4. Put [AI Gateway](https://developers.cloudflare.com/ai-gateway/) in front when you need analytics or cross-team controls.
+5. Escalate JS-heavy pages through [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) before summarize.
+6. Rate-limit and authenticate public summarizers.
+7. Log model, token estimates, and extract length - not raw private HTML.
+
+## Prompt and evaluation loop
+
+Ship with a golden set of 10–20 URLs (news, docs, SPA, empty page, paywall). For each, assert:
+
+- Summary is non-empty when extract succeeded
+- Refusal / clear message when extract failed
+- Latency under your SLO
+- No leakage of nav chrome phrases (“Accept cookies”, “Sign in”)
+
+Re-run the set when changing models or extractors.
+
+## FAQ
+
+### Which model should I pick?
+Start with a small instruct model for cost, then upgrade only if quality fails your golden set. See [Workers AI models](https://developers.cloudflare.com/workers-ai/models/).
+
+### Is Workers AI enough for RAG?
+Summarizing one URL is not RAG. For multi-doc Q&A use [Vectorize](https://developers.cloudflare.com/vectorize/) via [RAG Mini Search](/docs/experiments/rag-mini-search) or [AI Search](https://developers.cloudflare.com/ai-search/).

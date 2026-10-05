@@ -1,0 +1,118 @@
+---
+title: Background jobs at the edge with Cloudflare Queues
+description: Deep Cloudflare Queues guide - producers, consumers, retries, idempotency, vs Workflows, batch AI, and the Task Queue experiment.
+date: 2026-10-05
+updated: 2026-10-05
+readingMinutes: 20
+featured: true
+keywords:
+  - Cloudflare Queues
+  - background jobs Workers
+  - edge queue consumer
+  - async Worker tasks
+  - task queue example
+  - Cloudflare Workflows
+  - queue retries
+experiments:
+  - task-queue
+  - queue-job-visualizer
+  - ai-batch-infer
+  - event-pipeline
+  - workflows-pipeline-demo
+---
+
+Screenshot pipelines, bulk AI calls, and fan-out notifications should not block the user’s request. **[Cloudflare Queues](https://developers.cloudflare.com/queues/)** let a [Worker](https://developers.cloudflare.com/workers/) publish messages and a consumer process them asynchronously with retries - keeping the HTTP path under the catalog’s ~60 second guideline.
+
+Learn the wiring with [Task Queue](/docs/experiments/task-queue), then specialize.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [Queues](https://developers.cloudflare.com/queues/) | Durable message buffer between Workers | Product home |
+| [Queue producers](https://developers.cloudflare.com/queues/configuration/configure-queues/) | `env.QUEUE.send` | Config |
+| [Queue consumers](https://developers.cloudflare.com/queues/configuration/consumer/) | Batch handler Worker | Consumers |
+| [Workers](https://developers.cloudflare.com/workers/) | Produce + consume entrypoints | Runtime |
+| [Workflows](https://developers.cloudflare.com/workflows/) | Multi-step durable orchestration | Workflows |
+| [R2](https://developers.cloudflare.com/r2/) | Store large payloads by reference | Objects |
+| [Durable Objects](https://developers.cloudflare.com/durable-objects/) | Job dashboards / coordination | State |
+| [Workers AI](https://developers.cloudflare.com/workers-ai/) | Async inference consumers | AI |
+
+## Queues vs doing it inline vs Workflows
+
+| Work | Prefer | Docs |
+| --- | --- | --- |
+| Validate input + enqueue | Request Worker (producer) | [Queues](https://developers.cloudflare.com/queues/) |
+| Slow AI / scrape / email | Queue consumer | [Consumers](https://developers.cloudflare.com/queues/configuration/consumer/) |
+| Multi-step durable waits | **[Workflows](https://developers.cloudflare.com/workflows/)** | Workflows |
+| Sticky per-entity coordination | [Durable Objects](https://developers.cloudflare.com/durable-objects/) | DOs |
+
+If the user must wait for the result, stream or poll - do not hold the original request open for batch jobs. See also [Queues vs other products](https://developers.cloudflare.com/queues/) in Cloudflare’s docs for positioning.
+
+## Producer / consumer shape
+
+```txt
+HTTP POST /jobs → producer Worker → queue.send(message)
+                                      ↓
+                               consumer Worker batch handler
+                                      ↓
+                               R2 / D1 / webhook side effects
+```
+
+Official guides:
+
+- [Get started with Queues](https://developers.cloudflare.com/queues/get-started/)
+- [JavaScript APIs](https://developers.cloudflare.com/queues/configuration/javascript-apis/)
+
+Message schema tips:
+
+- Include a `jobId` and `createdAt`
+- Version the payload (`v: 1`)
+- Keep messages small; store blobs in [R2](https://developers.cloudflare.com/r2/) and pass keys
+- Design for **at-least-once** delivery ([delivery guarantees](https://developers.cloudflare.com/queues/reference/delivery-guarantees/))
+
+## Experiments that teach the ecosystem
+
+| Goal | Experiment | Product |
+| --- | --- | --- |
+| Basic producer/consumer | [Task Queue](/docs/experiments/task-queue) | Queues |
+| Inspect job flow with a DO view | [Queue Job Visualizer](/docs/experiments/queue-job-visualizer) | Queues + Durable Objects |
+| Async embeddings | [AI Batch Infer](/docs/experiments/ai-batch-infer) | Queues + Workers AI |
+| Broader event fan-in | [Event Pipeline](/docs/experiments/event-pipeline) | [Pipelines](https://developers.cloudflare.com/pipelines/) / R2 |
+| Multi-step orchestration | [Workflows Pipeline Demo](/docs/experiments/workflows-pipeline-demo) | [Workflows](https://developers.cloudflare.com/workflows/) |
+
+## Reliability checklist
+
+1. Make consumers **idempotent** - duplicates happen ([delivery guarantees](https://developers.cloudflare.com/queues/reference/delivery-guarantees/))
+2. Configure retries / dead-letter intentionally ([retries](https://developers.cloudflare.com/queues/configuration/batching-retries/))
+3. Log `jobId` end-to-end
+4. Separate “accept job” (`202`) from “job finished”
+5. Monitor lag; a silent consumer is worse than a failing HTTP route
+6. Bound batch sizes and concurrency to stay within Worker limits
+
+## Deploy Task Queue
+
+1. Read [Queues get started](https://developers.cloudflare.com/queues/get-started/)
+2. Open [Task Queue](/docs/experiments/task-queue)
+3. Deploy producer + consumer bindings
+4. Enqueue a few jobs from the documented route
+5. Watch the consumer drain them
+6. Map your payload onto the same wiring
+7. Consider [Workflows](https://developers.cloudflare.com/workflows/) when steps need durable waits
+
+You get a working async spine for edge apps - the difference between a demo API and something you can put behind a button that says “processing,” built on Cloudflare Queues rather than a self-hosted broker.
+## Production checklist
+
+1. Version message schemas.
+2. Keep payloads small; put blobs in [R2](https://developers.cloudflare.com/r2/).
+3. Make consumers idempotent ([delivery guarantees](https://developers.cloudflare.com/queues/reference/delivery-guarantees/)).
+4. Configure batch size, concurrency, and retries ([batching & retries](https://developers.cloudflare.com/queues/configuration/batching-retries/)).
+5. Separate accept (`202`) from completion.
+6. Prefer [Workflows](https://developers.cloudflare.com/workflows/) when steps need durable waits and branching.
+
+## FAQ
+
+### Queue vs Workflow vs Cron?
+- **Queue**: many independent messages
+- **Workflow**: multi-step durable process
+- **Cron**: time-based tick ([Cron Triggers](https://developers.cloudflare.com/workers/configuration/cron-triggers/))

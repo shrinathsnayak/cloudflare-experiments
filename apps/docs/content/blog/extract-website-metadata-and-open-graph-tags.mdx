@@ -1,0 +1,119 @@
+---
+title: Extract website metadata and Open Graph tags at the edge
+description: Deep HTMLRewriter guide for OG/meta extraction on Cloudflare Workers - vs Browser Rendering, JSON-LD, caching, link previews, and Metadata Extractor.
+date: 2026-10-03
+updated: 2026-10-05
+readingMinutes: 18
+keywords:
+  - Open Graph scraper
+  - metadata extractor
+  - HTMLRewriter
+  - og:title
+  - Cloudflare Workers scraping
+  - link preview API
+experiments:
+  - website-metadata-extractor
+  - website-to-api
+  - website-to-llms-txt
+  - html-rewriter
+  - json-ld-extractor
+  - screenshot-api
+---
+
+Link previews, SEO audits, and agent crawls often need **title, description, canonical, and Open Graph tags**. Fetching HTML and walking it with **[HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/)** on a [Worker](https://developers.cloudflare.com/workers/) is fast and cheaper than launching [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) for every URL.
+
+The [Metadata Extractor](/docs/experiments/website-metadata-extractor) experiment returns those fields as JSON with validated `http(s)` input.
+
+## Cloudflare products in this pattern
+
+| Product | Role | Docs |
+| --- | --- | --- |
+| [Workers](https://developers.cloudflare.com/workers/) | Fetch + API facade | Edge compute |
+| [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) | Streaming CSS-selector HTML parse | Runtime API |
+| [Fetch](https://developers.cloudflare.com/workers/runtime-apis/fetch/) | Retrieve origin HTML | Fetch |
+| [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) | Escalate when tags need JS | Headless Chrome |
+| [Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/) | Cache successful metadata JSON | Cache |
+| [KV](https://developers.cloudflare.com/kv/) / [R2](https://developers.cloudflare.com/r2/) | Longer-lived preview storage | Storage |
+
+## Fetch + rewrite vs headless Chrome
+
+| Approach | Best when | Product |
+| --- | --- | --- |
+| `fetch` + HTMLRewriter | Tags exist in initial HTML | [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) |
+| Browser Rendering | Tags injected only after JS | [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) |
+
+Most marketing sites and blogs still ship `og:*` in the first response. Start cheap; escalate only when fields are missing. Official HTMLRewriter guide: [HTMLRewriter · Workers](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/).
+
+## What to extract
+
+A practical metadata payload:
+
+- `title` - `<title>` or `og:title`
+- `description` - meta description or `og:description`
+- `canonical` - `rel=canonical` or `og:url`
+- `image` - `og:image`
+- `siteName` - `og:site_name`
+- Optional: Twitter card tags, theme color, robots meta
+
+Normalize absolute image URLs against the page origin. Truncate oversized descriptions for UI cards. Prefer UTF-8 decoding awareness for international sites.
+
+## HTMLRewriter sketch
+
+HTMLRewriter streams the response so you never buffer megabytes just to read a few tags:
+
+```ts
+rewriter.on('meta[property="og:title"]', {
+  element(el) {
+    title = el.getAttribute("content") ?? title;
+  },
+});
+```
+
+Handlers run as the HTML streams - see element handlers in the [HTMLRewriter docs](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/). The [HTML Rewriter](/docs/experiments/html-rewriter) experiment isolates the API itself if you want a smaller learning surface.
+
+## Compose richer page APIs
+
+| Goal | Experiment | Product |
+| --- | --- | --- |
+| Core OG/meta | [Metadata Extractor](/docs/experiments/website-metadata-extractor) | HTMLRewriter |
+| Broader structured JSON | [Website to API](/docs/experiments/website-to-api) | HTMLRewriter |
+| LLM-friendly export | [Website to llms.txt](/docs/experiments/website-to-llms-txt) | Fetch + parse |
+| JSON-LD entities | [JSON-LD Extractor](/docs/experiments/json-ld-extractor) | HTMLRewriter / JSON |
+| Visual fallback image | [Screenshot API](/docs/experiments/screenshot-api) | Browser Rendering |
+
+A link-preview product might call metadata first, then optionally screenshot when an image is missing.
+
+## Caching strategy
+
+Metadata for a URL is often stable for hours:
+
+1. Build a cache key from canonical URL
+2. `caches.default.match` ([Cache API](https://developers.cloudflare.com/workers/runtime-apis/cache/))
+3. On MISS, fetch + rewrite, then `put` with `s-maxage`
+4. For editorial previews, also store in [KV](https://developers.cloudflare.com/kv/) with explicit purge on publish webhooks
+
+## Deploy and compare
+
+1. Read [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/)
+2. Deploy [Metadata Extractor](/docs/experiments/website-metadata-extractor)
+3. Point it at a blog post and a JS-heavy SPA
+4. If SPA tags are empty, retry with Browser Rendering scrape / screenshot
+5. Cache successful payloads
+
+You get previews that stay cheap on the common path and only spend browser time when HTML is not enough - Workers as the vehicle, HTMLRewriter as the product capability.
+## Production checklist
+
+1. Validate URLs and block private destinations.
+2. Prefer [HTMLRewriter](https://developers.cloudflare.com/workers/runtime-apis/html-rewriter/) first; escalate to [Browser Rendering](https://developers.cloudflare.com/browser-rendering/) only on miss.
+3. Normalize absolute image URLs.
+4. Cache successful payloads.
+5. Respect robots/ToS for third-party targets.
+6. Store preview cards with explicit TTLs.
+
+## FAQ
+
+### Why is og:image empty on SPAs?
+Client-rendered meta tags never appear in the first HTML. Use Browser Rendering or ask the site for SSR.
+
+### JSON-LD instead of OG?
+Many sites expose Product/Article entities in JSON-LD - see [JSON-LD Extractor](/docs/experiments/json-ld-extractor). Use both when building rich previews.
