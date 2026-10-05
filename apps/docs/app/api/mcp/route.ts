@@ -1,5 +1,6 @@
 import { createMcpHandler, McpServer } from "@modelcontextprotocol/server";
 import { registerSearchTool, registerSourceTools } from "fumadocs-core/mcp";
+import { MCP_SERVER_INFO } from "@/lib/mcp-server-card";
 import { enforceApiRateLimit } from "@/lib/rate-limit";
 import { applySecurityHeaders } from "@/lib/security-headers";
 import { docsSearch } from "@/lib/search";
@@ -7,8 +8,8 @@ import { docsLlms, source } from "@/lib/source";
 
 const handler = createMcpHandler(() => {
   const mcp = new McpServer({
-    name: "cloudflare-experiments",
-    version: "1.0.0",
+    name: MCP_SERVER_INFO.name,
+    version: MCP_SERVER_INFO.version,
   });
 
   registerSourceTools(mcp, source, docsLlms);

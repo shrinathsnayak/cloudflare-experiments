@@ -1,6 +1,6 @@
 ---
 title: "Clef Decision (Jev-compatible)"
-description: "Jev / System One API-compatible decision model on Workers AI — Clef & Clef-Flash return probabilities for noul/choice questions without free-form text"
+description: "Jev / System One API-compatible decision model on Workers AI - Clef & Clef-Flash return probabilities for noul/choice questions without free-form text"
 tags:
   - ai
   - workers-ai
@@ -16,7 +16,7 @@ bindings:
 status: new
 ---
 
-**Clef** is Cloudflare's open-source **decision model** on Workers AI — in the same family as Typesafe's **Jev** / **System One** API. Instead of generating free-form text, it takes a state plus typed questions and returns a **probability for every allowed answer** so agents can act without parsing LLM prose.
+**Clef** is Cloudflare's open-source **decision model** on Workers AI - in the same family as Typesafe's **Jev** / **System One** API. Instead of generating free-form text, it takes a state plus typed questions and returns a **probability for every allowed answer** so agents can act without parsing LLM prose.
 
 This experiment is a deployable Worker reference for `@cf/cloudflare/clef` and `@cf/cloudflare/clef-flash`: post a state and `noul` (binary) or `choice` (multiple-choice) questions, get structured probabilities back. Existing Jev integrations can switch by changing the endpoint and model.
 
@@ -24,8 +24,8 @@ This experiment is a deployable Worker reference for `@cf/cloudflare/clef` and `
 
 - Jev / System One-style decision API on Workers AI (Clef and Clef-Flash)
 - Binary (`noul`) and multiple-choice (`choice`) questions with probability distributions
-- No free-form generation — bounded outputs agents can route on immediately
-- Stateless edge Worker — under ~60s, no storage required
+- No free-form generation - bounded outputs agents can route on immediately
+- Stateless edge Worker - under ~60s, no storage required
 - Pasteable `src/lib/decision.ts` core for your own project
 
 ## API Reference
@@ -107,8 +107,8 @@ curl -X POST https://clef-decision.example.workers.dev/decision \
 
 ## Use Cases
 
-- **Agent routing** — escalate, auto-resolve, or assign a ticket without a human in the loop
-- **Jev / System One alternative** — drop-in decision model on Workers AI with Clef or Clef-Flash
+- **Agent routing** - escalate, auto-resolve, or assign a ticket without a human in the loop
+- **Jev / System One alternative** - drop-in decision model on Workers AI with Clef or Clef-Flash
 - Support triage, invoice workflows, and security incident classification
 - Multi-step agent graphs that need bounded yes/no or choice probabilities
 - Fast edge decisions where LLM free-form text would be slow or hard to parse
@@ -119,7 +119,7 @@ curl -X POST https://clef-decision.example.workers.dev/decision \
 - Question complexity limited by model context window
 - Probability outputs are model-generated estimates, not guarantees
 - No persistent storage or decision history
-- Optimized for structured decision questions — not open-ended chat or free-form generation
+- Optimized for structured decision questions - not open-ended chat or free-form generation
 
 ## Use in your project
 

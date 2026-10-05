@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "rm -rf dist && vite build",
+    "build": "node scripts/generate-agent-skills.mjs && rm -rf dist && vite build",
     "preview": "npm run build && vite preview",
     "deploy": "npm run build && wrangler deploy",
     "deploy:version": "npm run build && wrangler versions upload",
-    "postinstall": "fumadocs-mdx && node scripts/generate-logo-data.mjs"
+    "postinstall": "fumadocs-mdx && node scripts/generate-logo-data.mjs && node scripts/generate-agent-skills.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.1.0",

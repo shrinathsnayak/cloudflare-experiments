@@ -1,5 +1,6 @@
 import { docsLlms, source } from "@/lib/source";
 import { isMarkdownPreferred } from "fumadocs-core/negotiation";
+import { apiCatalogLlmsLines } from "@/lib/api-catalog";
 import { markdownResponse } from "@/lib/markdown-response";
 import { appName, siteDescription, siteUrl } from "@/lib/shared";
 import { getExperimentCount } from "@/lib/catalog.server";
@@ -28,8 +29,12 @@ Browser Rendering, R2, D1, Queues, MCP, decision models (Clef / Jev-compatible),
 
 - Full markdown dump: ${siteUrl}/llms-full.txt
 - Per-page markdown: ${siteUrl}/llms.mdx/{slug}/content.md (also linked from each docs page)
-- Search API: ${siteUrl}/api/search?q={query}
+- Agent Skills discovery: ${siteUrl}/.well-known/agent-skills/index.json
 - Source monorepo: https://github.com/shrinathsnayak/cloudflare-experiments
+
+## Site APIs
+
+${apiCatalogLlmsLines(experimentCount)}
 
 ## Experiment catalog (${experimentPages.length})
 

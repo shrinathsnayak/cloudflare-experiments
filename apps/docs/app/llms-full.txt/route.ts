@@ -5,7 +5,7 @@ import { getExperimentCount } from "@/lib/catalog.server";
 
 export async function GET() {
   const experimentCount = getExperimentCount();
-  const preamble = `# ${appName} — full documentation
+  const preamble = `# ${appName} - full documentation
 
 > ${siteDescription(experimentCount)}
 

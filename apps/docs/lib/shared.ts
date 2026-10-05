@@ -11,7 +11,7 @@ export function siteTitle(experimentCount: number): string {
 }
 
 export function siteDescription(experimentCount: number): string {
-  return `${experimentCount} open-source Cloudflare Workers you can deploy in one click — pasteable reference implementations for Workers AI (including Clef decision models / Jev-compatible APIs), MCP, RAG, D1, R2, Durable Objects, Browser Rendering, and edge APIs. Built for developers and AI agents.`;
+  return `${experimentCount} open-source Cloudflare Workers you can deploy in one click - pasteable reference implementations for Workers AI (including Clef decision models / Jev-compatible APIs), MCP, RAG, D1, R2, Durable Objects, Browser Rendering, and edge APIs. Built for developers and AI agents.`;
 }
 
 export const themeColor = { light: "#ffffff", dark: "#0a0a0a" } as const;

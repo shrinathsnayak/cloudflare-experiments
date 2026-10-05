@@ -40,7 +40,15 @@ export function GET() {
   const blocks = [
     userAgentBlock("*", ["/"]),
     ...aiBots.map((bot) =>
-      userAgentBlock(bot, ["/", "/llms.txt", "/llms-full.txt", "/llms.mdx/", "/docs/"]),
+      userAgentBlock(bot, [
+        "/",
+        "/llms.txt",
+        "/llms-full.txt",
+        "/llms.mdx/",
+        "/docs/",
+        "/.well-known/",
+        "/openapi/",
+      ]),
     ),
   ];
 

@@ -11,7 +11,7 @@ export const viewport = rootViewport;
 /** First-party path; proxied to the Traks collector by the site Worker (not Next routes). */
 const traksScriptPath = "/t.js";
 
-/** Inlined at build time — must be set in Workers Builds vars (CI has no `.env.local`). */
+/** Inlined at build time - must be set in Workers Builds vars (CI has no `.env.local`). */
 const traksSite = process.env.NEXT_PUBLIC_TRAKS_SITE?.trim();
 
 export default function Layout({ children }: LayoutProps<"/">) {

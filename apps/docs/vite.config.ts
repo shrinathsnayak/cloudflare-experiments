@@ -38,7 +38,7 @@ function mergeOptimizeDepsExclude(packages: readonly string[]): Plugin {
  * Vinext's MDX proxy only treats plugins named `mdx` or `@mdx-js/rollup` as
  * "user MDX". Fumadocs registers `fumadocs-mdx*`, so without this stub vinext
  * throws on content MDX HMR: "Encountered MDX module … no MDX plugin".
- * No-op transform — fumadocs-mdx owns content under `content/docs`.
+ * No-op transform - fumadocs-mdx owns content under `content/docs`.
  */
 function vinextFumadocsMdxCompat(): Plugin {
   return { name: "mdx" };

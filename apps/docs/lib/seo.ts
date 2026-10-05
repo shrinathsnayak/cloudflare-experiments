@@ -178,7 +178,7 @@ export function createWebsiteJsonLd() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${siteUrl}/api/search?q={search_term_string}`,
+        urlTemplate: `${siteUrl}/api/search?query={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
